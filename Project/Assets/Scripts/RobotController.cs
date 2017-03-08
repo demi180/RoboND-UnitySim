@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RobotController : MonoBehaviour
+public class RobotController : IRobotController
 {
+	public override Vector3 GroundVelocity { get { return new Vector3 ( controller.velocity.x, 0, controller.velocity.z ); } }
+	public override Vector3 VerticalVelocity { get { return new Vector3 ( 0, controller.velocity.y, 0 ); } }
+	public override float SteerAngle { get { return robotBody.eulerAngles.y; } }
+	public override float Zoom { get { return cameraDefaultFOV / camera.fieldOfView; } }
+
 	public Transform robotBody;
 	public Transform cameraHAxis;
 	public Transform cameraVAxis;
@@ -17,31 +22,34 @@ public class RobotController : MonoBehaviour
 	public float cameraMaxAngle;
 	public float cameraMinFOV;
 	public float cameraMaxFOV;
+	public float cameraDefaultFOV = 60;
 
 	int curCamera;
 
 	void Awake ()
 	{
 		actualCamera.SetParent ( fpsPosition );
+		ResetZoom ();
 	}
 
-	public void Move (float speed)
+	public override void Move (float input)
 	{
-		controller.SimpleMove ( robotBody.forward * speed );
+		controller.SimpleMove ( robotBody.forward * input * moveSpeed );
 	}
 
-	public void Move (Vector3 direction)
+	public override void Move (Vector3 direction)
 	{
+		direction *= moveSpeed;
 		direction.y = Physics.gravity.y * Time.deltaTime;
 		controller.Move ( direction );
 	}
 
-	public void Rotate (float angle)
+	public override void Rotate (float angle)
 	{
-		robotBody.Rotate ( Vector3.up * angle );
+		robotBody.Rotate ( Vector3.up * angle * hRotateSpeed );
 	}
 
-	public void RotateCamera (float horizontal, float vertical)
+	public override void RotateCamera (float horizontal, float vertical)
 	{
 //		cameraHAxis.Rotate ( Vector3.up * horizontal, Space.World );
 //		cameraVAxis.Rotate ( Vector3.right * -vertical, Space.Self );
@@ -53,19 +61,19 @@ public class RobotController : MonoBehaviour
 		cameraVAxis.localEulerAngles = euler;
 	}
 
-	public void ZoomCamera (float amount)
+	public override void ZoomCamera (float amount)
 	{
-		camera.fieldOfView += amount;
+		camera.fieldOfView += amount * cameraZoomSpeed;
 		camera.fieldOfView = Mathf.Clamp ( camera.fieldOfView, cameraMinFOV, cameraMaxFOV );
 	}
 
-	public void ResetZoom ()
+	public override void ResetZoom ()
 	{
 		camera.fieldOfView = 60;
 //		camera.ResetFieldOfView ();
 	}
 
-	public void SwitchCamera ()
+	public override void SwitchCamera ()
 	{
 		if ( curCamera == 0 )
 		{
@@ -76,5 +84,10 @@ public class RobotController : MonoBehaviour
 			curCamera = 0;
 			actualCamera.SetParent ( fpsPosition, false );
 		}
+	}
+
+	public override Vector3 TransformDirection (Vector3 localDirection)
+	{
+		return robotBody.TransformDirection ( localDirection );
 	}
 }

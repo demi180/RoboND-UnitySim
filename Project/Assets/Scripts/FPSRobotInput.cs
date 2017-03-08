@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class FPSRobotInput : MonoBehaviour
 {
-	public RobotController controller;
+	public IRobotController controller;
 
-	public bool allowStrafe;
-	public float hRotateSpeed;
-	public float vRotateSpeed;
-	public float moveSpeed;
-	public float cameraZoomSpeed;
+//	public bool allowStrafe;
+//	public float hRotateSpeed;
+//	public float vRotateSpeed;
+//	public float moveSpeed;
+//	public float cameraZoomSpeed;
 
 	public bool controllable;
 
@@ -28,29 +28,30 @@ public class FPSRobotInput : MonoBehaviour
 			// check for rotation input
 			float mouseX = Input.GetAxis ( "Mouse X" );
 			float mouseY = Input.GetAxis ( "Mouse Y" );
-			controller.Rotate ( mouseX * hRotateSpeed * Time.deltaTime );
+			controller.Rotate ( mouseX * Time.deltaTime );
 			controller.RotateCamera ( 0, mouseY );
 
 			// check for camera zoom
 			float wheel = Input.GetAxis ( "Mouse ScrollWheel" );
 			if ( wheel != 0 )
-				controller.ZoomCamera ( -wheel * cameraZoomSpeed );
+				controller.ZoomCamera ( -wheel );
 
 			// check to reset zoom
 			if ( Input.GetMouseButtonDown ( 2 ) )
 				controller.ResetZoom ();
 
 			// check for movement input
-			if ( allowStrafe )
+			if ( controller.allowStrafe )
 			{
-				Vector3 move = new Vector3 ( Input.GetAxis ( "Horizontal" ), 0, Input.GetAxis ( "Vertical" ) ) * moveSpeed * Time.deltaTime;
-				move = controller.robotBody.TransformDirection ( move );
+				Vector3 move = new Vector3 ( Input.GetAxis ( "Horizontal" ), 0, Input.GetAxis ( "Vertical" ) ) * Time.deltaTime;
+				move = controller.TransformDirection ( move );
+//				move = controller.robotBody.TransformDirection ( move );
 				controller.Move ( move );
 				
 			} else
 			{
 				float forward = Input.GetAxis ( "Vertical" );
-				controller.Move ( forward * moveSpeed );
+				controller.Move ( forward );
 			}
 
 			// check for camera switch key
@@ -63,6 +64,8 @@ public class FPSRobotInput : MonoBehaviour
 				controllable = false;
 				Cursor.lockState = CursorLockMode.None;
 				Cursor.visible = true;
+				controller.Move ( 0 );
+				controller.Rotate ( 0 );
 				return;
 			}
 		}
