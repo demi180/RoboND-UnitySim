@@ -5,14 +5,9 @@ using UnityEngine;
 public class FPSRobotInput : MonoBehaviour
 {
 	public IRobotController controller;
-
-//	public bool allowStrafe;
-//	public float hRotateSpeed;
-//	public float vRotateSpeed;
-//	public float moveSpeed;
-//	public float cameraZoomSpeed;
-
 	public bool controllable;
+
+	RaycastHit rayHit;
 
 	void Start ()
 	{
@@ -68,6 +63,9 @@ public class FPSRobotInput : MonoBehaviour
 				controller.Rotate ( 0 );
 				return;
 			}
+
+//			Ray ray = controller.camera
+//			Physics.Raycast (  )
 		}
 		// check for focus input
 		if ( Input.GetMouseButtonDown ( 0 ) )
