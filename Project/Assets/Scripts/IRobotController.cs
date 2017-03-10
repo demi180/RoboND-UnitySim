@@ -16,8 +16,12 @@ public abstract class IRobotController : MonoBehaviour
 	public abstract Vector3 TransformDirection (Vector3 localDirection);
 
 	public bool allowStrafe;
+	public bool allowSprint;
+	public bool allowJump;
 	public float hRotateSpeed = 90;
 	public float vRotateSpeed = 90;
 	public float moveSpeed = 5;
+	public float sprintMultiplier = 2;
 	public float cameraZoomSpeed = 20;
+	public float maxSlope = 50;
 }

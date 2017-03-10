@@ -17,6 +17,9 @@ public class WalkerController : IRobotController
 	public Transform actualCamera;
 	public Camera camera;
 	public CharacterController controller;
+	public Rigidbody rigidbody;
+	public Animator animator;
+	public Collider bodyCollider;
 
 	public float cameraMinAngle;
 	public float cameraMaxAngle;
@@ -24,7 +27,16 @@ public class WalkerController : IRobotController
 	public float cameraMaxFOV;
 	public float cameraDefaultFOV = 60;
 
+	public PhysicMaterial idleMaterial;
+	public PhysicMaterial movingMaterial;
+	public LayerMask collisionMask;
+
+	[SerializeField]
+	float slopeAngle;
+	float moveInput;
 	int curCamera;
+	[SerializeField]
+	bool isFacingSlope;
 
 	void Awake ()
 	{
@@ -32,9 +44,42 @@ public class WalkerController : IRobotController
 		ResetZoom ();
 	}
 
+	void Update ()
+	{
+		// check for slope angle ahead
+		Vector3 kneePoint = robotBody.position + Vector3.up * 0.4f;
+		float rayDistance = 1;
+//		Ray ray = new Ray ( kneePoint, Vector3.down );
+		Ray ray = new Ray ( kneePoint, ( robotBody.forward * Mathf.Sign ( moveInput ) - Vector3.up ).normalized );
+		RaycastHit hit;
+		if ( Physics.Raycast ( ray, out hit, rayDistance, 1 << collisionMask.value ) )
+		{
+			slopeAngle = Vector3.Angle ( hit.normal, Vector3.up );
+			if ( slopeAngle >= maxSlope )
+				isFacingSlope = true;
+			else
+				isFacingSlope = false;
+
+		} else
+		{
+			isFacingSlope = false;
+			slopeAngle = 0;
+		}
+		Debug.DrawLine ( ray.origin, ray.origin + ray.direction * rayDistance, Color.red );
+
+		if ( isFacingSlope )
+			animator.applyRootMotion = false;
+		else
+			animator.applyRootMotion = true;
+//			moveInput = 0;
+		animator.SetFloat ( "Vertical", moveInput );
+		bodyCollider.material = moveInput == 0 ? idleMaterial : movingMaterial;
+	}
+
 	public override void Move (float input)
 	{
-		controller.SimpleMove ( robotBody.forward * input * moveSpeed );
+//		controller.SimpleMove ( robotBody.forward * input * moveSpeed );
+		moveInput = input;
 	}
 
 	public override void Move (Vector3 direction)

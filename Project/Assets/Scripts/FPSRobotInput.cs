@@ -46,6 +46,12 @@ public class FPSRobotInput : MonoBehaviour
 			} else
 			{
 				float forward = Input.GetAxis ( "Vertical" );
+				if ( controller.allowSprint )
+				{
+//					if ( Input.GetButton ( "Sprint" ) )
+						
+						forward *= Mathf.Lerp ( 1, controller.sprintMultiplier, Input.GetAxis ( "Sprint" ) );
+				}
 				controller.Move ( forward );
 			}
 
