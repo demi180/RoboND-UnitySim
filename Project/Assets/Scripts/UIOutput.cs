@@ -10,6 +10,20 @@ public class UIOutput : MonoBehaviour
 
 	System.Text.StringBuilder sb = new System.Text.StringBuilder ();
 
+	void Start ()
+	{
+		if ( infoText == null )
+		{
+			enabled = false;
+			return;
+		}
+//		infoText.gameObject.SetActive ( false );
+//		infoText.gameObject.SetActive ( true );
+		infoText.text = "";
+		infoText.transform.parent.gameObject.SetActive ( false );
+		infoText.transform.parent.gameObject.SetActive ( true );
+	}
+
 	void Update ()
 	{
 		if ( infoText == null )
@@ -17,12 +31,17 @@ public class UIOutput : MonoBehaviour
 		
 		sb.Length = 0;
 		sb.Capacity = 16;
-		float speed = controller.GroundVelocity.magnitude;
+		float speed = controller.Speed;
 		float steer = controller.SteerAngle;
+		float vAngle = controller.VerticalAngle;
+		float throttle = controller.ThrottleInput;
 
+		sb.Append ( "Throttle: " + throttle.ToString ( "F1" ) + "\n" );
+		sb.Append ( "Steer angle: " + steer.ToString ( "F4" ) + "\n" );
+		sb.Append ( "Vertical angle: " + vAngle.ToString ( "F4" ) + "\n" );
 		sb.Append ( "Ground speed: " + speed.ToString ( "F1" ) + "m/s\n" );
-		sb.Append ( "Steer angle: " + steer.ToString ( "F1" ) + "\n" );
-		sb.Append ( "Camera zoom: " + controller.Zoom.ToString ( "F1" ) + "x" );
+		sb.Append ( "Camera zoom: " + controller.Zoom.ToString ( "F1" ) + "x\n" );
+		sb.Append ( "Is near objective: " + ( controller.IsNearObjective ? "Yes" : "No" ) );
 		infoText.text = sb.ToString ();
 
 	}

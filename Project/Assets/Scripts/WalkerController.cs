@@ -4,22 +4,24 @@ using UnityEngine;
 
 public class WalkerController : IRobotController
 {
-	public override Vector3 GroundVelocity { get { return new Vector3 ( controller.velocity.x, 0, controller.velocity.z ); } }
-	public override Vector3 VerticalVelocity { get { return new Vector3 ( 0, controller.velocity.y, 0 ); } }
-	public override float SteerAngle { get { return robotBody.eulerAngles.y; } }
+//	public override Vector3 GroundVelocity { get { return animator.velocity; } }
+//	public override Vector3 GroundVelocity { get { return new Vector3 ( animator.velocity.x, 0, animator.velocity.z ); } }
+//	public override Vector3 VerticalVelocity { get { return new Vector3 ( 0, animator.velocity.y, 0 ); } }
+//	public override float SteerAngle { get { return lastSteerAngle; } }
 	public override float Zoom { get { return cameraDefaultFOV / camera.fieldOfView; } }
 
-	public Transform robotBody;
-	public Transform cameraHAxis;
-	public Transform cameraVAxis;
-	public Transform fpsPosition;
-	public Transform tpsPosition;
-	public Transform actualCamera;
-	public Camera camera;
+//	public Transform robotBody;
+//	public Transform cameraHAxis;
+//	public Transform cameraVAxis;
+//	public Transform fpsPosition;
+//	public Transform tpsPosition;
+//	public Transform actualCamera;
+//	public Camera camera;
 	public CharacterController controller;
 	public Rigidbody rigidbody;
 	public Animator animator;
 	public Collider bodyCollider;
+	public Transform head;
 
 	public float cameraMinAngle;
 	public float cameraMaxAngle;
@@ -31,12 +33,17 @@ public class WalkerController : IRobotController
 	public PhysicMaterial movingMaterial;
 	public LayerMask collisionMask;
 
+//	float lastSteerAngle;
 	[SerializeField]
 	float slopeAngle;
 	float moveInput;
 	int curCamera;
 	[SerializeField]
 	bool isFacingSlope;
+
+	Vector3 point1, point2;
+	float radius;
+	bool isPickingUp;
 
 	void Awake ()
 	{
@@ -65,19 +72,47 @@ public class WalkerController : IRobotController
 			isFacingSlope = false;
 			slopeAngle = 0;
 		}
-		Debug.DrawLine ( ray.origin, ray.origin + ray.direction * rayDistance, Color.red );
+//		Debug.DrawLine ( ray.origin, ray.origin + ray.direction * rayDistance, Color.red );
 
 		if ( isFacingSlope )
 			animator.applyRootMotion = false;
 		else
 			animator.applyRootMotion = true;
-//			moveInput = 0;
 		animator.SetFloat ( "Vertical", moveInput );
 		bodyCollider.material = moveInput == 0 ? idleMaterial : movingMaterial;
+
+		if ( !isPickingUp )
+		{
+			// check for objectives. only if not already picking one up
+			// start by building a capsule of the player's size
+			CapsuleCollider c = (CapsuleCollider) bodyCollider;
+			radius = c.radius;
+			point1 = robotBody.position + robotBody.forward + Vector3.up * radius;
+			point2 = point1 + Vector3.up * ( c.height - radius * 2 );
+			// then check for a capsule ahead of the player.
+			Collider[] objectives = Physics.OverlapCapsule ( point1, point2, radius, objectiveMask );
+			if ( objectives != null && objectives.Length > 0 )
+			{
+				IsNearObjective = true;
+				curObjective = objectives [ 0 ].gameObject;
+				if ( objectives.Length > 1 )
+					Debug.Log ( "Near " + objectives.Length + " objectives." );
+			} else
+			{
+				IsNearObjective = false;
+				curObjective = null;
+			}
+			Speed = new Vector3 ( animator.velocity.x, 0, animator.velocity.z ).magnitude;
+		} else
+		{
+			Speed = 0;
+		}
+
 	}
 
 	public override void Move (float input)
 	{
+		ThrottleInput = input;
 //		controller.SimpleMove ( robotBody.forward * input * moveSpeed );
 		moveInput = input;
 	}
@@ -91,13 +126,15 @@ public class WalkerController : IRobotController
 
 	public override void Rotate (float angle)
 	{
-		robotBody.Rotate ( Vector3.up * angle * hRotateSpeed );
+		SteerAngle = angle;
+		robotBody.Rotate ( Vector3.up * angle );
 	}
 
 	public override void RotateCamera (float horizontal, float vertical)
 	{
-		//		cameraHAxis.Rotate ( Vector3.up * horizontal, Space.World );
-		//		cameraVAxis.Rotate ( Vector3.right * -vertical, Space.Self );
+//		cameraHAxis.Rotate ( Vector3.up * horizontal, Space.World );
+//		cameraVAxis.Rotate ( Vector3.right * -vertical, Space.Self );
+		VerticalAngle = vertical;
 		Vector3 euler = cameraVAxis.localEulerAngles;
 		euler.x -= vertical;
 		if ( euler.x > 270 )
@@ -127,7 +164,10 @@ public class WalkerController : IRobotController
 		} else
 		{
 			curCamera = 0;
-			actualCamera.SetParent ( fpsPosition, false );
+			if ( isPickingUp )
+				actualCamera.SetParent ( head, false );
+			else
+				actualCamera.SetParent ( fpsPosition, false );
 		}
 	}
 
@@ -135,4 +175,45 @@ public class WalkerController : IRobotController
 	{
 		return robotBody.TransformDirection ( localDirection );
 	}
+
+	public override void PickupObjective ()
+	{
+		if ( !IsNearObjective || curObjective == null )
+			return;
+
+		isPickingUp = true;
+		animator.SetTrigger ( "Pickup" );
+		animator.SetIKPosition ( AvatarIKGoal.LeftHand, curObjective.transform.position );
+		animator.SetIKPositionWeight ( AvatarIKGoal.LeftHand, 1 );
+		if ( curCamera == 0 )
+		{
+			actualCamera.SetParent ( head, false );
+		}
+	}
+
+	public void OnPickup ()
+	{
+		Destroy ( curObjective );
+		curObjective = null;
+		IsNearObjective = false;
+		animator.SetIKPositionWeight ( AvatarIKGoal.LeftHand, 0 );
+		isPickingUp = false;
+		if ( curCamera == 0 )
+			actualCamera.SetParent ( fpsPosition, false );
+	}
+
+	#if UNITY_EDITOR
+	void OnDrawGizmosSelected ()
+	{
+		if ( UnityEditor.SceneView.currentDrawingSceneView == null || UnityEditor.SceneView.currentDrawingSceneView.camera == null )
+			return;
+		
+		Gizmos.color = Color.red;
+		Gizmos.DrawWireSphere ( point1, radius );
+		Gizmos.DrawWireSphere ( point2, radius );
+		Vector3 camRight = UnityEditor.SceneView.currentDrawingSceneView.camera.transform.right;
+		Gizmos.DrawLine ( point1 + camRight * radius, point2 + camRight * radius );
+		Gizmos.DrawLine ( point1 - camRight * radius, point2 - camRight * radius );
+	}
+	#endif
 }

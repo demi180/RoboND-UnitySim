@@ -5,18 +5,18 @@ using UnityStandardAssets.ImageEffects ;
 
 public class RoverController : IRobotController
 {
-	public override Vector3 GroundVelocity { get { return new Vector3 ( rb.velocity.x, 0, rb.velocity.z ); } }
-	public override Vector3 VerticalVelocity { get { return new Vector3 ( 0, rb.velocity.y, 0 ); } }
-	public override float SteerAngle { get { return lastAngle; } }
+	Vector3 GroundVelocity { get { return new Vector3 ( rb.velocity.x, 0, rb.velocity.z ); } }
+	Vector3 VerticalVelocity { get { return new Vector3 ( 0, rb.velocity.y, 0 ); } }
+//	public override float SteerAngle { get { return lastAngle; } }
 	public override float Zoom { get { return cameraDefaultFOV / camera.fieldOfView; } }
 
-	public Transform robotBody;
-	public Transform cameraHAxis;
-	public Transform cameraVAxis;
-	public Transform fpsPosition;
-	public Transform tpsPosition;
-	public Transform actualCamera;
-	public Camera camera;
+//	public Transform robotBody;
+//	public Transform cameraHAxis;
+//	public Transform cameraVAxis;
+//	public Transform fpsPosition;
+//	public Transform tpsPosition;
+//	public Transform actualCamera;
+//	public Camera camera;
 	public Rigidbody rb;
 	public WheelCollider[] wheels;
 //	public WheelCollider wheels[0];
@@ -108,10 +108,13 @@ public class RoverController : IRobotController
 //			rb.AddRelativeTorque ( Vector3.up * lastAngle );
 //		else
 //			rb.angularVelocity = Vector3.zero;
+
+		Speed = new Vector3 ( rb.velocity.x, 0, rb.velocity.z ).magnitude;
 	}
 
 	public override void Move (float input)
 	{
+		ThrottleInput = input;
 		lastMoveInput = input * moveSpeed;
 		isMotorInput = input != 0;
 	}
@@ -124,10 +127,11 @@ public class RoverController : IRobotController
 
 	public override void Rotate (float angle)
 	{
+		SteerAngle = angle;
 		if ( angle != 0 )
 		{
 			lastSteerTime = Time.time;
-			lastAngle += angle * hRotateSpeed;
+			lastAngle += angle;
 			lastAngle = Mathf.Clamp ( lastAngle, -maxSteering, maxSteering );
 			isSteeringInput = true;
 

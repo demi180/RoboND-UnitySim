@@ -189,7 +189,8 @@ ModelImporter:
     animationPositionError: 0.5
     animationScaleError: 0.5
     animationWrapMode: 0
-    extraExposedTransformPaths: []
+    extraExposedTransformPaths:
+    - Player/hips/spine/chest/neck/head
     clipAnimations: []
     isReadable: 1
   meshes:

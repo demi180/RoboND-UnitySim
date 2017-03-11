@@ -4,26 +4,39 @@ using UnityEngine;
 
 public class FPSRobotInput : MonoBehaviour
 {
+	public bool DisableFocus { get; set; }
+
 	public IRobotController controller;
 	public bool controllable;
+
+
 
 	RaycastHit rayHit;
 
 	void Start ()
 	{
 		Cursor.lockState = CursorLockMode.Locked;
-		controllable = true;
+//		controllable = true;
 	}
 
 	void LateUpdate ()
-	{	
+	{
+		// check for close app
+		if ( Input.GetKeyDown ( KeyCode.F12 ) )
+		{
+			Application.Quit ();
+		}
+
+		if ( DisableFocus )
+			return;
+		
 		// check if we're not focused on our robot
 		if ( controllable )
 		{
 			// check for rotation input
 			float mouseX = Input.GetAxis ( "Mouse X" );
 			float mouseY = Input.GetAxis ( "Mouse Y" );
-			controller.Rotate ( mouseX * Time.deltaTime );
+			controller.Rotate ( mouseX * Time.deltaTime * controller.hRotateSpeed );
 			controller.RotateCamera ( 0, mouseY );
 
 			// check for camera zoom
@@ -62,11 +75,7 @@ public class FPSRobotInput : MonoBehaviour
 			// check for unfocus input
 			if ( Input.GetKeyDown ( KeyCode.Escape ) )
 			{
-				controllable = false;
-				Cursor.lockState = CursorLockMode.None;
-				Cursor.visible = true;
-				controller.Move ( 0 );
-				controller.Rotate ( 0 );
+				Unfocus ();
 				return;
 			}
 
@@ -76,14 +85,27 @@ public class FPSRobotInput : MonoBehaviour
 		// check for focus input
 		if ( Input.GetMouseButtonDown ( 0 ) )
 		{
-			Cursor.lockState = CursorLockMode.Locked;
-			controllable = true;
-		}
+			if ( controllable && controller.IsNearObjective )
+			{
+				controller.PickupObjective ();
+			}
 
-		// check for close app
-		if ( Input.GetKeyDown ( KeyCode.F12 ) )
-		{
-			Application.Quit ();
+			Focus ();
 		}
+	}
+
+	public void Focus ()
+	{
+		Cursor.lockState = CursorLockMode.Locked;
+		controllable = true;
+	}
+
+	public void Unfocus ()
+	{
+		controllable = false;
+		Cursor.lockState = CursorLockMode.None;
+		Cursor.visible = true;
+		controller.Move ( 0 );
+		controller.Rotate ( 0 );
 	}
 }
