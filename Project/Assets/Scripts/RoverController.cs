@@ -61,11 +61,15 @@ public class RoverController : IRobotController
 
 	void FixedUpdate ()
 	{
-		if ( Time.time - lastSteerTime > 0.2f )
+		if ( !isSteeringInput )
 		{
-			lastAngle = Mathf.MoveTowards ( lastAngle, 0, antiSteeringForce * Time.deltaTime );
-			isSteeringInput = false;
+			lastAngle = 0;
 		}
+//		if ( Time.time - lastSteerTime > 0.2f )
+//		{
+//			lastAngle = Mathf.MoveTowards ( lastAngle, 0, antiSteeringForce * Time.deltaTime );
+//			isSteeringInput = false;
+//		}
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -73,7 +77,10 @@ public class RoverController : IRobotController
 			Vector3 position;
 			wheels[i].GetWorldPose(out position, out quat);
 			wheelMeshes[i].transform.position = position;
-			wheelMeshes [ i ].transform.rotation = quat * localRotations [ i ];
+//			if ( isSteeringInput && !isMotorInput )
+//				wheelMeshes [ i ].transform.rotation = Quaternion.LookRotation ( robotBody.forward, Vector3.up );
+//			else
+				wheelMeshes [ i ].transform.rotation = quat * localRotations [ i ];
 		}
 
 		if ( isMotorInput )
@@ -84,11 +91,21 @@ public class RoverController : IRobotController
 
 		} else
 		{
-			wheels[0].brakeTorque = wheels[1].brakeTorque = wheels[2].brakeTorque = wheels[3].brakeTorque = brakeTorque;
-			wheels[0].motorTorque = wheels[1].motorTorque = wheels[2].motorTorque = wheels[3].motorTorque = 0;
+			if ( isSteeringInput )
+			{
+				wheels [ 0 ].motorTorque = wheels [ 1 ].motorTorque = -motorTorque * moveSpeed / 2;
+				wheels [ 2 ].motorTorque = wheels [ 3 ].motorTorque = -motorTorque * moveSpeed / 2;
+//				wheels[0].motorTorque = wheels[1].motorTorque = wheels[2].motorTorque = wheels[3].motorTorque = -motorTorque * speed;
+				wheels[0].brakeTorque = wheels[1].brakeTorque = wheels[2].brakeTorque = wheels[3].brakeTorque = 0;
+				
+			} else
+			{
+				wheels[0].brakeTorque = wheels[1].brakeTorque = wheels[2].brakeTorque = wheels[3].brakeTorque = brakeTorque;
+				wheels[0].motorTorque = wheels[1].motorTorque = wheels[2].motorTorque = wheels[3].motorTorque = 0;
+			}
 		}
 
-		float speedPercent = GroundVelocity.sqrMagnitude / moveSpeed * moveSpeed;
+		float speedPercent = GroundVelocity.sqrMagnitude;// / moveSpeed * moveSpeed;
 		rb.AddForce ( -robotBody.up * downForce * speedPercent );
 		if ( GroundVelocity.magnitude > moveSpeed )
 		{
@@ -97,19 +114,35 @@ public class RoverController : IRobotController
 			velo += VerticalVelocity;
 			rb.velocity = velo;
 		}
-		wheels[0].steerAngle = wheels[1].steerAngle = lastAngle;
-		if ( GroundVelocity.sqrMagnitude < 0.1f )
-			wheels[2].steerAngle = wheels[3].steerAngle = -lastAngle;
-		else
-			wheels[2].steerAngle = wheels[3].steerAngle = 0;
 
-		if ( isSteeringInput && GroundVelocity.sqrMagnitude < 0.1f )
-			robotBody.Rotate ( robotBody.up * lastAngle * Time.deltaTime );
+
+		if ( isSteeringInput && !isMotorInput )
+//		if ( GroundVelocity.sqrMagnitude < 0.1f )
+		{
+			wheels [ 0 ].steerAngle = wheels [ 1 ].steerAngle = lastAngle * 2; //  45 * Mathf.Sign ( lastAngle );
+			wheels [ 2 ].steerAngle = wheels [ 3 ].steerAngle = -lastAngle * 2; // -45 * Mathf.Sign ( lastAngle );
+			
+		} else
+		{
+			wheels[0].steerAngle = wheels[1].steerAngle = lastAngle;
+			wheels[2].steerAngle = wheels[3].steerAngle = 0;
+		}
+
+//		if ( isSteeringInput && GroundVelocity.sqrMagnitude < 0.1f )
+//			robotBody.Rotate ( robotBody.up * lastAngle * Time.deltaTime );
 //			rb.AddRelativeTorque ( Vector3.up * lastAngle );
 //		else
 //			rb.angularVelocity = Vector3.zero;
 
 		Speed = new Vector3 ( rb.velocity.x, 0, rb.velocity.z ).magnitude;
+//		isSteeringInput = false;
+	}
+
+	void LateUpdate ()
+	{
+		isSteeringInput = false;
+		lastAngle = 0;
+		SteerAngle = 0;
 	}
 
 	public override void Move (float input)
@@ -127,16 +160,21 @@ public class RoverController : IRobotController
 
 	public override void Rotate (float angle)
 	{
-		SteerAngle = angle;
+		SteerAngle = angle * maxSteering;
 		if ( angle != 0 )
 		{
 			lastSteerTime = Time.time;
-			lastAngle += angle;
+			lastAngle = angle * hRotateSpeed;
+//			lastAngle += angle;
+//			lastAngle = Mathf.Clamp ( lastAngle, -hRotateSpeed, hRotateSpeed );
 			lastAngle = Mathf.Clamp ( lastAngle, -maxSteering, maxSteering );
 			isSteeringInput = true;
 
 		} else
 		{
+			lastAngle = 0;
+			SteerAngle = 0;
+			isSteeringInput = false;
 //			if ( Time.time - lastSteerTime > 0.2f )
 //			{
 //				lastAngle = Mathf.MoveTowards ( lastAngle, 0, antiSteeringForce * Time.deltaTime );

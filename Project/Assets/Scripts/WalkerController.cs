@@ -126,8 +126,8 @@ public class WalkerController : IRobotController
 
 	public override void Rotate (float angle)
 	{
-		SteerAngle = angle;
-		robotBody.Rotate ( Vector3.up * angle );
+		SteerAngle = angle * hRotateSpeed;
+		robotBody.Rotate ( Vector3.up * SteerAngle * Time.deltaTime );
 	}
 
 	public override void RotateCamera (float horizontal, float vertical)
