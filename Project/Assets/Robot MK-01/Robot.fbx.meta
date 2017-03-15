@@ -191,6 +191,8 @@ ModelImporter:
     animationWrapMode: 0
     extraExposedTransformPaths:
     - Player/hips/spine/chest/neck/head
+    - Player/hips/thigh.L/shin.L/foot.L
+    - Player/hips/thigh.R/shin.R/foot.R
     clipAnimations: []
     isReadable: 1
   meshes:

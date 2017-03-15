@@ -32,6 +32,9 @@ public class WalkerController : IRobotController
 	public PhysicMaterial idleMaterial;
 	public PhysicMaterial movingMaterial;
 	public LayerMask collisionMask;
+	public GameObject footprint;
+	public Transform[] feet;
+	public int maxFootprints = 50;
 
 //	float lastSteerAngle;
 	[SerializeField]
@@ -45,10 +48,15 @@ public class WalkerController : IRobotController
 	float radius;
 	bool isPickingUp;
 
+	Queue<GameObject> footprints;
+	Transform footprintParent;
+
 	void Awake ()
 	{
 		actualCamera.SetParent ( fpsPosition );
 		ResetZoom ();
+		footprints = new Queue<GameObject> ();
+		footprintParent = new GameObject ( "Footprints" ).transform;
 	}
 
 	void Update ()
@@ -107,7 +115,8 @@ public class WalkerController : IRobotController
 		{
 			Speed = 0;
 		}
-
+		ThrottleInput = 0;
+		moveInput = 0;
 	}
 
 	public override void Move (float input)
@@ -201,6 +210,67 @@ public class WalkerController : IRobotController
 		if ( curCamera == 0 )
 			actualCamera.SetParent ( fpsPosition, false );
 	}
+
+	public void OnFootDown (int footID)
+	{
+		OnFootDown ( footID, feet [ footID ] );
+	}
+
+	public void OnFootDown (int footID, Transform foot)
+	{
+		GameObject footprintInstance = Instantiate ( footprint, foot.position, Quaternion.identity );
+		if ( footID == 1 )
+		{
+			Vector3 scale = footprintInstance.transform.localScale;
+			scale.x *= -1;
+			footprintInstance.transform.localScale = scale;
+		}
+		Vector3 forward = Vector3.ProjectOnPlane ( foot.forward, Vector3.up ).normalized;
+		footprintInstance.transform.rotation = Quaternion.LookRotation ( forward, Vector3.up );
+		Vector3 position = footprintInstance.transform.position;
+		position.y += 0.01f;
+		footprintInstance.transform.position = position;
+		footprintInstance.transform.parent = footprintParent;
+
+//		RaycastHit hit;
+//		Physics.Raycast ( footprintInstance.transform.position, Vector3.down, out hit );
+//		Vector3 position = hit.point;
+//		position.y += 0.01f;
+//		footprintInstance.transform.position = position;
+//		footprintInstance.transform.rotation = Quaternion.LookRotation ( footprintInstance.transform.forward, hit.normal );
+		footprints.Enqueue ( footprintInstance );
+		if ( footprints.Count > maxFootprints )
+		{
+			GameObject oldestFootprint = footprints.Dequeue ();
+			Destroy ( oldestFootprint );
+		}
+	}
+
+//	public void OnFootDown (AnimationEvent footEvent)
+//	{
+//		if ( footEvent != null )
+//		{
+//			GameObject go = (GameObject) footEvent.objectReferenceParameter;
+//			GameObject footprintInstance = Instantiate ( footprint, go.transform.position, go.transform.rotation );
+//			if ( footEvent.intParameter == 0 )
+//			{
+//				Debug.Log ( "Left foot down at " + ( (GameObject) footEvent.objectReferenceParameter ).transform.position );
+//
+//			} else
+//			{
+//				Debug.Log ( "Right foot down at " + ( (GameObject) footEvent.objectReferenceParameter ).transform.position );
+//				Vector3 scale = footprintInstance.transform.localScale;
+//				scale.x *= -1;
+//				footprintInstance.transform.localScale = scale;
+//			}
+//			footprints.Enqueue ( footprintInstance );
+//			if ( footprints.Count > 100 )
+//			{
+//				GameObject oldestFootprint = footprints.Dequeue ();
+//				Destroy ( oldestFootprint );
+//			}
+//		}
+//	}
 
 	#if UNITY_EDITOR
 	void OnDrawGizmosSelected ()

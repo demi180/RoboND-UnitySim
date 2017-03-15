@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class ObjectiveSpawner : MonoBehaviour
 {
 	public GameObject[] prefabs;
-	public GameObject[] objectives;
+	GameObject[] objectives;
 	public int spawnCount;
 	public Color[] colors;
 
@@ -13,12 +13,16 @@ public class ObjectiveSpawner : MonoBehaviour
 
 	void Start ()
 	{
+		int count = transform.childCount;
 		if ( spawnCount == 0 )
-			spawnCount = Random.Range ( 1, objectives.Length );
-		
+			spawnCount = Random.Range ( 1, count );
+
+
+		objectives = new GameObject [ count ];
 		List<int> indices = new List<int> ();
-		for ( int i = 0; i < objectives.Length; i++ )
+		for ( int i = 0; i < count; i++ )
 		{
+			objectives [ i ] = transform.GetChild ( i ).gameObject;
 			indices.Add ( i );
 			GameObject go = Instantiate ( prefabs [ Random.Range ( 0, prefabs.Length ) ] );
 			go.transform.position = objectives [ i ].transform.position; // - Vector3.up * go.GetComponent<Collider> ().bounds.extents.y;
