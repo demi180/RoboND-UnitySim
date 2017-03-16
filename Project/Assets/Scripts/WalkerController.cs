@@ -50,6 +50,7 @@ public class WalkerController : IRobotController
 
 	Queue<GameObject> footprints;
 	Transform footprintParent;
+	System.Action<GameObject> pickupCallback;
 
 	void Awake ()
 	{
@@ -94,7 +95,7 @@ public class WalkerController : IRobotController
 			// check for objectives. only if not already picking one up
 			// start by building a capsule of the player's size
 			CapsuleCollider c = (CapsuleCollider) bodyCollider;
-			radius = c.radius;
+			radius = 0.5f;
 			point1 = robotBody.position + robotBody.forward + Vector3.up * radius;
 			point2 = point1 + Vector3.up * ( c.height - radius * 2 );
 			// then check for a capsule ahead of the player.
@@ -185,11 +186,12 @@ public class WalkerController : IRobotController
 		return robotBody.TransformDirection ( localDirection );
 	}
 
-	public override void PickupObjective ()
+	public override void PickupObjective (System.Action<GameObject> onPickup)
 	{
 		if ( !IsNearObjective || curObjective == null )
 			return;
 
+		pickupCallback = onPickup;
 		isPickingUp = true;
 		animator.SetTrigger ( "Pickup" );
 		animator.SetIKPosition ( AvatarIKGoal.LeftHand, curObjective.transform.position );
@@ -202,7 +204,10 @@ public class WalkerController : IRobotController
 
 	public void OnPickup ()
 	{
-		Destroy ( curObjective );
+		if ( pickupCallback != null )
+			pickupCallback ( curObjective );
+		else
+			Destroy ( curObjective );
 		curObjective = null;
 		IsNearObjective = false;
 		animator.SetIKPositionWeight ( AvatarIKGoal.LeftHand, 0 );

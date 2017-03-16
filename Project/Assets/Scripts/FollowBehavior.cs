@@ -7,6 +7,7 @@ public class FollowBehavior : MonoBehaviour
 	public IRobotController thisRobot;
 	public IRobotController followTarget;
 	public float minFollowDistance = 3;
+	public float breakingDistance = 3.5f;
 
 	Transform followTransform;
 	Transform thisTransform;
@@ -58,9 +59,11 @@ public class FollowBehavior : MonoBehaviour
 
 //			if ( localTargetPos.z > 0 )
 			if ( distance > 10 )
-				thisRobot.Move ( 2 * ( 1 - angleRatio ) );
+				thisRobot.Move ( ( distance + 1 - 10 ) * ( 1 - angleRatio ) ); // lerp walk to run speed
 			else
-				thisRobot.Move ( 1 - angleRatio );
+//				if ( distance <= breakingDistance )
+				thisRobot.Move ( Mathf.Clamp01 ( Mathf.InverseLerp ( minFollowDistance, breakingDistance, distance ) ) - angleRatio );
+//				thisRobot.Move ( 1 - angleRatio );
 //			else
 //			if ( localTargetPos.z < 0 )
 //				thisRobot.Move ( -1 );
@@ -76,6 +79,7 @@ public class FollowBehavior : MonoBehaviour
 		}
 	}
 
+	#if UNITY_EDITOR
 	void OnDrawGizmosSelected ()
 	{
 		if ( !Application.isPlaying || !enabled )
@@ -86,4 +90,5 @@ public class FollowBehavior : MonoBehaviour
 		Gizmos.color = Color.red;
 		Gizmos.DrawRay ( pos, targetGizmo );
 	}
+	#endif
 }

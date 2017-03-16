@@ -27,6 +27,7 @@ public class ObjectiveSpawner : MonoBehaviour
 			GameObject go = Instantiate ( prefabs [ Random.Range ( 0, prefabs.Length ) ] );
 			go.transform.position = objectives [ i ].transform.position; // - Vector3.up * go.GetComponent<Collider> ().bounds.extents.y;
 			go.transform.rotation = Quaternion.Euler ( new Vector3 ( 0, Random.Range ( 0f, 360f ), 0 ) );
+			go.transform.SetParent ( transform );
 			Destroy ( objectives [ i ] );
 			objectives [ i ] = go;
 			go.SetActive ( false );

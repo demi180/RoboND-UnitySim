@@ -25,7 +25,8 @@ public abstract class IRobotController : MonoBehaviour
 	public abstract void ResetZoom ();
 	public abstract void SwitchCamera ();
 	public abstract Vector3 TransformDirection (Vector3 localDirection);
-	public virtual void PickupObjective () {}
+	public virtual void PickupObjective (System.Action<GameObject> onPickup) {}
+	public virtual void CarryObjective (GameObject objective) { Destroy ( objective ); }
 
 	public Transform robotBody;
 	public Transform cameraHAxis;

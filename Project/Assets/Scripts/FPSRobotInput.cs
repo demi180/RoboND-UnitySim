@@ -7,6 +7,7 @@ public class FPSRobotInput : MonoBehaviour
 	public bool DisableFocus { get; set; }
 
 	public IRobotController controller;
+	public IRobotController follower;
 	public bool controllable;
 
 
@@ -15,7 +16,7 @@ public class FPSRobotInput : MonoBehaviour
 
 	void Start ()
 	{
-		Cursor.lockState = CursorLockMode.Locked;
+//		Cursor.lockState = CursorLockMode.Locked;
 //		controllable = true;
 	}
 
@@ -91,7 +92,7 @@ public class FPSRobotInput : MonoBehaviour
 		{
 			if ( controllable && controller.IsNearObjective )
 			{
-				controller.PickupObjective ();
+				controller.PickupObjective ( OnPickedUpObjective );
 			}
 
 			Focus ();
@@ -111,5 +112,10 @@ public class FPSRobotInput : MonoBehaviour
 		Cursor.visible = true;
 		controller.Move ( 0 );
 		controller.Rotate ( 0 );
+	}
+
+	void OnPickedUpObjective (GameObject objective)
+	{
+		follower.CarryObjective ( objective );
 	}
 }

@@ -17,6 +17,7 @@ public class RoverController : IRobotController
 //	public Transform tpsPosition;
 //	public Transform actualCamera;
 //	public Camera camera;
+	public Transform flatbed;
 	public Rigidbody rb;
 	public WheelCollider[] wheels;
 //	public WheelCollider wheels[0];
@@ -46,6 +47,7 @@ public class RoverController : IRobotController
 	[SerializeField]
 	float lastAngle;
 	float lastSteerTime;
+	float lastSteerInput;
 
 	bool isMotorInput;
 	bool isSteeringInput;
@@ -65,6 +67,7 @@ public class RoverController : IRobotController
 		if ( !isSteeringInput )
 		{
 			lastAngle = 0;
+			lastSteerInput = 0;
 		}
 //		if ( Time.time - lastSteerTime > 0.2f )
 //		{
@@ -94,11 +97,13 @@ public class RoverController : IRobotController
 		{
 			if ( isSteeringInput )
 			{
-				
+				wheels [ 0 ].motorTorque = wheels [ 1 ].motorTorque = Mathf.Abs ( lastSteerInput ) * acceleration * motorTorque * 2;
+				wheels [ 2 ].motorTorque = wheels [ 3 ].motorTorque = Mathf.Abs ( lastSteerInput ) * acceleration * motorTorque * 2;
+
 //				wheels [ 0 ].motorTorque = wheels [ 1 ].motorTorque = -motorTorque * moveSpeed / 2;
 //				wheels [ 2 ].motorTorque = wheels [ 3 ].motorTorque = -motorTorque * moveSpeed / 2;
 //				wheels[0].motorTorque = wheels[1].motorTorque = wheels[2].motorTorque = wheels[3].motorTorque = -motorTorque * speed;
-//				wheels[0].brakeTorque = wheels[1].brakeTorque = wheels[2].brakeTorque = wheels[3].brakeTorque = 0;
+				wheels[0].brakeTorque = wheels[1].brakeTorque = wheels[2].brakeTorque = wheels[3].brakeTorque = 0;
 				
 			} else
 			{
@@ -122,8 +127,8 @@ public class RoverController : IRobotController
 		if ( isSteeringInput && !isMotorInput )
 //		if ( GroundVelocity.sqrMagnitude < 0.1f )
 		{
-			wheels [ 0 ].steerAngle = wheels [ 1 ].steerAngle = -lastAngle * 2; //  45 * Mathf.Sign ( lastAngle );
-			wheels [ 2 ].steerAngle = wheels [ 3 ].steerAngle = lastAngle * 2; // -45 * Mathf.Sign ( lastAngle );
+			wheels [ 0 ].steerAngle = wheels [ 1 ].steerAngle = lastAngle * 2; //  45 * Mathf.Sign ( lastAngle );
+			wheels [ 2 ].steerAngle = wheels [ 3 ].steerAngle = -lastAngle * 2; // -45 * Mathf.Sign ( lastAngle );
 			
 		} else
 		{
@@ -149,6 +154,7 @@ public class RoverController : IRobotController
 		ThrottleInput = 0;
 		isMotorInput = false;
 		lastMoveInput = 0;
+		lastSteerInput = 0;
 	}
 
 	public override void Move (float input)
@@ -169,6 +175,7 @@ public class RoverController : IRobotController
 		SteerAngle = angle * maxSteering;
 		if ( angle != 0 )
 		{
+			lastSteerInput = angle;
 			lastSteerTime = Time.time;
 			lastAngle = angle * maxSteering;
 //			lastAngle += angle;
@@ -235,5 +242,19 @@ public class RoverController : IRobotController
 	public override Vector3 TransformDirection (Vector3 localDirection)
 	{
 		return robotBody.TransformDirection ( localDirection );
+	}
+
+	public override void CarryObjective (GameObject objective)
+	{
+		if ( objective == null )
+			return;
+		objective.transform.rotation = flatbed.rotation;
+//		BoxCollider c = flatbed.GetComponent<BoxCollider> ();
+		Vector3 size = flatbed.localScale;
+		Vector3 rand = flatbed.forward * Random.Range ( -size.z, size.z ) + flatbed.right * Random.Range ( -size.x, size.x );
+//		Vector3 rand = new Vector3 ( Random.Range ( -size.x, size.x ) * flatbed.localScale.x, 0, Random.Range ( -size.z, size.z ) * flatbed.localScale.z );
+		objective.transform.position = flatbed.position + rand;
+		Destroy ( objective.GetComponent<Collider> () );
+		objective.transform.parent = flatbed;
 	}
 }
