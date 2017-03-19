@@ -251,31 +251,10 @@ public class WalkerController : IRobotController
 		}
 	}
 
-//	public void OnFootDown (AnimationEvent footEvent)
-//	{
-//		if ( footEvent != null )
-//		{
-//			GameObject go = (GameObject) footEvent.objectReferenceParameter;
-//			GameObject footprintInstance = Instantiate ( footprint, go.transform.position, go.transform.rotation );
-//			if ( footEvent.intParameter == 0 )
-//			{
-//				Debug.Log ( "Left foot down at " + ( (GameObject) footEvent.objectReferenceParameter ).transform.position );
-//
-//			} else
-//			{
-//				Debug.Log ( "Right foot down at " + ( (GameObject) footEvent.objectReferenceParameter ).transform.position );
-//				Vector3 scale = footprintInstance.transform.localScale;
-//				scale.x *= -1;
-//				footprintInstance.transform.localScale = scale;
-//			}
-//			footprints.Enqueue ( footprintInstance );
-//			if ( footprints.Count > 100 )
-//			{
-//				GameObject oldestFootprint = footprints.Dequeue ();
-//				Destroy ( oldestFootprint );
-//			}
-//		}
-//	}
+	void OnAnimatorIK (int layerIndex)
+	{
+		Debug.Log ( "OAK called " + layerIndex );
+	}
 
 	#if UNITY_EDITOR
 	void OnDrawGizmosSelected ()

@@ -129,15 +129,15 @@ public class TireTracks : MonoBehaviour
 	}
 
 	#if UNITY_EDITOR
-	void OnDrawGizmosSelected ()
-	{
-		if ( UnityEditor.SceneView.currentDrawingSceneView == null || UnityEditor.SceneView.currentDrawingSceneView.camera == null )
-			return;
-		
-		Gizmos.color = Color.blue;
-		Gizmos.DrawRay ( transform.position, forward );
-		Gizmos.color = Color.red;
-		Gizmos.DrawRay ( transform.position, transform.right );
-	}
+//	void OnDrawGizmosSelected ()
+//	{
+//		if ( UnityEditor.SceneView.currentDrawingSceneView == null || UnityEditor.SceneView.currentDrawingSceneView.camera == null )
+//			return;
+//		
+//		Gizmos.color = Color.blue;
+//		Gizmos.DrawRay ( transform.position, forward );
+//		Gizmos.color = Color.red;
+//		Gizmos.DrawRay ( transform.position, transform.right );
+//	}
 	#endif
 }

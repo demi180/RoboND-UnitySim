@@ -6,7 +6,6 @@ public class Menu : MonoBehaviour
 {
 	public Canvas canvas;
 	public FPSRobotInput playerInput;
-	public IRobotController[] allRobots;
 
 	public GameObject socketObject;
 	public GameObject serverObject;
@@ -40,14 +39,6 @@ public class Menu : MonoBehaviour
 
 			playerInput.DisableFocus = false;
 			playerInput.Focus ();
-			
-//			foreach ( IRobotController robot in allRobots )
-//			{
-//				FollowBehavior follow = robot.GetComponent<FollowBehavior> ();
-//				if ( follow != null )
-//					follow.enabled = false;
-//			}
-
 			remoteControl.enabled = false;
 		}
 
@@ -58,14 +49,6 @@ public class Menu : MonoBehaviour
 			serverObject.SetActive ( true );
 
 			playerInput.controllable = false;
-
-//			foreach ( IRobotController robot in allRobots )
-//			{
-//				FollowBehavior follow = robot.GetComponent<FollowBehavior> ();
-//				if ( follow != null )
-//					follow.enabled = true;
-//			}
-
 			remoteControl.enabled = true;
 		}
 

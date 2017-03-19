@@ -37,12 +37,12 @@ public class FPSRobotInput : MonoBehaviour
 			// check for rotation input
 			float mouseX = Input.GetAxis ( "Mouse X" );
 			float mouseY = Input.GetAxis ( "Mouse Y" );
-			if ( mouseX != 0 )
-				controller.Rotate ( mouseX );
+//			if ( mouseX != 0 )
+//				controller.Rotate ( mouseX );
 			if ( Input.GetAxis ( "Horizontal" ) != 0 )
 				controller.Rotate ( Input.GetAxis ( "Horizontal" ) );
 //			controller.Rotate ( mouseX * Time.deltaTime * controller.hRotateSpeed );
-			controller.RotateCamera ( 0, mouseY );
+			controller.RotateCamera ( mouseX, mouseY );
 
 			// check for camera zoom
 			float wheel = Input.GetAxis ( "Mouse ScrollWheel" );
