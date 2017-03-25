@@ -20,7 +20,7 @@ public class CommandServer : MonoBehaviour
 		_socket.On("steer", OnSteer);
 		_socket.On("manual", onManual);
 		robotController = robotRemoteControl.robot;
-		frontFacingCamera = robotController.camera;
+		frontFacingCamera = robotController.recordingCam;
 	}
 
 	void OnOpen(SocketIOEvent obj)

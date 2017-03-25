@@ -17,6 +17,7 @@ public class RoverController : IRobotController
 	public Transform robotArmShoulder;
 	public Transform robotGrabPoint;
 	public SphereCollider cameraCollider;
+	public RobotArmActuator armActuator;
 
 	public float cameraMinAngle;
 	public float cameraMaxAngle;
@@ -64,6 +65,14 @@ public class RoverController : IRobotController
 		inverseShoulder = Quaternion.Inverse ( robotArmShoulder.rotation );
 		storedShoulder = robotArmShoulder.rotation;
 		ResetZoom ();
+
+		armActuator.onArrive = OnPickup;
+		armAnimator.enabled = false;
+	}
+
+	void Start ()
+	{
+		armActuator.Fold ();
 	}
 
 	void FixedUpdate ()
@@ -222,7 +231,7 @@ public class RoverController : IRobotController
 //		isTurningInPlace = false;
 	}
 
-	void LateUpdate ()
+/*	void LateUpdate ()
 	{
 		if ( isPickingUp )
 		{
@@ -246,7 +255,7 @@ public class RoverController : IRobotController
 				}
 			}
 		}
-	}
+	}*/
 
 	public override void Move (float input)
 	{
@@ -295,6 +304,10 @@ public class RoverController : IRobotController
 		{
 			tpsPosition.RotateAround ( robotBody.position, Vector3.up, horizontal );
 			tpsPosition.RotateAround ( robotBody.position, tpsPosition.right, -vertical );
+			Vector3 euler = tpsPosition.localEulerAngles;
+			euler.z = 0;
+//			euler.y = euler.z = 0;
+			tpsPosition.localEulerAngles = euler;
 		}
 
 	}
@@ -346,6 +359,7 @@ public class RoverController : IRobotController
 		rb.isKinematic = true;
 		pickupCallback = onPickup;
 		isPickingUp = true;
+//		Time.timeScale = 0.2f;
 		StartCoroutine ( DoPickup () );
 //		armAnimator.SetTrigger ( "Pickup" );
 	}
@@ -353,26 +367,36 @@ public class RoverController : IRobotController
 	IEnumerator DoPickup ()
 	{
 		grabbingObject = false;
-		armAnimator.enabled = false;
-		yield return StartCoroutine ( RotateTo ( curObjective.transform.position ) );
-		armAnimator.enabled = true;
-		armAnimator.SetTrigger ( "Pickup" );
+//		armAnimator.enabled = false;
+		armActuator.SetTarget ( curObjective.transform.position );
+		armActuator.Unfold ( true );
+//		armActuator.MoveToTarget ();
+//		yield return StartCoroutine ( RotateTo ( curObjective.transform.position ) );
+//		armAnimator.enabled = true;
+//		armAnimator.SetTrigger ( "Pickup" );
 		while ( !grabbingObject )
 			yield return null;
 		IsNearObjective = false;
 		Vector3 rand = GetPositionOnFlatbed ();
-		armAnimator.enabled = false;
-		yield return StartCoroutine ( RotateTo ( rand ) );
+//		armAnimator.enabled = false;
+//		armActuator.SetTarget ( rand );
+//		armActuator.MoveToTarget ();
+		armActuator.MoveTarget ( rand );
+		while ( grabbingObject )
+			yield return null;
+//		yield return StartCoroutine ( RotateTo ( rand ) );
 //		curObjective.transform.rotation = Quaternion.identity;
-		curObjective.transform.parent = flatbed;
+		curObjective.transform.parent = robotBody;
 		curObjective.transform.position = rand;
-		armAnimator.enabled = true;
+//		armAnimator.enabled = true;
 		grabbingObject = false;
 		isPickingUp = false;
 		rb.isKinematic = false;
+		armActuator.Fold ( true );
+//		Time.timeScale = 1;
 	}
 
-	IEnumerator RotateTo (Vector3 targetPosition)
+/*	IEnumerator RotateTo (Vector3 targetPosition)
 	{
 		yield return null;
 		Vector3 toTarget = targetPosition - robotArmShoulder.position;
@@ -383,13 +407,10 @@ public class RoverController : IRobotController
 		while ( Quaternion.Angle ( robotArmShoulder.rotation, targetRot ) > 0.1f )
 		{
 			robotArmShoulder.rotation = Quaternion.RotateTowards ( robotArmShoulder.rotation, targetRot, 50 * Time.deltaTime );
-//			Debug.DrawLine ( robotArmShoulder.position, robotArmShoulder.position + toTarget, Color.blue );
-//			Debug.DrawLine ( robotArmShoulder.position, robotArmShoulder.position + robotArmShoulder.forward, Color.red );
-//			Debug.Log ( "rotating" );
 			yield return null;
 		}
 		robotArmShoulder.rotation = targetRot;
-	}
+	}*/
 
 	public void OnPickup ()
 	{
@@ -401,7 +422,8 @@ public class RoverController : IRobotController
 //		IsNearObjective = false;
 		curObjective.transform.position = robotGrabPoint.position;
 		curObjective.transform.parent = robotGrabPoint;
-		grabbingObject = true;
+		grabbingObject = !grabbingObject;
+//		grabbingObject = true;
 //		isPickingUp = false;
 //		if ( curCamera == 0 )
 //			actualCamera.SetParent ( fpsPosition, false );
@@ -413,8 +435,14 @@ public class RoverController : IRobotController
 		c.enabled = false;
 		curObjective.transform.rotation = flatbed.rotation;
 		BoxCollider b = flatbed.GetComponent<BoxCollider> ();
-		Vector3 size = flatbed.rotation * flatbed.localScale / 2;
-		Vector3 rand = flatbed.forward * Random.Range ( -size.z, size.z ) + flatbed.right * Random.Range ( -size.x, size.x );
+		Vector3 size = flatbed.rotation * flatbed.localScale;// / 2;
+		Debug.DrawLine ( flatbed.position, flatbed.position - size/2, Color.green, 5 );
+		Debug.DrawLine ( flatbed.position, flatbed.position + size/2, Color.green, 5 );
+		size.z /= 3;
+		size.x /= 2;
+		Vector3 rand = -flatbed.forward * flatbed.localScale.z * 1 / 6 + flatbed.forward * Random.Range ( -size.z, size.z ) + flatbed.right * Random.Range ( -size.x, size.x );
+//		Vector3 rand = flatbed.forward * Random.Range ( -size.z, size.z ) + flatbed.right * Random.Range ( -size.x, size.x );
+
 		return flatbed.position + rand;
 	}
 

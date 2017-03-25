@@ -14,31 +14,35 @@ public class RobotRemoteControl : MonoBehaviour
 
 	void Awake ()
 	{
+		useFixedUpdate = robot.GetType () == typeof (RoverController);
 		if ( manualInput.controllable )
 		{
 			enabled = false;
 			return;
 		}
-		useFixedUpdate = robot.GetType () == typeof (RoverController);
 	}
 
-	void Lateupdate ()
+	void LateUpdate ()
 	{
-		if ( !useFixedUpdate )
-		{
-			robot.Move ( ThrottleInput );
-			robot.Rotate ( SteeringAngle );
+//		if ( !useFixedUpdate )
+//		{
+			float throttle = ThrottleInput;
+			float steer = SteeringAngle;
+			robot.Move ( throttle );
+			robot.Rotate ( steer );
 			robot.RotateCamera ( 0, VerticalAngle );
-		}
+//		}
 	}
 
-	void FixedUpdate ()
-	{
-		if ( useFixedUpdate )
-		{
-			robot.Move ( ThrottleInput );
-			robot.Rotate ( SteeringAngle );
-			robot.RotateCamera ( 0, VerticalAngle );
-		}
-	}
+//	void FixedUpdate ()
+//	{
+//		if ( useFixedUpdate )
+//		{
+//			float throttle = ThrottleInput;
+//			float steer = SteeringAngle;
+//			robot.Move ( throttle );
+//			robot.Rotate ( steer );
+//			robot.RotateCamera ( 0, VerticalAngle );
+//		}
+//	}
 }

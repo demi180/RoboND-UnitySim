@@ -83,7 +83,7 @@ public class AnotherIK : MonoBehaviour
 
 		//Bla-bla-bla
 		transform.position = Members[0].transform.position;
-		transform.LookAt(TargetPos, BendTargetPos - transform.position);
+//		transform.LookAt(TargetPos, BendTargetPos - transform.position);
 
 		GameObject M0AxisCorrection = new GameObject("M0AxisCorrection");
 		GameObject M1AxisCorrection = new GameObject("M1AxisCorrection");

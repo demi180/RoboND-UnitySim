@@ -11,6 +11,7 @@ public class TrainingUI : MonoBehaviour
 	public IRobotController robotController;
 
 	public RectTransform trainingArea;
+	public RectTransform rightArea;
 	public Text saveStatus;
 	public Text recordStatus;
 
@@ -43,19 +44,7 @@ public class TrainingUI : MonoBehaviour
 		if ( Input.GetButtonDown ( "Record" ) )
 			ToggleRecording ();
 
-//		if (!isTrainingMode) 
-//		{
-//			if ((Input.GetKey(KeyCode.W)) || (Input.GetKey(KeyCode.S))) 
-//			{
-//				DriveStatus_Text.color = Color.red;
-//				DriveStatus_Text.text = "Mode: Manual";
-//			} 
-//			else 
-//			{
-//				DriveStatus_Text.color = Color.white;
-//				DriveStatus_Text.text = "Mode: Autonomous";
-//			}
-//		}
+
 	}
 
 	void ToggleRecording ()
@@ -99,6 +88,7 @@ public class TrainingUI : MonoBehaviour
 	{
 		isTrainingMode = training;
 		trainingArea.gameObject.SetActive ( isTrainingMode );
+		rightArea.gameObject.SetActive ( isTrainingMode );
 		enabled = isTrainingMode;
 	}
 }
