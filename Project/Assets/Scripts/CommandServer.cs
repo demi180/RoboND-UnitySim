@@ -25,7 +25,7 @@ public class CommandServer : MonoBehaviour
 
 	void OnOpen(SocketIOEvent obj)
 	{
-		Debug.Log("Connection Open");
+//		Debug.Log("Connection Open");
 		EmitTelemetry(obj);
 	}
 
@@ -37,15 +37,17 @@ public class CommandServer : MonoBehaviour
 
 	void OnSteer(SocketIOEvent obj)
 	{
+//		Debug.Log ( "Steer" );
 		JSONObject jsonObject = obj.data;
 		robotRemoteControl.SteeringAngle = float.Parse(jsonObject.GetField("steering_angle").str);
 		robotRemoteControl.ThrottleInput = float.Parse(jsonObject.GetField("throttle").str);
-		robotRemoteControl.VerticalAngle = float.Parse ( jsonObject.GetField ( "vert_angle" ).str );
+//		robotRemoteControl.VerticalAngle = float.Parse ( jsonObject.GetField ( "vert_angle" ).str );
 		EmitTelemetry(obj);
 	}
 
 	void EmitTelemetry(SocketIOEvent obj)
 	{
+//		Debug.Log ( "Emitting" );
 		UnityMainThreadDispatcher.Instance().Enqueue(() =>
 		{
 			print("Attempting to Send...");
@@ -62,6 +64,7 @@ public class CommandServer : MonoBehaviour
 				data["throttle"] = robotController.ThrottleInput.ToString("N4");
 				data["speed"] = robotController.Speed.ToString("N4");
 				data["image"] = Convert.ToBase64String(CameraHelper.CaptureFrame(frontFacingCamera));
+//				Debug.Log ("sangle " + data["steering_angle"] + " vert " + data["vert_angle"] + " throt " + data["throttle"] + " speed " + data["speed"] + " image " + data["image"]);
 				_socket.Emit("telemetry", new JSONObject(data));
 			}
 		});

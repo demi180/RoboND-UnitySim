@@ -30,7 +30,7 @@ public class RobotRemoteControl : MonoBehaviour
 			float steer = SteeringAngle;
 			robot.Move ( throttle );
 			robot.Rotate ( steer );
-			robot.RotateCamera ( 0, VerticalAngle );
+//			robot.RotateCamera ( 0, VerticalAngle );
 //		}
 	}
 

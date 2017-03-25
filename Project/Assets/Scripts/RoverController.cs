@@ -18,6 +18,7 @@ public class RoverController : IRobotController
 	public Transform robotGrabPoint;
 	public SphereCollider cameraCollider;
 	public RobotArmActuator armActuator;
+	public List<Transform> storedLocations;
 
 	public float cameraMinAngle;
 	public float cameraMaxAngle;
@@ -377,17 +378,24 @@ public class RoverController : IRobotController
 		while ( !grabbingObject )
 			yield return null;
 		IsNearObjective = false;
-		Vector3 rand = GetPositionOnFlatbed ();
+		Vector3 pos = GetPositionOnFlatbed ();
 //		armAnimator.enabled = false;
-//		armActuator.SetTarget ( rand );
+//		armActuator.SetTarget ( pos );
 //		armActuator.MoveToTarget ();
-		armActuator.MoveTarget ( rand );
+		armActuator.MoveTarget ( pos );
 		while ( grabbingObject )
 			yield return null;
-//		yield return StartCoroutine ( RotateTo ( rand ) );
-//		curObjective.transform.rotation = Quaternion.identity;
+//		yield return StartCoroutine ( RotateTo ( pos ) );
+		curObjective.transform.rotation = Quaternion.identity;
 		curObjective.transform.parent = robotBody;
-		curObjective.transform.position = rand;
+		Collider c = curObjective.GetComponent<Collider> ();
+		float bottomY = c.bounds.min.y;
+//		if ( bottomY < curObjective.transform.position.y )
+//		{
+//			float delta = curObjective.transform.position.y - bottomY;
+//			curObjective.transform.position 
+//		}
+		curObjective.transform.position = pos;
 //		armAnimator.enabled = true;
 		grabbingObject = false;
 		isPickingUp = false;
@@ -431,19 +439,28 @@ public class RoverController : IRobotController
 
 	Vector3 GetPositionOnFlatbed ()
 	{
-		Collider c = curObjective.GetComponent<Collider> ();
-		c.enabled = false;
-		curObjective.transform.rotation = flatbed.rotation;
-		BoxCollider b = flatbed.GetComponent<BoxCollider> ();
-		Vector3 size = flatbed.rotation * flatbed.localScale;// / 2;
-		Debug.DrawLine ( flatbed.position, flatbed.position - size/2, Color.green, 5 );
-		Debug.DrawLine ( flatbed.position, flatbed.position + size/2, Color.green, 5 );
-		size.z /= 3;
-		size.x /= 2;
-		Vector3 rand = -flatbed.forward * flatbed.localScale.z * 1 / 6 + flatbed.forward * Random.Range ( -size.z, size.z ) + flatbed.right * Random.Range ( -size.x, size.x );
+		if ( storedLocations.Count > 0 )
+		{
+			Vector3 pos = storedLocations [ 0 ].position;
+			Destroy ( storedLocations [ 0 ].gameObject );
+			storedLocations.RemoveAt ( 0 );
+			return pos;
+		}
+
+		throw new System.NullReferenceException ( "No more positions left on the rover!" );
+//		Collider c = curObjective.GetComponent<Collider> ();
+//		c.enabled = false;
+//		curObjective.transform.rotation = flatbed.rotation;
+//		BoxCollider b = flatbed.GetComponent<BoxCollider> ();
+//		Vector3 size = flatbed.rotation * flatbed.localScale;// / 2;
+//		Debug.DrawLine ( flatbed.position, flatbed.position - size/2, Color.green, 5 );
+//		Debug.DrawLine ( flatbed.position, flatbed.position + size/2, Color.green, 5 );
+//		size.z /= 3;
+//		size.x /= 2;
+//		Vector3 rand = -flatbed.forward * flatbed.localScale.z * 1 / 6 + flatbed.forward * Random.Range ( -size.z, size.z ) + flatbed.right * Random.Range ( -size.x, size.x );
 //		Vector3 rand = flatbed.forward * Random.Range ( -size.z, size.z ) + flatbed.right * Random.Range ( -size.x, size.x );
 
-		return flatbed.position + rand;
+//		return flatbed.position + rand;
 	}
 
 	public override void CarryObjective (GameObject objective)

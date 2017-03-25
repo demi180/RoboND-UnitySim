@@ -6,6 +6,7 @@ public static class CameraHelper
   {
 		if ( camera == null )
 		{
+			Debug.Log ( "null camera" );
 			return new byte[0];
 		}
     RenderTexture targetTexture = camera.targetTexture;
