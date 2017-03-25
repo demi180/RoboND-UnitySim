@@ -22,6 +22,14 @@ public class Menu : MonoBehaviour
 		EnableCanvas ();
 	}
 
+	void LateUpdate ()
+	{
+		if ( Input.GetKeyDown ( KeyCode.F1 ) )
+		{
+			UnityEngine.SceneManagement.SceneManager.LoadScene ( UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name );
+		}
+	}
+
 	void EnableCanvas ()
 	{
 		canvas.enabled = true;
@@ -50,6 +58,8 @@ public class Menu : MonoBehaviour
 
 			playerInput.controllable = false;
 			remoteControl.enabled = true;
+			playerInput.controller.SwitchCamera (); // set to 3rd person camera by default
+			playerInput.DisableFocus = false;
 		}
 
 		canvas.enabled = false;

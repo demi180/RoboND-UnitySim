@@ -86,6 +86,12 @@ public class FPSRobotInput : MonoBehaviour
 
 //			Ray ray = controller.camera
 //			Physics.Raycast (  )
+		} else
+		{
+			// check for rotation input
+			float mouseX = Input.GetAxis ( "Mouse X" );
+			float mouseY = Input.GetAxis ( "Mouse Y" );
+			controller.RotateCamera ( mouseX, mouseY );
 		}
 		// check for focus input
 		if ( Input.GetMouseButtonDown ( 0 ) )
