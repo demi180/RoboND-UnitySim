@@ -8,7 +8,9 @@ internal class RobotSample
 	public Quaternion rotation;
 	public Vector3 position;
 	public float throttle;
+	public float brake;
 	public float speed;
+	public float yaw;
 	public float steerAngle;
 	public float verticalAngle;
 	public string timestamp;
@@ -69,6 +71,9 @@ public abstract class IRobotController : MonoBehaviour
 	private Quaternion saved_rotation;
 	float saved_vAngle;
 	System.Action beginRecordCallback;
+	public float recordRate = 25;
+	protected float recordTime;
+	float nextRecordTime;
 	private bool m_isRecording = false;
 	public bool IsRecording {
 		get
@@ -83,12 +88,12 @@ public abstract class IRobotController : MonoBehaviour
 			{ 
 				Debug.Log("Starting to record");
 				samples = new Queue<RobotSample>();
-				StartCoroutine(Sample());             
+//				StartCoroutine(Sample());             
 			} 
 			else
 			{
 				Debug.Log("Stopping record");
-				StopCoroutine(Sample());
+//				StopCoroutine(Sample());
 				Debug.Log("Writing to disk");
 				//save the cars coordinate parameters so we can reset it to this properly after capturing data
 				saved_position = transform.position;
@@ -129,17 +134,15 @@ public abstract class IRobotController : MonoBehaviour
 			//pysically moving the car to get the right camera position
 			transform.position = sample.position;
 			transform.rotation = sample.rotation;
-			Vector3 euler = cameraVAxis.localEulerAngles;
-			euler.x = sample.verticalAngle;
-			cameraVAxis.localEulerAngles = euler;
+//			Vector3 euler = cameraVAxis.localEulerAngles;
+//			euler.x = sample.verticalAngle;
+//			cameraVAxis.localEulerAngles = euler;
 
 			// Capture and Persist Image
 			string camPath = WriteImage ( recordingCam, "robocam", sample.timestamp );
-//			string centerPath = WriteImage (CenterCamera, "center", sample.timeStamp);
-//			string leftPath = WriteImage (LeftCamera, "left", sample.timeStamp);
-//			string rightPath = WriteImage (RightCamera, "right", sample.timeStamp);
 
-			string row = camPath + "," + sample.steerAngle + "," + sample.verticalAngle + "," + sample.throttle + "," + sample.speed + "\n";
+			string row = camPath + "," + sample.steerAngle + "," + sample.throttle + "," + sample.brake + "," + sample.speed + "," +
+				sample.position.x + "," + sample.position.y + "," + sample.position.z + "," + sample.yaw + "\r\n";
 //			string row = string.Format ("{0},{1},{2},{3},{4},{5},{6}\n", centerPath, leftPath, rightPath, sample.steeringAngle, sample.throttle, sample.brake, sample.speed);
 			File.AppendAllText (Path.Combine (m_saveLocation, CSVFileName), row);
 		}
@@ -177,6 +180,34 @@ public abstract class IRobotController : MonoBehaviour
 		return isSaving;
 	}
 
+	public void GetSample ()
+	{
+		if ( Time.time > nextRecordTime )
+		{
+			if (m_saveLocation != "")
+			{
+				RobotSample sample = new RobotSample();
+				
+				sample.timestamp = System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss_fff");
+				sample.steerAngle = SteerAngle;
+				//			sample.steerAngle = m_SteerAngle / m_MaximumSteerAngle;
+				sample.verticalAngle = VerticalAngle;
+				sample.throttle = ThrottleInput;
+				sample.brake = BrakeInput;
+				sample.speed = Speed;
+				sample.yaw = Orientation;
+				sample.position = transform.position;
+				sample.rotation = transform.rotation;
+//				Debug.Log ( "Throt " + sample.throttle + " brake " + sample.brake + " pos " + sample.position + " yaw " + sample.yaw );
+				
+				samples.Enqueue(sample);
+				
+				sample = null;
+				//may or may not be needed
+			}
+			nextRecordTime = Time.time + recordTime;
+		}
+	}
 
 	public IEnumerator Sample()
 	{
@@ -193,9 +224,12 @@ public abstract class IRobotController : MonoBehaviour
 //			sample.steerAngle = m_SteerAngle / m_MaximumSteerAngle;
 			sample.verticalAngle = VerticalAngle;
 			sample.throttle = ThrottleInput;
+			sample.brake = BrakeInput;
 			sample.speed = Speed;
+			sample.yaw = Orientation;
 			sample.position = transform.position;
 			sample.rotation = transform.rotation;
+			Debug.Log ( "Throt " + sample.throttle + " brake " + sample.brake + " pos " + sample.position + " yaw " + sample.yaw );
 
 			samples.Enqueue(sample);
 

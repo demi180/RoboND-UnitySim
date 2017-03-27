@@ -56,6 +56,7 @@ public class RoverController : IRobotController
 
 	void Awake ()
 	{
+		recordTime = 1f / recordRate;
 		actualCamera.SetParent ( fpsPosition );
 		rb.centerOfMass = new Vector3 ( 0, -1, 0 );
 		for ( int i = 0; i < 4; i++ )
@@ -150,8 +151,10 @@ public class RoverController : IRobotController
 		{
 //			SteerAngle = lastSteerInput * hRotateSpeed;
 			robotBody.Rotate ( Vector3.up * lastSteerInput * hRotateSpeed * Time.deltaTime );
-			wheels [ 0 ].steerAngle = wheels [ 1 ].steerAngle = lastAngle * 2; //  45 * Mathf.Sign ( lastAngle );
-			wheels [ 2 ].steerAngle = wheels [ 3 ].steerAngle = -lastAngle * 2; // -45 * Mathf.Sign ( lastAngle );
+			wheels [ 0 ].steerAngle = wheels [ 3 ].steerAngle = 45 * Mathf.Abs ( lastSteerInput );
+			wheels [ 1 ].steerAngle = wheels [ 2 ].steerAngle = -45 * Mathf.Abs ( lastSteerInput );
+//			wheels [ 0 ].steerAngle = wheels [ 1 ].steerAngle = lastAngle * 2; //  45 * Mathf.Sign ( lastAngle );
+//			wheels [ 2 ].steerAngle = wheels [ 3 ].steerAngle = -lastAngle * 2; // -45 * Mathf.Sign ( lastAngle );
 		} else
 		{
 			wheels[0].steerAngle = wheels[1].steerAngle = lastAngle;
@@ -161,6 +164,9 @@ public class RoverController : IRobotController
 
 	void Update ()
 	{
+		if ( IsRecording )
+			GetSample ();
+		
 		if ( !isPickingUp )
 		{
 			// check for objectives. only if not already picking one up
