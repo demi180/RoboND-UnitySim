@@ -5,6 +5,7 @@ using UnityEngine;
 public class RobotRemoteControl : MonoBehaviour
 {
 	public float ThrottleInput { get; set; }
+	public float BrakeInput { get; set; }
 	public float SteeringAngle { get; set; }
 	public float VerticalAngle { get; set; }
 
@@ -24,14 +25,13 @@ public class RobotRemoteControl : MonoBehaviour
 
 	void LateUpdate ()
 	{
-//		if ( !useFixedUpdate )
-//		{
-			float throttle = ThrottleInput;
-			float steer = SteeringAngle;
-			robot.Move ( throttle );
-			robot.Rotate ( steer );
-//			robot.RotateCamera ( 0, VerticalAngle );
-//		}
+		float throttle = ThrottleInput;
+		float brake = BrakeInput;
+		float steer = SteeringAngle;
+		robot.Move ( throttle, brake );
+//		robot.Move ( throttle );
+		robot.Rotate ( steer );
+//		robot.RotateCamera ( 0, VerticalAngle );
 	}
 
 //	void FixedUpdate ()

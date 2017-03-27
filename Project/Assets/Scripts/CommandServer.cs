@@ -41,6 +41,10 @@ public class CommandServer : MonoBehaviour
 		JSONObject jsonObject = obj.data;
 		robotRemoteControl.SteeringAngle = float.Parse(jsonObject.GetField("steering_angle").str);
 		robotRemoteControl.ThrottleInput = float.Parse(jsonObject.GetField("throttle").str);
+		if ( jsonObject.HasField ( "brake" ) )
+			robotRemoteControl.BrakeInput = float.Parse ( jsonObject.GetField ( "brake" ).str );
+		else
+			robotRemoteControl.BrakeInput = 0;
 //		robotRemoteControl.VerticalAngle = float.Parse ( jsonObject.GetField ( "vert_angle" ).str );
 		EmitTelemetry(obj);
 	}
@@ -60,9 +64,13 @@ public class CommandServer : MonoBehaviour
 				Dictionary<string, string> data = new Dictionary<string, string>();
 
 				data["steering_angle"] = robotController.SteerAngle.ToString("N4");
-				data["vert_angle"] = robotController.VerticalAngle.ToString ("N4");
+//				data["vert_angle"] = robotController.VerticalAngle.ToString ("N4");
 				data["throttle"] = robotController.ThrottleInput.ToString("N4");
+				data["brake"] = robotController.BrakeInput.ToString ("N4");
 				data["speed"] = robotController.Speed.ToString("N4");
+				Vector3 pos = robotController.Position;
+				data["position"] = pos.x.ToString ("N4") + "," + pos.y.ToString ("N4") + "," + pos.z.ToString ("N4");
+				data["orientation"] = robotController.Orientation.ToString ("N4");
 				data["image"] = Convert.ToBase64String(CameraHelper.CaptureFrame(frontFacingCamera));
 //				Debug.Log ("sangle " + data["steering_angle"] + " vert " + data["vert_angle"] + " throt " + data["throttle"] + " speed " + data["speed"] + " image " + data["image"]);
 				_socket.Emit("telemetry", new JSONObject(data));

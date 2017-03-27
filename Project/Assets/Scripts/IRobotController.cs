@@ -18,6 +18,7 @@ public abstract class IRobotController : MonoBehaviour
 {
 	public abstract float Zoom { get; }
 	public abstract void Move (float input);
+	public virtual void Move (float throttle, float brake) {}
 	public abstract void Move (Vector3 direction);
 	public abstract void Rotate (float angle);
 	public abstract void RotateCamera (float horizontal, float vertical);
@@ -38,10 +39,13 @@ public abstract class IRobotController : MonoBehaviour
 	public Camera recordingCam;
 
 	public float ThrottleInput { get; protected set; }
+	public float BrakeInput { get; protected set; }
 	public float Speed { get; protected set; }
 	public float SteerAngle { get; protected set; }
 	public float VerticalAngle { get; protected set; }
 	public bool IsNearObjective { get; protected set; }
+	public Vector3 Position { get { return transform.position; } }
+	public float Orientation { get { return transform.eulerAngles.y; } }
 	public bool allowStrafe;
 	public bool allowSprint;
 	public bool allowJump;

@@ -6,6 +6,7 @@ public class Menu : MonoBehaviour
 {
 	public Canvas canvas;
 	public FPSRobotInput playerInput;
+	public TrainingUI trainingUI;
 
 	public GameObject socketObject;
 	public GameObject serverObject;
@@ -48,6 +49,7 @@ public class Menu : MonoBehaviour
 			playerInput.DisableFocus = false;
 			playerInput.Focus ();
 			remoteControl.enabled = false;
+			trainingUI.SetTrainingMode ( true );
 		}
 
 		// autonomous
@@ -60,6 +62,7 @@ public class Menu : MonoBehaviour
 			remoteControl.enabled = true;
 			playerInput.controller.SwitchCamera (); // set to 3rd person camera by default
 			playerInput.DisableFocus = false;
+			trainingUI.SetTrainingMode ( false );
 		}
 
 		canvas.enabled = false;

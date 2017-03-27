@@ -90,5 +90,6 @@ public class TrainingUI : MonoBehaviour
 		trainingArea.gameObject.SetActive ( isTrainingMode );
 		rightArea.gameObject.SetActive ( isTrainingMode );
 		enabled = isTrainingMode;
+		robotInput.isTrainingMode = training;
 	}
 }

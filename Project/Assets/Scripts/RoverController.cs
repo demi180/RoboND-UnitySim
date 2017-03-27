@@ -9,7 +9,6 @@ public class RoverController : IRobotController
 	Vector3 VerticalVelocity { get { return new Vector3 ( 0, rb.velocity.y, 0 ); } }
 	public override float Zoom { get { return cameraDefaultFOV / camera.fieldOfView; } }
 
-	public Animator armAnimator;
 	public Transform flatbed;
 	public Rigidbody rb;
 	public WheelCollider[] wheels;
@@ -38,6 +37,7 @@ public class RoverController : IRobotController
 	DepthOfField depthOfField;
 	Quaternion[] localRotations = new Quaternion[4];
 	float lastMoveInput;
+	float lastBrakeInput;
 	[SerializeField]
 	float lastAngle;
 	float lastSteerTime;
@@ -49,8 +49,6 @@ public class RoverController : IRobotController
 	bool grabbingObject;
 	bool isTurningInPlace;
 	System.Action<GameObject> pickupCallback;
-	Quaternion inverseShoulder;
-	Quaternion storedShoulder;
 
 	// gizmo drawing vars
 	Vector3 point1, point2;
@@ -63,12 +61,9 @@ public class RoverController : IRobotController
 		for ( int i = 0; i < 4; i++ )
 			localRotations [ i ] = wheelMeshes [ i ].transform.localRotation;
 		depthOfField = camera.GetComponent<DepthOfField> ();
-		inverseShoulder = Quaternion.Inverse ( robotArmShoulder.rotation );
-		storedShoulder = robotArmShoulder.rotation;
 		ResetZoom ();
 
 		armActuator.onArrive = OnPickup;
-		armAnimator.enabled = false;
 	}
 
 	void Start ()
@@ -99,24 +94,27 @@ public class RoverController : IRobotController
 		if ( isMotorInput )
 		{
 			isTurningInPlace = false;
-			if ( Vector3.Angle ( robotBody.forward * lastMoveInput, GroundVelocity ) < 90 )
+			wheels [ 0 ].motorTorque = wheels [ 1 ].motorTorque = wheels [ 2 ].motorTorque = wheels [ 3 ].motorTorque = lastMoveInput * motorTorque;
+			wheels [ 0 ].brakeTorque = wheels [ 1 ].brakeTorque = wheels [ 2 ].brakeTorque = wheels [ 3 ].brakeTorque = lastBrakeInput * brakeTorque;
+//			Debug.Log ( "lmi " + lastMoveInput + " lbi " + lastBrakeInput );
+/*			if ( Vector3.Angle ( robotBody.forward * lastMoveInput, GroundVelocity ) < 90 )
 			{
 				wheels [ 0 ].motorTorque = wheels [ 1 ].motorTorque = wheels [ 2 ].motorTorque = wheels [ 3 ].motorTorque = lastMoveInput * motorTorque;
-				wheels [ 0 ].brakeTorque = wheels [ 1 ].brakeTorque = wheels [ 2 ].brakeTorque = wheels [ 3 ].brakeTorque = 0;
+				wheels [ 0 ].brakeTorque = wheels [ 1 ].brakeTorque = wheels [ 2 ].brakeTorque = wheels [ 3 ].brakeTorque = lastBrakeInput * brakeTorque;
+//				wheels [ 0 ].brakeTorque = wheels [ 1 ].brakeTorque = wheels [ 2 ].brakeTorque = wheels [ 3 ].brakeTorque = 0;
 
 			} else
 			{
 				wheels [ 0 ].motorTorque = wheels [ 1 ].motorTorque = wheels [ 2 ].motorTorque = wheels [ 3 ].motorTorque = 0;
 				wheels [ 0 ].brakeTorque = wheels [ 1 ].brakeTorque = wheels [ 2 ].brakeTorque = wheels [ 3 ].brakeTorque = Mathf.Abs ( lastMoveInput ) * brakeTorque;
-			}
-				
-
+			}*/
 		} else
 		{
 			if ( isTurningInPlace )
 			{
-				wheels [ 0 ].motorTorque = wheels [ 1 ].motorTorque = Mathf.Abs ( lastSteerInput ) * motorTorque * 2;
-				wheels [ 2 ].motorTorque = wheels [ 3 ].motorTorque = Mathf.Abs ( lastSteerInput ) * motorTorque * 2;
+				// turning in place now just literally turns in place
+//				wheels [ 0 ].motorTorque = wheels [ 1 ].motorTorque = Mathf.Abs ( lastSteerInput ) * motorTorque * 2;
+//				wheels [ 2 ].motorTorque = wheels [ 3 ].motorTorque = Mathf.Abs ( lastSteerInput ) * motorTorque * 2;
 
 //				wheels [ 0 ].motorTorque = wheels [ 1 ].motorTorque = -motorTorque * moveSpeed / 2;
 //				wheels [ 2 ].motorTorque = wheels [ 3 ].motorTorque = -motorTorque * moveSpeed / 2;
@@ -143,22 +141,15 @@ public class RoverController : IRobotController
 		}
 
 		if ( isSteeringInput && !isMotorInput )
-//		if ( GroundVelocity.sqrMagnitude < 0.1f )
 		{
 			if ( GroundVelocity.sqrMagnitude < 0.1f )
 				isTurningInPlace = true;
-
-//			if ( isTurningInPlace )
-//			{
-//				wheels [ 0 ].steerAngle = wheels [ 1 ].steerAngle = lastAngle * 2; //  45 * Mathf.Sign ( lastAngle );
-//				wheels [ 2 ].steerAngle = wheels [ 3 ].steerAngle = -lastAngle * 2; // -45 * Mathf.Sign ( lastAngle );
-//			} else
-//			{	
-//			}
 		}
 
 		if ( isTurningInPlace )
 		{
+//			SteerAngle = lastSteerInput * hRotateSpeed;
+			robotBody.Rotate ( Vector3.up * lastSteerInput * hRotateSpeed * Time.deltaTime );
 			wheels [ 0 ].steerAngle = wheels [ 1 ].steerAngle = lastAngle * 2; //  45 * Mathf.Sign ( lastAngle );
 			wheels [ 2 ].steerAngle = wheels [ 3 ].steerAngle = -lastAngle * 2; // -45 * Mathf.Sign ( lastAngle );
 		} else
@@ -166,15 +157,6 @@ public class RoverController : IRobotController
 			wheels[0].steerAngle = wheels[1].steerAngle = lastAngle;
 			wheels[2].steerAngle = wheels[3].steerAngle = 0;
 		}
-
-//		if ( isSteeringInput && GroundVelocity.sqrMagnitude < 0.1f )
-//			robotBody.Rotate ( robotBody.up * lastAngle * Time.deltaTime );
-//			rb.AddRelativeTorque ( Vector3.up * lastAngle );
-//		else
-//			rb.angularVelocity = Vector3.zero;
-
-		Speed = new Vector3 ( rb.velocity.x, 0, rb.velocity.z ).magnitude;
-//		isSteeringInput = false;
 	}
 
 	void Update ()
@@ -214,8 +196,15 @@ public class RoverController : IRobotController
 				IsNearObjective = false;
 				curObjective = null;
 			}
-			Speed = GroundVelocity.magnitude;
-//			Speed = new Vector3 ( rb.velocity.x, 0, rb.velocity.z ).magnitude;
+//			Speed = GroundVelocity.magnitude;
+			float spd = GroundVelocity.magnitude;
+			// if moving forward
+			if ( spd >= 0.01f && Vector3.Angle ( robotBody.forward, GroundVelocity ) > 90 )
+				spd *= -1;
+			else
+			if ( spd < 0.01f )
+				spd = 0;
+			Speed = spd;
 		} else
 		{
 			Speed = 0;
@@ -232,31 +221,17 @@ public class RoverController : IRobotController
 //		isTurningInPlace = false;
 	}
 
-/*	void LateUpdate ()
+	public override void Move (float throttle, float brake)
 	{
-		if ( isPickingUp )
-		{
-			if ( Input.GetKeyDown ( KeyCode.P ) )
-			{
-				armAnimator.speed = 1 - armAnimator.speed;
-			}
-			if ( armAnimator.speed == 0 )
-			{
-				if ( Input.GetKeyDown ( KeyCode.LeftBracket ) )
-				{
-					int hash = armAnimator.GetCurrentAnimatorStateInfo ( 0 ).shortNameHash;
-					float normalizedTime = armAnimator.GetCurrentAnimatorStateInfo ( 0 ).normalizedTime;
-					armAnimator.Play ( hash, 0, normalizedTime - Time.deltaTime );
-				} else
-				if ( Input.GetKeyDown ( KeyCode.RightBracket ) )
-				{
-						int hash = armAnimator.GetCurrentAnimatorStateInfo ( 0 ).shortNameHash;
-						float normalizedTime = armAnimator.GetCurrentAnimatorStateInfo ( 0 ).normalizedTime;
-						armAnimator.Play ( hash, 0, normalizedTime + Time.deltaTime );	
-				}
-			}
-		}
-	}*/
+		ThrottleInput = throttle;
+		BrakeInput = brake;
+		lastMoveInput = throttle;
+		lastBrakeInput = brake;
+//		Debug.Log ( "throt: " + lastMoveInput + " brake: " + lastBrakeInput );
+		isMotorInput = throttle != 0 || brake != 0;
+		if ( isMotorInput && !isPickingUp )
+			armActuator.enabled = false;
+	}
 
 	public override void Move (float input)
 	{
@@ -273,6 +248,7 @@ public class RoverController : IRobotController
 
 	public override void Rotate (float angle)
 	{
+		angle = Mathf.Clamp ( angle, -1f, 1f );
 		SteerAngle = angle * maxSteering;
 		if ( angle != 0 )
 		{
@@ -281,6 +257,8 @@ public class RoverController : IRobotController
 			lastAngle = angle * maxSteering;
 			lastAngle = Mathf.Clamp ( lastAngle, -maxSteering, maxSteering );
 			isSteeringInput = true;
+			if ( !isPickingUp )
+				armActuator.enabled = false;
 
 		} else
 		{
@@ -360,26 +338,22 @@ public class RoverController : IRobotController
 		rb.isKinematic = true;
 		pickupCallback = onPickup;
 		isPickingUp = true;
+		armActuator.enabled = true;
 //		Time.timeScale = 0.2f;
 		StartCoroutine ( DoPickup () );
-//		armAnimator.SetTrigger ( "Pickup" );
 	}
 
 	IEnumerator DoPickup ()
 	{
 		grabbingObject = false;
-//		armAnimator.enabled = false;
 		armActuator.SetTarget ( curObjective.transform.position );
 		armActuator.Unfold ( true );
 //		armActuator.MoveToTarget ();
 //		yield return StartCoroutine ( RotateTo ( curObjective.transform.position ) );
-//		armAnimator.enabled = true;
-//		armAnimator.SetTrigger ( "Pickup" );
 		while ( !grabbingObject )
 			yield return null;
 		IsNearObjective = false;
 		Vector3 pos = GetPositionOnFlatbed ();
-//		armAnimator.enabled = false;
 //		armActuator.SetTarget ( pos );
 //		armActuator.MoveToTarget ();
 		armActuator.MoveTarget ( pos );
@@ -396,7 +370,6 @@ public class RoverController : IRobotController
 //			curObjective.transform.position 
 //		}
 		curObjective.transform.position = pos;
-//		armAnimator.enabled = true;
 		grabbingObject = false;
 		isPickingUp = false;
 		rb.isKinematic = false;
