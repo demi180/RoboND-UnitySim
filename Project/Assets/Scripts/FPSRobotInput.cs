@@ -11,7 +11,7 @@ public class FPSRobotInput : MonoBehaviour
 	public bool controllable;
 	public bool isTrainingMode;
 
-
+	Renderer grid;
 	RaycastHit rayHit;
 	bool braking;
 	float lastMouseTime;
@@ -19,6 +19,11 @@ public class FPSRobotInput : MonoBehaviour
 
 	void Start ()
 	{
+		GameObject gridObject = GameObject.Find ( "Grid_v2" );
+		if ( gridObject != null )
+			grid = gridObject.GetComponent<Renderer> ();
+		if ( grid != null )
+			grid.enabled = false;
 //		Cursor.lockState = CursorLockMode.Locked;
 //		controllable = true;
 	}
@@ -29,6 +34,12 @@ public class FPSRobotInput : MonoBehaviour
 		if ( Input.GetKeyDown ( KeyCode.F12 ) )
 		{
 			Application.Quit ();
+		}
+
+		if ( Input.GetKeyDown ( KeyCode.G ) )
+		{
+			if ( grid != null )
+				grid.enabled = !grid.enabled;
 		}
 
 		if ( DisableFocus )
@@ -115,7 +126,7 @@ public class FPSRobotInput : MonoBehaviour
 //				controller.Move ( forward );
 			}
 
-			if ( Input.GetButtonDown ( "Jump" ) )
+			if ( Input.GetKeyDown ( KeyCode.Space ) )
 			{
 				controller.FixedTurn ( 180, 3 );
 			}
@@ -180,7 +191,7 @@ public class FPSRobotInput : MonoBehaviour
 		controllable = false;
 		Cursor.lockState = CursorLockMode.None;
 		Cursor.visible = true;
-		controller.Move ( 0 );
+		controller.Move ( 0, 1 );
 		controller.Rotate ( 0 );
 	}
 

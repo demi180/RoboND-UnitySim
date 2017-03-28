@@ -44,6 +44,7 @@ public class RoverController : IRobotController
 	float lastSteerInput;
 	float targetYaw;
 	float fixedTurnSpeed;
+	float wheelAngle;
 
 	bool isMotorInput;
 	bool isSteeringInput;
@@ -63,7 +64,7 @@ public class RoverController : IRobotController
 		actualCamera.SetParent ( fpsPosition );
 		rb.centerOfMass = new Vector3 ( 0, -1, 0 );
 		for ( int i = 0; i < 4; i++ )
-			localRotations [ i ] = wheelMeshes [ i ].transform.localRotation;
+			localRotations [ i ] = wheelMeshes [ i ].localRotation;
 		depthOfField = camera.GetComponent<DepthOfField> ();
 		ResetZoom ();
 
@@ -87,12 +88,16 @@ public class RoverController : IRobotController
 		{
 			Quaternion quat;
 			Vector3 position;
-			wheels[i].GetWorldPose(out position, out quat);
-			wheelMeshes[i].transform.position = position;
-//			if ( isSteeringInput && !isMotorInput )
-//				wheelMeshes [ i ].transform.rotation = Quaternion.LookRotation ( robotBody.forward, Vector3.up );
-//			else
-				wheelMeshes [ i ].transform.rotation = quat * localRotations [ i ];
+			wheels [ i ].GetWorldPose ( out position, out quat );
+			wheelMeshes [ i ].position = position;
+			wheelMeshes [ i ].rotation = quat * localRotations [ i ];
+			if ( isTurningInPlace || isFixedTurning )
+			{
+				float y = robotBody.eulerAngles.y * 2.5f;
+				wheelMeshes [ i ].rotation *= Quaternion.Euler ( y, 0, 0 );
+//				wheelMeshes [ i ].rotation *= Quaternion.Euler ( -wheelAngle, 0, 0 );
+//				wheelAngle += hRotateSpeed * Time.deltaTime;
+			}
 		}
 
 		if ( isMotorInput )
@@ -153,16 +158,19 @@ public class RoverController : IRobotController
 		if ( isFixedTurning )
 		{
 			Vector3 euler = robotBody.eulerAngles;
-//			euler.y = Mathf.MoveTowards ( euler.y, targetYaw, fixedTurnSpeed * Time.deltaTime );
 			euler.y = Mathf.MoveTowardsAngle ( euler.y, targetYaw, fixedTurnSpeed * Time.deltaTime );
 			robotBody.eulerAngles = euler;
-//			robotBody.Rotate ( Vector3.up * lastSteerInput *  * Time.deltaTime );
 			wheels [ 0 ].steerAngle = wheels [ 3 ].steerAngle = 45;// * Mathf.Abs ( lastSteerInput );
 			wheels [ 1 ].steerAngle = wheels [ 2 ].steerAngle = -45;// * Mathf.Abs ( lastSteerInput );
+			for ( int i = 0; i < 4; i++ )
+				wheelMeshes [ i ].Rotate ( Vector3.right, fixedTurnSpeed * Time.deltaTime );
+//				wheelMeshes [ i ].Rotate ( Vector3.right * fixedTurnSpeed, Space.World );
 			if ( euler.y == targetYaw )
 			{
 				isFixedTurning = false;
 				rb.isKinematic = false;
+				for ( int i = 0; i < 4; i++ )
+					wheelMeshes [ i ].transform.localRotation = localRotations [ i ];
 			}
 
 		} else
@@ -172,6 +180,8 @@ public class RoverController : IRobotController
 			robotBody.Rotate ( Vector3.up * lastSteerInput * hRotateSpeed * Time.deltaTime );
 			wheels [ 0 ].steerAngle = wheels [ 3 ].steerAngle = 45 * Mathf.Abs ( lastSteerInput );
 			wheels [ 1 ].steerAngle = wheels [ 2 ].steerAngle = -45 * Mathf.Abs ( lastSteerInput );
+			for ( int i = 0; i < 4; i++ )
+				wheelMeshes [ i ].Rotate ( Vector3.right, hRotateSpeed * Time.deltaTime );
 //			wheels [ 0 ].steerAngle = wheels [ 1 ].steerAngle = lastAngle * 2; //  45 * Mathf.Sign ( lastAngle );
 //			wheels [ 2 ].steerAngle = wheels [ 3 ].steerAngle = -lastAngle * 2; // -45 * Mathf.Sign ( lastAngle );
 		} else
@@ -298,6 +308,7 @@ public class RoverController : IRobotController
 			lastAngle = 0;
 			SteerAngle = 0;
 			isSteeringInput = false;
+			isTurningInPlace = false;
 		}
 	}
 
@@ -311,6 +322,7 @@ public class RoverController : IRobotController
 			targetYaw = robotBody.eulerAngles.y + angle;
 			fixedTurnSpeed = angle / time;
 			rb.isKinematic = true;
+			wheelAngle = 0;
 		}
 	}
 
