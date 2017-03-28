@@ -19,6 +19,7 @@ public class CommandServer : MonoBehaviour
 		_socket.On("open", OnOpen);
 		_socket.On("steer", OnSteer);
 		_socket.On("manual", onManual);
+		_socket.On ( "fixed_turn", OnFixedTurn );
 		robotController = robotRemoteControl.robot;
 		frontFacingCamera = robotController.recordingCam;
 	}
@@ -47,6 +48,17 @@ public class CommandServer : MonoBehaviour
 			robotRemoteControl.BrakeInput = 0;
 //		robotRemoteControl.VerticalAngle = float.Parse ( jsonObject.GetField ( "vert_angle" ).str );
 		EmitTelemetry(obj);
+	}
+
+	void OnFixedTurn(SocketIOEvent obj)
+	{
+		JSONObject json = obj.data;
+		float angle = float.Parse ( json.GetField ( "angle" ).str );
+		float time = 0;
+		if ( json.HasField ( "time" ) )
+			time = float.Parse ( json.GetField ( "time" ).str );
+		robotRemoteControl.FixedTurn ( angle, time );
+		EmitTelemetry ( obj );
 	}
 
 	void EmitTelemetry(SocketIOEvent obj)

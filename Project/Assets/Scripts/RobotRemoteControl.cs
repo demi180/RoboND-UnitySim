@@ -25,6 +25,8 @@ public class RobotRemoteControl : MonoBehaviour
 
 	void LateUpdate ()
 	{
+		if ( robot.IsTurningInPlace )
+			return;
 		float throttle = ThrottleInput;
 		float brake = BrakeInput;
 		float steer = SteeringAngle;
@@ -32,6 +34,11 @@ public class RobotRemoteControl : MonoBehaviour
 //		robot.Move ( throttle );
 		robot.Rotate ( steer );
 //		robot.RotateCamera ( 0, VerticalAngle );
+	}
+
+	public void FixedTurn (float angle, float time = 0)
+	{
+		robot.FixedTurn ( angle, time );
 	}
 
 //	void FixedUpdate ()
