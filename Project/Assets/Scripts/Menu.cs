@@ -60,11 +60,12 @@ public class Menu : MonoBehaviour
 
 			playerInput.controllable = false;
 			remoteControl.enabled = true;
-			playerInput.controller.SwitchCamera (); // set to 3rd person camera by default
+//			playerInput.controller.SwitchCamera (); // set to 3rd person camera by default
 			playerInput.DisableFocus = false;
 			trainingUI.SetTrainingMode ( false );
 		}
 
+		playerInput.controller.SwitchCamera ();
 		canvas.enabled = false;
 	}
 

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 529239097d02f9f42b0ddd436c6fcbb0
+guid: ac518eca17198da4899ec1cad436c712
 TextureImporter:
   fileIDToRecycleName: {}
   serializedVersion: 4
@@ -25,8 +25,8 @@ TextureImporter:
   textureFormat: -1
   maxTextureSize: 256
   textureSettings:
-    filterMode: -1
-    aniso: -1
+    filterMode: 2
+    aniso: 16
     mipBias: -1
     wrapMode: 0
   nPOTScale: 1
@@ -39,8 +39,8 @@ TextureImporter:
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 100
-  alphaUsage: 1
-  alphaIsTransparency: 1
+  alphaUsage: 2
+  alphaIsTransparency: 0
   spriteTessellationDetail: -1
   textureType: 0
   textureShape: 1

@@ -176,7 +176,8 @@ public class RoverController : IRobotController
 //			wheels [ 2 ].steerAngle = wheels [ 3 ].steerAngle = -lastAngle * 2; // -45 * Mathf.Sign ( lastAngle );
 		} else
 		{
-			wheels[0].steerAngle = wheels[1].steerAngle = lastAngle;
+			float steeringLerp = Mathf.Lerp ( 5, maxSteering, 1 - speedPercent ) * lastSteerInput;
+			wheels [ 0 ].steerAngle = wheels [ 1 ].steerAngle = steeringLerp; //lastAngle;
 			wheels[2].steerAngle = wheels[3].steerAngle = 0;
 		}
 	}
@@ -249,7 +250,7 @@ public class RoverController : IRobotController
 
 	public override void Move (float throttle, float brake)
 	{
-		if ( isFixedTurning )
+		if ( isFixedTurning || isPickingUp )
 			return;
 		ThrottleInput = throttle;
 		BrakeInput = brake;
@@ -263,7 +264,7 @@ public class RoverController : IRobotController
 
 	public override void Move (float input)
 	{
-		if ( isFixedTurning )
+		if ( isFixedTurning || isPickingUp )
 			return;
 		ThrottleInput = input;
 		lastMoveInput = input; // * acceleration;
@@ -278,7 +279,7 @@ public class RoverController : IRobotController
 
 	public override void Rotate (float angle)
 	{
-		if ( isFixedTurning )
+		if ( isFixedTurning || isPickingUp )
 			return;
 		angle = Mathf.Clamp ( angle, -1f, 1f );
 		SteerAngle = angle * maxSteering;

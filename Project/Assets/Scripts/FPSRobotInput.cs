@@ -85,6 +85,11 @@ public class FPSRobotInput : MonoBehaviour
 				
 			} else
 			{
+				if ( braking && Input.GetButtonUp ( "Vertical" ) )
+				{
+					Input.ResetInputAxes ();
+				}
+					
 				float throttle = Input.GetAxis ( "Vertical" );
 				if ( throttle != 0 && Mathf.Abs ( controller.Speed ) > 0.01f && Mathf.Sign ( throttle ) != Mathf.Sign ( controller.Speed ) )
 					braking = true;
@@ -92,7 +97,7 @@ public class FPSRobotInput : MonoBehaviour
 //					braking = false;
 //				if ( braking = true )
 				if ( throttle == 0 )
-						braking = false;
+					braking = false;
 //				Debug.Log ( "vert: " + throttle + " speed: " + controller.Speed + " vsign " + Mathf.Sign ( throttle ) + " vspd " + Mathf.Sign ( controller.Speed ) + " braking " + braking );
 
 //				Debug.Log ( "braking: " + braking);
