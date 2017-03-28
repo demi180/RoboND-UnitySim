@@ -417,9 +417,9 @@ public class SimpleFileBrowser : MonoBehaviour
 	public void OnSubmitButtonClicked()
 	{
 		string path = m_currentPath;
-		if( filenameInputField.text.Length > 0 )
-			path = Path.Combine( path, filenameInputField.text );
-		else
+//		if( filenameInputField.text.Length > 0 )
+//			path = Path.Combine( path, filenameInputField.text );
+//		else
 			path = GetPathWithoutTrailingDirectorySeparator( path );
 		
 		if( File.Exists( path ) )
