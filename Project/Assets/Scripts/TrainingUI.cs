@@ -14,7 +14,9 @@ public class TrainingUI : MonoBehaviour
 	public RectTransform rightArea;
 	public Text saveStatus;
 	public Text recordStatus;
+	public RawImage roboCamImage;
 
+	float roboCamAlpha = 1;
 	bool recording;
 	bool saveRecording;
 
@@ -44,7 +46,11 @@ public class TrainingUI : MonoBehaviour
 		if ( Input.GetButtonDown ( "Record" ) )
 			ToggleRecording ();
 
-
+		if ( Input.GetKeyDown ( KeyCode.C ) )
+		{
+			roboCamAlpha = 1 - roboCamAlpha;
+			roboCamImage.CrossFadeAlpha ( roboCamAlpha, 0.35f, false );
+		}
 	}
 
 	void ToggleRecording ()

@@ -30,6 +30,7 @@ public abstract class IRobotController : MonoBehaviour
 	public abstract Vector3 TransformDirection (Vector3 localDirection);
 	public virtual void PickupObjective (System.Action<GameObject> onPickup) {}
 	public virtual void CarryObjective (GameObject objective) { Destroy ( objective ); }
+	public virtual void FixedTurn (float angle, float time) {}
 
 	public Transform robotBody;
 	public Transform cameraHAxis;
@@ -48,6 +49,7 @@ public abstract class IRobotController : MonoBehaviour
 	public bool IsNearObjective { get; protected set; }
 	public Vector3 Position { get { return transform.position; } }
 	public float Orientation { get { return transform.eulerAngles.y; } }
+	public bool IsTurningInPlace { get; protected set; }
 	public bool allowStrafe;
 	public bool allowSprint;
 	public bool allowJump;

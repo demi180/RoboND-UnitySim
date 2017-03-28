@@ -42,12 +42,15 @@ public class RoverController : IRobotController
 	float lastAngle;
 	float lastSteerTime;
 	float lastSteerInput;
+	float targetYaw;
+	float fixedTurnSpeed;
 
 	bool isMotorInput;
 	bool isSteeringInput;
 	bool isPickingUp;
 	bool grabbingObject;
 	bool isTurningInPlace;
+	bool isFixedTurning;
 	System.Action<GameObject> pickupCallback;
 
 	// gizmo drawing vars
@@ -147,6 +150,22 @@ public class RoverController : IRobotController
 				isTurningInPlace = true;
 		}
 
+		if ( isFixedTurning )
+		{
+			Vector3 euler = robotBody.eulerAngles;
+//			euler.y = Mathf.MoveTowards ( euler.y, targetYaw, fixedTurnSpeed * Time.deltaTime );
+			euler.y = Mathf.MoveTowardsAngle ( euler.y, targetYaw, fixedTurnSpeed * Time.deltaTime );
+			robotBody.eulerAngles = euler;
+//			robotBody.Rotate ( Vector3.up * lastSteerInput *  * Time.deltaTime );
+			wheels [ 0 ].steerAngle = wheels [ 3 ].steerAngle = 45;// * Mathf.Abs ( lastSteerInput );
+			wheels [ 1 ].steerAngle = wheels [ 2 ].steerAngle = -45;// * Mathf.Abs ( lastSteerInput );
+			if ( euler.y == targetYaw )
+			{
+				isFixedTurning = false;
+				rb.isKinematic = false;
+			}
+
+		} else
 		if ( isTurningInPlace )
 		{
 //			SteerAngle = lastSteerInput * hRotateSpeed;
@@ -224,11 +243,14 @@ public class RoverController : IRobotController
 		isMotorInput = false;
 		lastMoveInput = 0;
 		lastSteerInput = 0;
+		IsTurningInPlace = isFixedTurning;
 //		isTurningInPlace = false;
 	}
 
 	public override void Move (float throttle, float brake)
 	{
+		if ( isFixedTurning )
+			return;
 		ThrottleInput = throttle;
 		BrakeInput = brake;
 		lastMoveInput = throttle;
@@ -241,6 +263,8 @@ public class RoverController : IRobotController
 
 	public override void Move (float input)
 	{
+		if ( isFixedTurning )
+			return;
 		ThrottleInput = input;
 		lastMoveInput = input; // * acceleration;
 		isMotorInput = input != 0;
@@ -254,6 +278,8 @@ public class RoverController : IRobotController
 
 	public override void Rotate (float angle)
 	{
+		if ( isFixedTurning )
+			return;
 		angle = Mathf.Clamp ( angle, -1f, 1f );
 		SteerAngle = angle * maxSteering;
 		if ( angle != 0 )
@@ -271,6 +297,19 @@ public class RoverController : IRobotController
 			lastAngle = 0;
 			SteerAngle = 0;
 			isSteeringInput = false;
+		}
+	}
+
+	public override void FixedTurn (float angle, float time = 0)
+	{
+		if ( Speed == 0 && !isMotorInput && !isSteeringInput && !isFixedTurning )
+		{
+			isFixedTurning = true;
+			if ( time == 0 )
+				time = angle / hRotateSpeed;
+			targetYaw = robotBody.eulerAngles.y + angle;
+			fixedTurnSpeed = angle / time;
+			rb.isKinematic = true;
 		}
 	}
 

@@ -110,6 +110,11 @@ public class FPSRobotInput : MonoBehaviour
 //				controller.Move ( forward );
 			}
 
+			if ( Input.GetButtonDown ( "Jump" ) )
+			{
+				controller.FixedTurn ( 180, 3 );
+			}
+
 			// check for camera switch key
 			if ( Input.GetKeyDown ( KeyCode.Tab ) )
 				controller.SwitchCamera ();
@@ -132,6 +137,14 @@ public class FPSRobotInput : MonoBehaviour
 				controller.RotateCamera ( mouseX, mouseY );
 			braking = false;
 		}
+		// check for sample pickup
+		if ( Input.GetKeyDown ( KeyCode.Return ) || Input.GetKeyDown ( KeyCode.KeypadEnter ) )
+		{
+			if ( controllable && controller.IsNearObjective )
+			{
+				controller.PickupObjective ( OnPickedUpObjective );
+			}
+		}
 		// check for focus input
 		if ( Input.GetMouseButtonDown ( 0 ) )
 		{
@@ -141,6 +154,13 @@ public class FPSRobotInput : MonoBehaviour
 			}
 
 			Focus ();
+		}
+		if ( Input.GetKeyDown ( KeyCode.Escape ) )
+		{
+			if ( controllable )
+				Unfocus ();
+			else
+				Focus ();
 		}
 	}
 

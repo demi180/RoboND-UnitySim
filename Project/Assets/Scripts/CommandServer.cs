@@ -71,6 +71,7 @@ public class CommandServer : MonoBehaviour
 				Vector3 pos = robotController.Position;
 				data["position"] = pos.x.ToString ("N4") + "," + pos.y.ToString ("N4") + "," + pos.z.ToString ("N4");
 				data["orientation"] = robotController.Orientation.ToString ("N4");
+				data["fixed_turn"] = robotController.IsTurningInPlace ? "1" : "0";
 				data["image"] = Convert.ToBase64String(CameraHelper.CaptureFrame(frontFacingCamera));
 //				Debug.Log ("sangle " + data["steering_angle"] + " vert " + data["vert_angle"] + " throt " + data["throttle"] + " speed " + data["speed"] + " image " + data["image"]);
 				_socket.Emit("telemetry", new JSONObject(data));
