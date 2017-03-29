@@ -50,7 +50,7 @@ public class WalkerController : IRobotController
 
 	Queue<GameObject> footprints;
 	Transform footprintParent;
-	System.Action<GameObject> pickupCallback;
+	System.Action<PickupSample> pickupCallback;
 
 	void Awake ()
 	{
@@ -103,7 +103,7 @@ public class WalkerController : IRobotController
 			if ( objectives != null && objectives.Length > 0 )
 			{
 				IsNearObjective = true;
-				curObjective = objectives [ 0 ].gameObject;
+				curObjective = objectives [ 0 ].transform.root.GetComponent<PickupSample> ();
 				if ( objectives.Length > 1 )
 					Debug.Log ( "Near " + objectives.Length + " objectives." );
 			} else
@@ -186,7 +186,7 @@ public class WalkerController : IRobotController
 		return robotBody.TransformDirection ( localDirection );
 	}
 
-	public override void PickupObjective (System.Action<GameObject> onPickup)
+	public override void PickupObjective (System.Action<PickupSample> onPickup)
 	{
 		if ( !IsNearObjective || curObjective == null )
 			return;

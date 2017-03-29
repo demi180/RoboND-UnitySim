@@ -39,9 +39,7 @@ public class ObjectiveSpawner : MonoBehaviour
 			int index = Random.Range ( 0, indices.Count );
 			GameObject ob = objectives [ indices [ index ] ];
 			ob.SetActive ( true );
-			ob.GetComponent<Renderer> ().material.SetColor ( colorProp, colors [ Random.Range ( 0, colors.Length ) ] );
-//			ob.GetComponent<Renderer> ().material.color = colors [ Random.Range ( 0, colors.Length ) ];
-//			ob.GetComponent<Renderer> ().material.color = new Color ( 0.1f, 0.1f, 0.8f );
+//			ob.GetComponent<Renderer> ().material.SetColor ( colorProp, colors [ Random.Range ( 0, colors.Length ) ] );
 			indices.RemoveAt ( index );
 		}
 	}

@@ -28,7 +28,7 @@ public abstract class IRobotController : MonoBehaviour
 	public abstract void ResetZoom ();
 	public abstract void SwitchCamera ();
 	public abstract Vector3 TransformDirection (Vector3 localDirection);
-	public virtual void PickupObjective (System.Action<GameObject> onPickup) {}
+	public virtual void PickupObjective (System.Action<PickupSample> onPickup) {}
 	public virtual void CarryObjective (GameObject objective) { Destroy ( objective ); }
 	public virtual void FixedTurn (float angle, float time) {}
 
@@ -61,7 +61,8 @@ public abstract class IRobotController : MonoBehaviour
 	public float maxSlope = 50;
 	public LayerMask objectiveMask;
 
-	protected GameObject curObjective;
+	protected PickupSample curObjective;
+//	protected GameObject curObjective;
 
 	public const string CSVFileName = "robot_log.csv";
 	public const string DirFrames = "IMG";

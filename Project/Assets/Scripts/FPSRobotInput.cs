@@ -195,8 +195,8 @@ public class FPSRobotInput : MonoBehaviour
 		controller.Rotate ( 0 );
 	}
 
-	void OnPickedUpObjective (GameObject objective)
+	void OnPickedUpObjective (PickupSample objective)
 	{
-		follower.CarryObjective ( objective );
+//		follower.CarryObjective ( objective );
 	}
 }

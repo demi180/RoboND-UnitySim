@@ -52,7 +52,7 @@ public class RoverController : IRobotController
 	bool grabbingObject;
 	bool isTurningInPlace;
 	bool isFixedTurning;
-	System.Action<GameObject> pickupCallback;
+	System.Action<PickupSample> pickupCallback;
 
 	// gizmo drawing vars
 	Vector3 point1, point2;
@@ -186,7 +186,11 @@ public class RoverController : IRobotController
 //			wheels [ 2 ].steerAngle = wheels [ 3 ].steerAngle = -lastAngle * 2; // -45 * Mathf.Sign ( lastAngle );
 		} else
 		{
+			speedPercent = GroundVelocity.magnitude / moveSpeed; // use the forward speed here so reverse can turn better
 			float steeringLerp = Mathf.Lerp ( 5, maxSteering, 1 - speedPercent ) * lastSteerInput;
+			// if we're in reverse, double the steer amount
+			if ( maxSpeed == maxReverseSpeed )
+				steeringLerp *= 2;
 			wheels [ 0 ].steerAngle = wheels [ 1 ].steerAngle = steeringLerp; //lastAngle;
 			wheels[2].steerAngle = wheels[3].steerAngle = 0;
 		}
@@ -223,7 +227,7 @@ public class RoverController : IRobotController
 //				if ( (objectives[0].transform.position - robotArmShoulder.position).sqrMagnitude > 0.1f )
 //				{
 					IsNearObjective = true;
-					curObjective = objectives [ 0 ].gameObject;
+				curObjective = objectives [ 0 ].transform.GetComponentInParent<PickupSample> ();
 //				}
 				if ( objectives.Length > 1 )
 					Debug.Log ( "Near " + objectives.Length + " objectives." );
@@ -385,7 +389,7 @@ public class RoverController : IRobotController
 		return robotBody.TransformDirection ( localDirection );
 	}
 
-	public override void PickupObjective (System.Action<GameObject> onPickup)
+	public override void PickupObjective (System.Action<PickupSample> onPickup)
 	{
 		// step 1: find pickup position
 		// step 2: actuate arm toward pickup
@@ -404,7 +408,8 @@ public class RoverController : IRobotController
 	IEnumerator DoPickup ()
 	{
 		grabbingObject = false;
-		armActuator.SetTarget ( curObjective.transform.position );
+		armActuator.SetTarget ( curObjective.GetCenterPosition () );
+//		armActuator.SetTarget ( curObjective.transform.position );
 		armActuator.Unfold ( true );
 //		armActuator.MoveToTarget ();
 //		yield return StartCoroutine ( RotateTo ( curObjective.transform.position ) );
@@ -420,7 +425,9 @@ public class RoverController : IRobotController
 //		yield return StartCoroutine ( RotateTo ( pos ) );
 		curObjective.transform.rotation = Quaternion.identity;
 		curObjective.transform.parent = robotBody;
-		Collider c = curObjective.GetComponent<Collider> ();
+//		curObjective.transform.localScale = Vector3.one * 0.25f;
+		Collider c = curObjective.Collider;
+//		Collider c = curObjective.GetComponent<Collider> ();
 		float bottomY = c.bounds.min.y;
 //		if ( bottomY < curObjective.transform.position.y )
 //		{
@@ -460,6 +467,7 @@ public class RoverController : IRobotController
 //		curObjective = null;
 //		IsNearObjective = false;
 		curObjective.transform.position = robotGrabPoint.position;
+		curObjective.transform.localScale = Vector3.one * 0.3f;
 		curObjective.transform.parent = robotGrabPoint;
 		grabbingObject = !grabbingObject;
 //		grabbingObject = true;
@@ -494,7 +502,7 @@ public class RoverController : IRobotController
 //		return flatbed.position + rand;
 	}
 
-	public override void CarryObjective (GameObject objective)
+/*	public override void CarryObjective (GameObject objective)
 	{
 		if ( objective == null )
 			return;
@@ -511,10 +519,10 @@ public class RoverController : IRobotController
 //		Vector3 rand = new Vector3 ( Random.Range ( -size.x, size.x ) * flatbed.localScale.x, 0, Random.Range ( -size.z, size.z ) * flatbed.localScale.z );
 		objective.transform.position = flatbed.position + rand;
 		objective.transform.parent = flatbed;
-	}
+	}*/
 
-	public void OnAnimatorIK (int layer)
+/*	public void OnAnimatorIK (int layer)
 	{
 		Debug.Log ( "animator IK" );
-	}
+	}*/
 }
