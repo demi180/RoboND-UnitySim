@@ -467,7 +467,7 @@ public class RoverController : IRobotController
 //		curObjective = null;
 //		IsNearObjective = false;
 		curObjective.transform.position = robotGrabPoint.position;
-		curObjective.transform.localScale = Vector3.one * 0.3f;
+//		curObjective.transform.localScale = Vector3.one * 0.3f;
 		curObjective.transform.parent = robotGrabPoint;
 		grabbingObject = !grabbingObject;
 //		grabbingObject = true;

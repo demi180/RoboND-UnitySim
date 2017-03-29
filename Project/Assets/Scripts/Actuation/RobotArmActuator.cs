@@ -23,6 +23,7 @@ public class RobotArmActuator : MonoBehaviour
 
 	float upperArmLength;
 	float forearmLength;
+	float upperArmEuler;
 	float elbowEuler;
 
 	public System.Action onArrive;
@@ -36,6 +37,7 @@ public class RobotArmActuator : MonoBehaviour
 		forearmLength = ( wrist.position - elbow.position ).magnitude;
 		elbowEuler = 150;
 		handConstraint.weight = 0;
+		upperArm.localEulerAngles = new Vector3 ( 10, 0, 0 );
 	}
 
 	void LateUpdate ()
@@ -67,37 +69,28 @@ public class RobotArmActuator : MonoBehaviour
 
 		toTarget = target.position - upperArm.position;
 		toTarget = Vector3.ProjectOnPlane ( toTarget, upperArm.right );
-//		toTarget = Vector3.ClampMagnitude ( toTarget, upperArmLength + forearmLength );
+
 		float a = upperArmLength;
 		float b = forearmLength; // let alpha opposite b = upper arm angle
 		float c = toTarget.magnitude; // let gamma opposite c = forearm angle
 		float alpha = Mathf.Acos ( ( c * c + a * a - b * b ) / ( 2 * a * c ) ) * Mathf.Rad2Deg;
-//		float gamma = Mathf.Acos ( ( a * a + b * b - c * c ) / ( 2 * a * b ) ) * Mathf.Rad2Deg;
-//		if ( alpha == 0 || float.IsNaN ( alpha ) )
-//			alpha = 0.1f;
-//		if ( gamma > 180 || float.IsNaN ( gamma ) )
-//			gamma = 179.9f;
-//		if ( gamma <= 0 )
-//			gamma = 0.1f;
-//		Debug.Log ( "UAL: " + a + " FAL: " + b + " tot: " + c + " Alpha: " + alpha + " Gamma: " + gamma );
-//		Debug.Log ( "cosAlpha = " + ( c * c + b * b - a * a ) / ( 2 * c * b ) );
-
-//		toTarget = Vector3.ProjectOnPlane ( toTarget, upperArm.right );
-//		Vector3 project = Vector3.Project ( upperArm.up * upperArmLength, toTarget );
-//		Vector3 pos = upperArm.position + upperArm.up * upperArmLength;
-//		Debug.DrawLine ( pos, upperArm.position + project, Color.white );
-//		Debug.DrawLine ( pos, pos + project, Color.black );
-
-		// upper arm
-		alpha = Mathf.Clamp ( 90 - alpha, upperArmMinAngle, upperArmMaxAngle );
-		Quaternion q = Quaternion.AngleAxis ( alpha, upperArm.right );
-		targetRot = Quaternion.LookRotation ( toTarget, upperArm.up );
-		targetRot = q * targetRot;
-		upperArm.rotation = Quaternion.RotateTowards ( upperArm.rotation, targetRot, rotationSpeed * Time.deltaTime );
-		Vector3 euler = upperArm.localEulerAngles;
-		euler.x = Mathf.Clamp ( euler.x, upperArmMinAngle, upperArmMaxAngle );
-		euler.y = euler.z = 0;
+//
+		alpha = Vector3.Angle ( Vector3.up, toTarget ) - alpha;
+		alpha = Mathf.Clamp ( alpha, upperArmMinAngle, upperArmMaxAngle );
+		upperArmEuler = Mathf.MoveTowards ( upperArmEuler, alpha, rotationSpeed * Time.deltaTime );
+		Vector3 euler = new Vector3 ( upperArmEuler, 0, 0 );
 		upperArm.localEulerAngles = euler;
+
+//		// upper arm
+//		alpha = Mathf.Clamp ( 90 - alpha, upperArmMinAngle, upperArmMaxAngle );
+//		Quaternion q = Quaternion.AngleAxis ( alpha, upperArm.right );
+//		targetRot = Quaternion.LookRotation ( toTarget, upperArm.up );
+//		targetRot = q * targetRot;
+//		upperArm.rotation = Quaternion.RotateTowards ( upperArm.rotation, targetRot, rotationSpeed * Time.deltaTime );
+//		Vector3 euler = upperArm.localEulerAngles;
+//		euler.x = Mathf.Clamp ( euler.x, upperArmMinAngle, upperArmMaxAngle );
+//		euler.y = euler.z = 0;
+//		upperArm.localEulerAngles = euler;
 		Debug.DrawRay ( upperArm.position, upperArm.forward, Color.blue );
 		Debug.DrawRay ( upperArm.position, toTarget, Color.cyan );
 
@@ -109,47 +102,9 @@ public class RobotArmActuator : MonoBehaviour
 		elbowEuler = Mathf.MoveTowards ( elbowEuler, 180 - gamma, rotationSpeed * Time.deltaTime );
 		euler = new Vector3 ( elbowEuler, 0, 0 );
 		elbow.localEulerAngles = euler;
-//		toTarget = target.position - elbow.position;
-//		toTarget = Vector3.ProjectOnPlane ( toTarget, elbow.right );
-//		toTarget = Vector3.ClampMagnitude ( toTarget, forearmLength );
-//		Debug.Log ( "Gamma: " + gamma + " New gamma: " + ( 180 - gamma ) );//+ " Eulerx: " + euler.x );
-//		gamma = Mathf.Clamp ( 180 - gamma, elbowMinAngle, elbowMaxAngle );
-//		Vector3 look = Quaternion.AngleAxis ( gamma, elbow.right ) * upperArm.up;
-//		targetRot = Quaternion.LookRotation ( look, -elbow.forward );
-//		q = Quaternion.AngleAxis ( 90, elbow.right );
-//		targetRot = Quaternion.LookRotation ( toTarget, elbow.up );
-//		targetRot = q * targetRot;
-//		toTarget = target.position - elbow.position;
-//		toTarget = Vector3.ProjectOnPlane ( toTarget, elbow.right );
-//		toTarget = Vector3.ClampMagnitude ( toTarget, forearmLength );
-//		q = Quaternion.AngleAxis ( 90, elbow.right );
-//		targetRot = Quaternion.LookRotation ( toTarget, elbow.up );
-//		targetRot = q * targetRot;
 		Debug.DrawRay ( elbow.position, toTarget, Color.magenta );
 		Debug.DrawRay ( elbow.position, elbow.up, Color.green );
 		Debug.DrawRay ( elbow.position, elbow.right, Color.red );
-//		elbow.localRotation = Quaternion.RotateTowards ( elbow.localRotation, targetRot, rotationSpeed * Time.deltaTime );
-//		elbow.rotation = Quaternion.RotateTowards ( elbow.rotation, targetRot, rotationSpeed * Time.deltaTime );
-//		euler = elbow.localEulerAngles;
-//		euler.x += 90;
-//		gamma = 180 - gamma;
-//		euler.x = Mathf.MoveTowards ( euler.x, gamma, rotationSpeed * Time.deltaTime );
-//		euler.x = 180 - euler.x;
-//		euler.x = Mathf.Clamp ( euler.x, elbowMinAngle, elbowMaxAngle );
-//		if ( euler.y < 90 )
-//		if ( Mathf.Approximately ( euler.y, 0 ) )
-//			euler.y = 0;
-//		else
-//			euler.y = 180;
-//		if ( euler.z < 90 )
-//		if ( Mathf.Approximately ( euler.z, 0 ) )
-//			euler.z = 0;
-//		else
-//			euler.z = 180;
-//		euler.y = euler.z = 0;
-//		Debug.Log ( "y: " + euler.y + " z: " + euler.z );
-//		elbow.localEulerAngles = euler;
-//		elbow.localEulerAngles = new Vector3 ( 150, 0, 0 );
 		Debug.DrawRay ( elbow.position, elbow.forward, Color.blue );
 
 		// piston?

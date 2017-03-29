@@ -11,6 +11,7 @@ public class FPSRobotInput : MonoBehaviour
 	public bool controllable;
 	public bool isTrainingMode;
 
+	GameObject objectiveParent;
 	Renderer grid;
 	RaycastHit rayHit;
 	bool braking;
@@ -19,6 +20,7 @@ public class FPSRobotInput : MonoBehaviour
 
 	void Start ()
 	{
+		objectiveParent = GameObject.Find ( "Objectives" );
 		GameObject gridObject = GameObject.Find ( "Grid_v2" );
 		if ( gridObject != null )
 			grid = gridObject.GetComponent<Renderer> ();
@@ -40,6 +42,12 @@ public class FPSRobotInput : MonoBehaviour
 		{
 			if ( grid != null )
 				grid.enabled = !grid.enabled;
+		}
+
+		if ( Input.GetKeyDown ( KeyCode.O ) )
+		{
+			if ( objectiveParent != null )
+				objectiveParent.SetActive ( !objectiveParent.activeSelf );
 		}
 
 		if ( DisableFocus )
