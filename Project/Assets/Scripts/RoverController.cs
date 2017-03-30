@@ -410,7 +410,7 @@ public class RoverController : IRobotController
 	{
 		float total = 2 + 3 + 3 + 3 + 3 + 6;
 		float t = 0;
-		curObjective.Collider.enabled = false;
+//		curObjective.Collider.enabled = false;
 //		grabbingObject = false;
 		// first find a new folded position facing the target
 		Vector3 centerPos = armActuator.baseTransform.position;
@@ -428,8 +428,15 @@ public class RoverController : IRobotController
 			t += Time.deltaTime;
 		}
 //		yield return new WaitForSeconds ( 2 );
-		// now assign the extended position as the sample's position
-		armActuator.SetTarget ( 1, curObjective.GetCenterPosition () );
+		// now assign the extended position as something near the sample's position
+		Ray ray = new Ray ( armActuator.foldedPosition.position, curObjective.GetCenterPosition () - armActuator.foldedPosition.position );
+//		Ray ray = new Ray ( robotGrabPoint.position, curObjective.GetCenterPosition () - robotGrabPoint.position );
+		RaycastHit hit;
+		curObjective.Collider.Raycast ( ray, out hit, 1 );
+		curObjective.Collider.enabled = false;
+//		Physics.Raycast ( ray, out hit );
+		armActuator.SetTarget ( 1, hit.point );
+//		armActuator.SetTarget ( 1, curObjective.GetCenterPosition () );
 		// and move towards that over 3 sec
 		armActuator.MoveToTarget ( 3 );
 		t = 0;
@@ -441,7 +448,10 @@ public class RoverController : IRobotController
 		}
 //		yield return new WaitForSeconds ( 3 );
 		// parent and position the sample to our vacuum attachment
-		curObjective.transform.position = robotGrabPoint.position;// - Vector3.up * curObjective.Collider.bounds.extents.y;
+		Vector3 positionDIff = curObjective.transform.position - hit.point;
+		Debug.DrawLine ( hit.point, curObjective.transform.position, Color.red, 3 );
+		curObjective.transform.position = robotGrabPoint.position + positionDIff;
+//		curObjective.transform.position = robotGrabPoint.position;// - Vector3.up * curObjective.Collider.bounds.extents.y;
 		curObjective.transform.parent = armActuator.wrist;
 		// now move back to folded position over 3 sec
 		armActuator.MoveToTarget ( 3, true );
@@ -468,7 +478,9 @@ public class RoverController : IRobotController
 		}
 //		yield return new WaitForSeconds ( 3 );
 		// extend the arm out to place the object
-		armActuator.SetTarget ( 1, newPos );
+		positionDIff = curObjective.transform.position - armActuator.foldedPosition.position;
+		armActuator.SetTarget ( 1, newPos - positionDIff );
+//		armActuator.SetTarget ( 1, newPos );
 		armActuator.MoveToTarget ( 3 );
 		t = 0;
 		while ( t < 3 )
