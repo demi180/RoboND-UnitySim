@@ -50,6 +50,7 @@ public abstract class IRobotController : MonoBehaviour
 	public Vector3 Position { get { return transform.position; } }
 	public float Orientation { get { return transform.eulerAngles.y; } }
 	public bool IsTurningInPlace { get; protected set; }
+	public float PickupProgress { get; set; }
 	public bool allowStrafe;
 	public bool allowSprint;
 	public bool allowJump;

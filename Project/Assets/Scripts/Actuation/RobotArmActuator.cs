@@ -31,6 +31,10 @@ public class RobotArmActuator : MonoBehaviour
 	float timeNotMoved;
 	Vector3 lastWristPos;
 
+	Vector3 initialFoldedPosition;
+	Vector3 initialTargetPosition;
+
+
 	void Awake ()
 	{
 		upperArmLength = ( elbow.position - upperArm.position ).magnitude;
@@ -38,6 +42,9 @@ public class RobotArmActuator : MonoBehaviour
 		elbowEuler = 150;
 		handConstraint.weight = 0;
 		upperArm.localEulerAngles = new Vector3 ( 10, 0, 0 );
+		upperArmEuler = 10;
+		initialFoldedPosition = foldedPosition.localPosition;
+		initialTargetPosition = targetPosition.localPosition;
 	}
 
 	void LateUpdate ()
@@ -74,10 +81,14 @@ public class RobotArmActuator : MonoBehaviour
 		float b = forearmLength; // let alpha opposite b = upper arm angle
 		float c = toTarget.magnitude; // let gamma opposite c = forearm angle
 		float alpha = Mathf.Acos ( ( c * c + a * a - b * b ) / ( 2 * a * c ) ) * Mathf.Rad2Deg;
+		if ( alpha == 0 || float.IsNaN ( alpha ) )
+			alpha = 0.1f;
 //
 		alpha = Vector3.Angle ( Vector3.up, toTarget ) - alpha;
 		alpha = Mathf.Clamp ( alpha, upperArmMinAngle, upperArmMaxAngle );
 		upperArmEuler = Mathf.MoveTowards ( upperArmEuler, alpha, rotationSpeed * Time.deltaTime );
+		if ( upperArmEuler > upperArmMaxAngle || upperArmEuler < upperArmMinAngle )
+			Debug.Log ( "alpha: " + alpha + " uae: " + upperArmEuler );
 		Vector3 euler = new Vector3 ( upperArmEuler, 0, 0 );
 		upperArm.localEulerAngles = euler;
 
@@ -152,32 +163,37 @@ public class RobotArmActuator : MonoBehaviour
 		timeNotMoved = 0;
 	}
 
-	public void MoveToTarget (float time = 2)
+	public void MoveToTarget (float time = 2, bool backwards = false)
 	{
-		StartCoroutine ( MoveTo ( time ) );
+		StartCoroutine ( MoveTo ( time, backwards ) );
 	}
 
-	IEnumerator MoveTo (float time)
+	IEnumerator MoveTo (float time, bool backwards = false)
 	{
 		yield return null;
-		float t = 0;
+		float t = backwards ? 1 : 0;
+		float target = 1 - t;
 		float spd = 1f / time;
 		while ( t < time )
 		{
-			handConstraint.weight += Time.deltaTime * spd;
-			if ( handConstraint.weight >= 1 )
+			handConstraint.weight = Mathf.MoveTowards ( handConstraint.weight, target, spd * Time.deltaTime );
+//			handConstraint.weight += Time.deltaTime * spd;
+			if ( handConstraint.weight >= 1 || handConstraint.weight <= 0 )
 				break;
 			t += Time.deltaTime;
 			yield return null;
 		}
-		handConstraint.weight = 1;
+		handConstraint.weight = target;
 		if ( onArrive != null )
 			onArrive ();
 	}
 
-	public void SetTarget (Vector3 position)
+	public void SetTarget (int target, Vector3 position)
 	{
-		targetPosition.position = position;
+		if ( target == 0 )
+			foldedPosition.position = position;
+		else
+			targetPosition.position = position;
 	}
 
 	public void MoveTarget (Vector3 position, float time = 3)
@@ -203,7 +219,21 @@ public class RobotArmActuator : MonoBehaviour
 		}
 
 		targetPosition.position = position;
-		if ( onArrive != null )
-			onArrive ();
+//		if ( onArrive != null )
+//			onArrive ();
+	}
+
+	public void ResetPosition ()
+	{
+		StartCoroutine ( _Reset () );
+	}
+
+	IEnumerator _Reset ()
+	{
+		handConstraint.weight = 0;
+		yield return new WaitForSeconds ( 3 );
+		foldedPosition.localPosition = initialFoldedPosition;
+		yield return new WaitForSeconds ( 3 );
+		targetPosition.localPosition = initialTargetPosition;
 	}
 }

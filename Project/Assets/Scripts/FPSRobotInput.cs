@@ -26,6 +26,7 @@ public class FPSRobotInput : MonoBehaviour
 			grid = gridObject.GetComponent<Renderer> ();
 		if ( grid != null )
 			grid.enabled = false;
+		controller.PickupProgress = -1;
 //		Cursor.lockState = CursorLockMode.Locked;
 //		controllable = true;
 	}

@@ -7,6 +7,8 @@ public class UIOutput : MonoBehaviour
 {
 	public IRobotController controller;
 	public Text infoText;
+	public GameObject progressParent;
+	public Image progressBar;
 
 	System.Text.StringBuilder sb = new System.Text.StringBuilder ();
 
@@ -48,5 +50,15 @@ public class UIOutput : MonoBehaviour
 		sb.Append ( "Is near objective: " + ( controller.IsNearObjective ? "Yes" : "No" ) );
 		infoText.text = sb.ToString ();
 
+		if ( controller.PickupProgress != -1 )
+		{
+			if ( !progressParent.activeSelf )
+				progressParent.SetActive ( true );
+			progressBar.fillAmount = controller.PickupProgress;
+		} else
+		{
+			if ( progressParent.activeSelf )
+				progressParent.SetActive ( false );
+		}
 	}
 }

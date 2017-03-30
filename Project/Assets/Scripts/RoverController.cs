@@ -68,12 +68,12 @@ public class RoverController : IRobotController
 		depthOfField = camera.GetComponent<DepthOfField> ();
 		ResetZoom ();
 
-		armActuator.onArrive = OnPickup;
+//		armActuator.onArrive = OnPickup;
 	}
 
 	void Start ()
 	{
-		armActuator.Fold ();
+		armActuator.Fold ( false );
 	}
 
 	void FixedUpdate ()
@@ -398,83 +398,140 @@ public class RoverController : IRobotController
 		// step 3: close claw on pickup
 		rb.velocity = Vector3.zero;
 		rb.isKinematic = true;
-		pickupCallback = onPickup;
+//		pickupCallback = onPickup;
 		isPickingUp = true;
 		armActuator.enabled = true;
 //		Time.timeScale = 0.2f;
+		PickupProgress = 0;
 		StartCoroutine ( DoPickup () );
 	}
 
 	IEnumerator DoPickup ()
 	{
-		grabbingObject = false;
-		armActuator.SetTarget ( curObjective.GetCenterPosition () );
-//		armActuator.SetTarget ( curObjective.transform.position );
-		armActuator.Unfold ( true );
-//		armActuator.MoveToTarget ();
-//		yield return StartCoroutine ( RotateTo ( curObjective.transform.position ) );
-		while ( !grabbingObject )
+		float total = 2 + 3 + 3 + 3 + 3 + 6;
+		float t = 0;
+		curObjective.Collider.enabled = false;
+//		grabbingObject = false;
+		// first find a new folded position facing the target
+		Vector3 centerPos = armActuator.baseTransform.position;
+		centerPos.y = armActuator.foldedPosition.position.y;
+		float dist = ( armActuator.foldedPosition.position - centerPos ).magnitude;
+		Vector3 toTarget = curObjective.GetCenterPosition () - centerPos;
+		toTarget.y = 0;
+		// assign that position to the folded position and the arm will turn to it
+		armActuator.SetTarget ( 0, centerPos + toTarget.normalized * dist );
+		t = 0;
+		while ( t < 2 )
+		{
 			yield return null;
-		IsNearObjective = false;
-		Vector3 pos = GetPositionOnFlatbed ();
-//		armActuator.SetTarget ( pos );
-//		armActuator.MoveToTarget ();
-		armActuator.MoveTarget ( pos );
-		while ( grabbingObject )
+			PickupProgress += Time.deltaTime / total;
+			t += Time.deltaTime;
+		}
+//		yield return new WaitForSeconds ( 2 );
+		// now assign the extended position as the sample's position
+		armActuator.SetTarget ( 1, curObjective.GetCenterPosition () );
+		// and move towards that over 3 sec
+		armActuator.MoveToTarget ( 3 );
+		t = 0;
+		while ( t < 3 )
+		{
 			yield return null;
-//		yield return StartCoroutine ( RotateTo ( pos ) );
-		curObjective.transform.rotation = Quaternion.identity;
+			PickupProgress += Time.deltaTime / total;
+			t += Time.deltaTime;
+		}
+//		yield return new WaitForSeconds ( 3 );
+		// parent and position the sample to our vacuum attachment
+		curObjective.transform.position = robotGrabPoint.position;// - Vector3.up * curObjective.Collider.bounds.extents.y;
+		curObjective.transform.parent = armActuator.wrist;
+		// now move back to folded position over 3 sec
+		armActuator.MoveToTarget ( 3, true );
+		t = 0;
+		while ( t < 3 )
+		{
+			yield return null;
+			PickupProgress += Time.deltaTime / total;
+			t += Time.deltaTime;
+		}
+//		yield return new WaitForSeconds ( 3 );
+		// find a place to put the sample
+		Vector3 newPos = GetPositionOnFlatbed ();
+		toTarget = newPos - centerPos;
+		toTarget.y = 0;
+		// move the folded position to turn the arm around
+		armActuator.SetTarget ( 0, centerPos + toTarget.normalized * dist );
+		t = 0;
+		while ( t < 3 )
+		{
+			yield return null;
+			PickupProgress += Time.deltaTime / total;
+			t += Time.deltaTime;
+		}
+//		yield return new WaitForSeconds ( 3 );
+		// extend the arm out to place the object
+		armActuator.SetTarget ( 1, newPos );
+		armActuator.MoveToTarget ( 3 );
+		t = 0;
+		while ( t < 3 )
+		{
+			yield return null;
+			PickupProgress += Time.deltaTime / total;
+			t += Time.deltaTime;
+		}
+//		yield return new WaitForSeconds ( 3 );
+		// parent and position it to us (not to the flatbed because thatscrews up scales)
+		curObjective.transform.position = newPos;
 		curObjective.transform.parent = robotBody;
-//		curObjective.transform.localScale = Vector3.one * 0.25f;
-		Collider c = curObjective.Collider;
-//		Collider c = curObjective.GetComponent<Collider> ();
-		float bottomY = c.bounds.min.y;
-//		if ( bottomY < curObjective.transform.position.y )
-//		{
-//			float delta = curObjective.transform.position.y - bottomY;
-//			curObjective.transform.position 
-//		}
-		curObjective.transform.position = pos;
-		grabbingObject = false;
+		// lastly reset the arm, and go back to drivable state
+		armActuator.ResetPosition ();
+		t = 0;
+		while ( t < 6 )
+		{
+			yield return null;
+			PickupProgress += Time.deltaTime / total;
+			t += Time.deltaTime;
+		}
+//		yield return new WaitForSeconds ( 6 );
 		isPickingUp = false;
 		rb.isKinematic = false;
-		armActuator.Fold ( true );
-//		Time.timeScale = 1;
+		PickupProgress = -1;
+		yield break;
+
+/*		grabbingObject = false;
+		armActuator.SetTarget ( 1, curObjective.GetCenterPosition () );
+//		armActuator.SetTarget ( curObjective.transform.position );
+		armActuator.Unfold ( false );
+//		armActuator.MoveToTarget ();
+//		yield return StartCoroutine ( RotateTo ( curObjective.transform.position ) );
+		yield return new WaitForSeconds ( 3 );
+		OnPickup ();
+//		while ( !grabbingObject )
+//			yield return null;
+		IsNearObjective = false;
+		armActuator.Fold ();
+		yield return new WaitForSeconds ( 3 );
+		Vector3 pos = GetPositionOnFlatbed ();
+		armActuator.MoveTarget ( pos );
+		yield return new WaitForSeconds ( 3 );
+		curObjective.transform.rotation = Quaternion.identity;
+		curObjective.transform.parent = robotBody;
+		Collider c = curObjective.Collider;
+		float bottomY = c.bounds.min.y;
+		curObjective.transform.position = pos;
+		grabbingObject = false;
+		rb.isKinematic = false;
+		armActuator.Fold ( false );
+		yield return new WaitForSeconds ( 3 );
+		isPickingUp = false;
+//		Time.timeScale = 1;*/
 	}
 
-/*	IEnumerator RotateTo (Vector3 targetPosition)
+/*	public void OnPickup ()
 	{
-		yield return null;
-		Vector3 toTarget = targetPosition - robotArmShoulder.position;
-		toTarget.y = 0;
-		toTarget = toTarget.normalized;
-//		Debug.DrawLine ( robotArmShoulder.position, robotArmShoulder.position + toTarget, Color.blue );
-		Quaternion targetRot = Quaternion.LookRotation ( toTarget ) * storedShoulder;
-		while ( Quaternion.Angle ( robotArmShoulder.rotation, targetRot ) > 0.1f )
-		{
-			robotArmShoulder.rotation = Quaternion.RotateTowards ( robotArmShoulder.rotation, targetRot, 50 * Time.deltaTime );
-			yield return null;
-		}
-		robotArmShoulder.rotation = targetRot;
-	}*/
-
-	public void OnPickup ()
-	{
-//		if ( pickupCallback != null )
-//			pickupCallback ( curObjective );
-//		else
-//			Destroy ( curObjective );
-//		curObjective = null;
-//		IsNearObjective = false;
+		Debug.Log ( "!!" );
 		curObjective.transform.position = robotGrabPoint.position;
-//		curObjective.transform.localScale = Vector3.one * 0.3f;
 		curObjective.transform.parent = robotGrabPoint;
 		grabbingObject = !grabbingObject;
-//		grabbingObject = true;
-//		isPickingUp = false;
-//		if ( curCamera == 0 )
-//			actualCamera.SetParent ( fpsPosition, false );
-	}
+	}*/
 
 	Vector3 GetPositionOnFlatbed ()
 	{
@@ -487,42 +544,5 @@ public class RoverController : IRobotController
 		}
 
 		throw new System.NullReferenceException ( "No more positions left on the rover!" );
-//		Collider c = curObjective.GetComponent<Collider> ();
-//		c.enabled = false;
-//		curObjective.transform.rotation = flatbed.rotation;
-//		BoxCollider b = flatbed.GetComponent<BoxCollider> ();
-//		Vector3 size = flatbed.rotation * flatbed.localScale;// / 2;
-//		Debug.DrawLine ( flatbed.position, flatbed.position - size/2, Color.green, 5 );
-//		Debug.DrawLine ( flatbed.position, flatbed.position + size/2, Color.green, 5 );
-//		size.z /= 3;
-//		size.x /= 2;
-//		Vector3 rand = -flatbed.forward * flatbed.localScale.z * 1 / 6 + flatbed.forward * Random.Range ( -size.z, size.z ) + flatbed.right * Random.Range ( -size.x, size.x );
-//		Vector3 rand = flatbed.forward * Random.Range ( -size.z, size.z ) + flatbed.right * Random.Range ( -size.x, size.x );
-
-//		return flatbed.position + rand;
 	}
-
-/*	public override void CarryObjective (GameObject objective)
-	{
-		if ( objective == null )
-			return;
-		Collider c = objective.GetComponent<Collider> ();
-		c.isTrigger = true;
-		c.enabled = false;
-		Destroy ( c );
-		objective.transform.rotation = flatbed.rotation;
-		BoxCollider b = flatbed.GetComponent<BoxCollider> ();
-		Vector3 size = flatbed.rotation * flatbed.localScale / 2;
-//		Debug.DrawLine ( flatbed.position, flatbed.position - size, Color.blue, 2 );
-//		Debug.DrawLine ( flatbed.position, flatbed.position + size, Color.red, 2 );
-		Vector3 rand = flatbed.forward * Random.Range ( -size.z, size.z ) + flatbed.right * Random.Range ( -size.x, size.x );
-//		Vector3 rand = new Vector3 ( Random.Range ( -size.x, size.x ) * flatbed.localScale.x, 0, Random.Range ( -size.z, size.z ) * flatbed.localScale.z );
-		objective.transform.position = flatbed.position + rand;
-		objective.transform.parent = flatbed;
-	}*/
-
-/*	public void OnAnimatorIK (int layer)
-	{
-		Debug.Log ( "animator IK" );
-	}*/
 }
