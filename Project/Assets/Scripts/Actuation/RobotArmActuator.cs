@@ -231,9 +231,9 @@ public class RobotArmActuator : MonoBehaviour
 	IEnumerator _Reset ()
 	{
 		handConstraint.weight = 0;
-		yield return new WaitForSeconds ( 3 );
+		yield return new WaitForSeconds ( 1.5f );
 		foldedPosition.localPosition = initialFoldedPosition;
-		yield return new WaitForSeconds ( 3 );
+		yield return new WaitForSeconds ( 1.5f );
 		targetPosition.localPosition = initialTargetPosition;
 	}
 }

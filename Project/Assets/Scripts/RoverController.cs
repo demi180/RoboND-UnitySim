@@ -402,13 +402,13 @@ public class RoverController : IRobotController
 		isPickingUp = true;
 		armActuator.enabled = true;
 //		Time.timeScale = 0.2f;
-		PickupProgress = 0;
+//		PickupProgress = 0;
 		StartCoroutine ( DoPickup () );
 	}
 
 	IEnumerator DoPickup ()
 	{
-		float total = 2 + 3 + 3 + 3 + 3 + 6;
+		float total = 1 + 1.5f + 1.5f + 1.5f + 1.5f + 3;
 		float t = 0;
 //		curObjective.Collider.enabled = false;
 //		grabbingObject = false;
@@ -421,10 +421,10 @@ public class RoverController : IRobotController
 		// assign that position to the folded position and the arm will turn to it
 		armActuator.SetTarget ( 0, centerPos + toTarget.normalized * dist );
 		t = 0;
-		while ( t < 2 )
+		while ( t < 1 )
 		{
 			yield return null;
-			PickupProgress += Time.deltaTime / total;
+//			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
 		}
 //		yield return new WaitForSeconds ( 2 );
@@ -438,12 +438,12 @@ public class RoverController : IRobotController
 		armActuator.SetTarget ( 1, hit.point );
 //		armActuator.SetTarget ( 1, curObjective.GetCenterPosition () );
 		// and move towards that over 3 sec
-		armActuator.MoveToTarget ( 3 );
+		armActuator.MoveToTarget ( 1.5f );
 		t = 0;
-		while ( t < 3 )
+		while ( t < 1.5f )
 		{
 			yield return null;
-			PickupProgress += Time.deltaTime / total;
+//			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
 		}
 //		yield return new WaitForSeconds ( 3 );
@@ -454,12 +454,12 @@ public class RoverController : IRobotController
 //		curObjective.transform.position = robotGrabPoint.position;// - Vector3.up * curObjective.Collider.bounds.extents.y;
 		curObjective.transform.parent = armActuator.wrist;
 		// now move back to folded position over 3 sec
-		armActuator.MoveToTarget ( 3, true );
+		armActuator.MoveToTarget ( 1.5f, true );
 		t = 0;
-		while ( t < 3 )
+		while ( t < 1.5f )
 		{
 			yield return null;
-			PickupProgress += Time.deltaTime / total;
+//			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
 		}
 //		yield return new WaitForSeconds ( 3 );
@@ -470,10 +470,10 @@ public class RoverController : IRobotController
 		// move the folded position to turn the arm around
 		armActuator.SetTarget ( 0, centerPos + toTarget.normalized * dist );
 		t = 0;
-		while ( t < 3 )
+		while ( t < 1.5f )
 		{
 			yield return null;
-			PickupProgress += Time.deltaTime / total;
+//			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
 		}
 //		yield return new WaitForSeconds ( 3 );
@@ -481,12 +481,12 @@ public class RoverController : IRobotController
 		positionDIff = curObjective.transform.position - armActuator.foldedPosition.position;
 		armActuator.SetTarget ( 1, newPos - positionDIff );
 //		armActuator.SetTarget ( 1, newPos );
-		armActuator.MoveToTarget ( 3 );
+		armActuator.MoveToTarget ( 1.5f );
 		t = 0;
-		while ( t < 3 )
+		while ( t < 1.5f )
 		{
 			yield return null;
-			PickupProgress += Time.deltaTime / total;
+//			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
 		}
 //		yield return new WaitForSeconds ( 3 );
@@ -496,16 +496,16 @@ public class RoverController : IRobotController
 		// lastly reset the arm, and go back to drivable state
 		armActuator.ResetPosition ();
 		t = 0;
-		while ( t < 6 )
+		while ( t < 3 )
 		{
 			yield return null;
-			PickupProgress += Time.deltaTime / total;
+//			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
 		}
 //		yield return new WaitForSeconds ( 6 );
 		isPickingUp = false;
 		rb.isKinematic = false;
-		PickupProgress = -1;
+//		PickupProgress = -1;
 		yield break;
 
 /*		grabbingObject = false;
