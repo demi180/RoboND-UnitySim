@@ -5,6 +5,7 @@ using UnityEngine;
 
 internal class RobotSample
 {
+	public Vector2 Position2 { get { return new Vector2 ( position.x, position.z ); } }
 	public Quaternion rotation;
 	public Vector3 position;
 	public float throttle;
@@ -130,7 +131,43 @@ public abstract class IRobotController : MonoBehaviour
 	//instead of showing frozen screen until all data is recorded
 	public IEnumerator WriteSamplesToDisk()
 	{
-		yield return new WaitForSeconds(0.000f); //retrieve as fast as we can but still allow communication of main thread to screen and UISystem
+		string newLine = "\n";
+		if ( Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer )
+			newLine = "\r\n";
+		
+		yield return null;
+		if ( samples.Count > 0 )
+		{
+			string row = "Path,SteerAngle,Throttle,Brake,Speed,X_Position,Y_Position,Yaw" + newLine;
+			File.AppendAllText (Path.Combine (m_saveLocation, CSVFileName), row);
+
+			int count = samples.Count;
+			for ( int i = 0; i < count; i++ )
+			{
+				RobotSample sample = samples.Dequeue ();
+				transform.position = sample.position;
+				transform.rotation = sample.rotation;
+				string camPath = WriteImage ( recordingCam, "robocam", sample.timestamp );
+
+				row = camPath + "," + sample.steerAngle + "," + sample.throttle + "," + sample.brake + "," + sample.speed + "," +
+					sample.position.x + "," + sample.position.z + "," + sample.yaw + newLine;
+				File.AppendAllText (Path.Combine (m_saveLocation, CSVFileName), row);
+				yield return null;
+			}
+
+			isSaving = false;
+			//need to reset the car back to its position before ending recording, otherwise sometimes the car ended up in strange areas
+			transform.position = saved_position;
+			transform.rotation = saved_rotation;
+			Vector3 euler = cameraVAxis.localEulerAngles;
+			euler.x = saved_vAngle;
+			cameraVAxis.localEulerAngles = euler;
+			Move ( 0 );
+			Rotate ( 0 );
+			RotateCamera ( 0, 0 );
+		}
+
+/*		yield return new WaitForSeconds(0.000f); //retrieve as fast as we can but still allow communication of main thread to screen and UISystem
 		if (samples.Count > 0) {
 			//pull off a sample from the que
 			RobotSample sample = samples.Dequeue();
@@ -166,12 +203,10 @@ public abstract class IRobotController : MonoBehaviour
 			Vector3 euler = cameraVAxis.localEulerAngles;
 			euler.x = saved_vAngle;
 			cameraVAxis.localEulerAngles = euler;
-//			m_Rigidbody.velocity = new Vector3(0f,-10f,0f);
-//			Move(0f, 0f, 0f, 0f);
 			Move ( 0 );
 			Rotate ( 0 );
 			RotateCamera ( 0, 0 );
-		}
+		}*/
 	}
 
 	public float getSavePercent()
