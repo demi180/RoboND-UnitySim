@@ -20,6 +20,7 @@ public class CommandServer : MonoBehaviour
 		_socket.On("steer", OnSteer);
 		_socket.On("manual", onManual);
 		_socket.On ( "fixed_turn", OnFixedTurn );
+		_socket.On ( "pickup", OnPickup );
 		robotController = robotRemoteControl.robot;
 		frontFacingCamera = robotController.recordingCam;
 	}
@@ -61,6 +62,12 @@ public class CommandServer : MonoBehaviour
 		EmitTelemetry ( obj );
 	}
 
+	void OnPickup (SocketIOEvent obj)
+	{
+		robotRemoteControl.PickupSample ();
+		EmitTelemetry ( obj );
+	}
+
 	void EmitTelemetry(SocketIOEvent obj)
 	{
 //		Debug.Log ( "Emitting" );
@@ -84,6 +91,8 @@ public class CommandServer : MonoBehaviour
 				data["position"] = pos.x.ToString ("N4") + "," + pos.z.ToString ("N4");
 				data["orientation"] = robotController.Orientation.ToString ("N4");
 				data["fixed_turn"] = robotController.IsTurningInPlace ? "1" : "0";
+				data["near_sample"] = robotController.IsNearObjective ? "1" : "0";
+				data["picking_up"] = robotController.IsPickingUpSample ? "1" : "0";
 				data["image"] = Convert.ToBase64String(CameraHelper.CaptureFrame(frontFacingCamera));
 //				Debug.Log ("sangle " + data["steering_angle"] + " vert " + data["vert_angle"] + " throt " + data["throttle"] + " speed " + data["speed"] + " image " + data["image"]);
 				_socket.Emit("telemetry", new JSONObject(data));

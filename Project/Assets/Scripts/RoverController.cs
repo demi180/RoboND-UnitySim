@@ -400,6 +400,7 @@ public class RoverController : IRobotController
 		rb.isKinematic = true;
 //		pickupCallback = onPickup;
 		isPickingUp = true;
+		IsPickingUpSample = isPickingUp;
 		armActuator.enabled = true;
 //		Time.timeScale = 0.2f;
 //		PickupProgress = 0;
@@ -504,6 +505,7 @@ public class RoverController : IRobotController
 		}
 //		yield return new WaitForSeconds ( 6 );
 		isPickingUp = false;
+		IsPickingUpSample = isPickingUp;
 		rb.isKinematic = false;
 //		PickupProgress = -1;
 		yield break;

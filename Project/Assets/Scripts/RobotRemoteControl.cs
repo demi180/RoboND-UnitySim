@@ -41,6 +41,11 @@ public class RobotRemoteControl : MonoBehaviour
 		robot.FixedTurn ( angle, time );
 	}
 
+	public void PickupSample ()
+	{
+		robot.PickupObjective ( null );
+	}
+
 //	void FixedUpdate ()
 //	{
 //		if ( useFixedUpdate )
