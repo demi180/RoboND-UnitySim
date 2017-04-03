@@ -81,7 +81,7 @@ public class CommandServer : MonoBehaviour
 				data["brake"] = robotController.BrakeInput.ToString ("N4");
 				data["speed"] = robotController.Speed.ToString("N4");
 				Vector3 pos = robotController.Position;
-				data["position"] = pos.x.ToString ("N4") + "," + pos.y.ToString ("N4") + "," + pos.z.ToString ("N4");
+				data["position"] = pos.x.ToString ("N4") + "," + pos.z.ToString ("N4");
 				data["orientation"] = robotController.Orientation.ToString ("N4");
 				data["fixed_turn"] = robotController.IsTurningInPlace ? "1" : "0";
 				data["image"] = Convert.ToBase64String(CameraHelper.CaptureFrame(frontFacingCamera));
