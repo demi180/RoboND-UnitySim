@@ -12,6 +12,9 @@ public class CommandServer : MonoBehaviour
 	public IRobotController robotController;
 	public Camera frontFacingCamera;
 	private SocketIOComponent _socket;
+	public UnityEngine.UI.RawImage mapImage;
+
+	Texture2D mapTex;
 
 	void Start()
 	{
@@ -23,6 +26,7 @@ public class CommandServer : MonoBehaviour
 		_socket.On ( "pickup", OnPickup );
 		robotController = robotRemoteControl.robot;
 		frontFacingCamera = robotController.recordingCam;
+		mapTex = new Texture2D ( 1, 1 );
 	}
 
 	void OnOpen(SocketIOEvent obj)
@@ -47,7 +51,19 @@ public class CommandServer : MonoBehaviour
 			robotRemoteControl.BrakeInput = float.Parse ( jsonObject.GetField ( "brake" ).str );
 		else
 			robotRemoteControl.BrakeInput = 0;
-//		robotRemoteControl.VerticalAngle = float.Parse ( jsonObject.GetField ( "vert_angle" ).str );
+
+		bool loaded = false;
+		if ( jsonObject.HasField ( "inset_image" ) )
+			loaded = mapTex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image" ).str ), true );
+		if ( loaded && mapImage != null )
+		{
+			mapImage.texture = mapTex;
+			mapImage.CrossFadeAlpha ( 1, 0.3f, false );
+		} else
+		if ( mapImage != null )
+		{
+			mapImage.CrossFadeAlpha ( 0, 0.3f, false );
+		}
 		EmitTelemetry(obj);
 	}
 

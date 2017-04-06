@@ -15,6 +15,7 @@ public class TrainingUI : MonoBehaviour
 	public Text saveStatus;
 	public Text recordStatus;
 	public RawImage roboCamImage;
+	public RawImage mapImage;
 
 	float roboCamAlpha = 1;
 	bool recording;
@@ -97,5 +98,7 @@ public class TrainingUI : MonoBehaviour
 		rightArea.gameObject.SetActive ( isTrainingMode );
 		enabled = isTrainingMode;
 		robotInput.isTrainingMode = training;
+		mapImage.enabled = !training;
+		mapImage.CrossFadeAlpha ( 0, 0, true );
 	}
 }
