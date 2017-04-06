@@ -8,8 +8,11 @@ public class FlyingCamera : MonoBehaviour
 	public float rotationSpeed = 180;
 	public float sprintFactor = 4;
 
+	Rigidbody rb;
+
 	void Start () 
 	{
+		rb = GetComponent<Rigidbody> ();
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 	}
@@ -22,7 +25,11 @@ public class FlyingCamera : MonoBehaviour
 
 		if ( Input.GetKey ( KeyCode.LeftShift ) || Input.GetKey ( KeyCode.RightShift ) )
 			move *= sprintFactor;
-		transform.Translate ( move * moveSpeed * Time.deltaTime, Space.Self );
+		move = transform.TransformDirection ( move );
+		rb.velocity = move * moveSpeed;
+//		rb.MovePosition ( transform.position + move * moveSpeed * Time.deltaTime );
+//		rb.AddForce ( move * moveSpeed * Time.deltaTime, ForceMode.Acceleration );
+//		transform.Translate ( move * moveSpeed * Time.deltaTime, Space.Self );
 		transform.Rotate ( Vector3.up * rotation.x * rotationSpeed * Time.deltaTime, Space.World );
 		transform.Rotate ( Vector3.right * -rotation.y * rotationSpeed * Time.deltaTime, Space.Self );
 
