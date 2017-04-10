@@ -5,6 +5,7 @@ using SocketIO;
 using UnityStandardAssets.Vehicles.Car;
 using System;
 using System.Security.AccessControl;
+using UnityEngine.UI;
 
 public class CommandServer : MonoBehaviour
 {
@@ -12,9 +13,13 @@ public class CommandServer : MonoBehaviour
 	public IRobotController robotController;
 	public Camera frontFacingCamera;
 	private SocketIOComponent _socket;
-	public UnityEngine.UI.RawImage mapImage;
+	public RawImage inset1;
+	public RawImage inset2;
+	public RawImage inset3;
 
-	Texture2D mapTex;
+	Texture2D inset1Tex;
+	Texture2D inset2Tex;
+	Texture2D inset3Tex;
 
 	void Start()
 	{
@@ -26,7 +31,9 @@ public class CommandServer : MonoBehaviour
 		_socket.On ( "pickup", OnPickup );
 		robotController = robotRemoteControl.robot;
 		frontFacingCamera = robotController.recordingCam;
-		mapTex = new Texture2D ( 1, 1 );
+		inset1Tex = new Texture2D ( 1, 1 );
+		inset2Tex = new Texture2D ( 1, 1 );
+		inset3Tex = new Texture2D ( 1, 1 );
 	}
 
 	void OnOpen(SocketIOEvent obj)
@@ -52,17 +59,54 @@ public class CommandServer : MonoBehaviour
 		else
 			robotRemoteControl.BrakeInput = 0;
 
+		// try to load image1
 		bool loaded = false;
+		Vector2 size = Vector2.zero;
 		if ( jsonObject.HasField ( "inset_image" ) )
-			loaded = mapTex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image" ).str ), true );
-		if ( loaded && mapImage != null )
+			loaded = inset1Tex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image" ).str ), true );
+		if ( loaded && inset1 != null )
 		{
-			mapImage.texture = mapTex;
-			mapImage.CrossFadeAlpha ( 1, 0.3f, false );
+			inset1.texture = inset1Tex;
+			size = inset1.rectTransform.sizeDelta;
+			size.x = 1f * inset1Tex.width / inset1Tex.height * size.y;
+			inset1.rectTransform.sizeDelta = size;
+			inset1.CrossFadeAlpha ( 1, 0.3f, false );
 		} else
-		if ( mapImage != null )
+		if ( inset1 != null )
 		{
-			mapImage.CrossFadeAlpha ( 0, 0.3f, false );
+			inset1.CrossFadeAlpha ( 0, 0.3f, false );
+		}
+		// try to load image2
+		loaded = false;
+		if ( jsonObject.HasField ( "inset_image2" ) )
+			loaded = inset2Tex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image2" ).str ), true );
+		if ( loaded && inset2Tex != null )
+		{
+			inset2.texture = inset2Tex;
+			size = inset2.rectTransform.sizeDelta;
+			size.x = 1f * inset2Tex.width / inset2Tex.height * size.y;
+			inset2.rectTransform.sizeDelta = size;
+			inset2.CrossFadeAlpha ( 1, 0.3f, false );
+		} else
+		if ( inset2 != null )
+		{
+			inset2.CrossFadeAlpha ( 0, 0.3f, false );
+		}
+		// try to load image3
+		loaded = false;
+		if ( jsonObject.HasField ( "inset_image3" ) )
+			loaded = inset3Tex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image3" ).str ), true );
+		if ( loaded && inset3Tex != null )
+		{
+			inset3.texture = inset3Tex;
+			size = inset3.rectTransform.sizeDelta;
+			size.x = 1f * inset3Tex.width / inset3Tex.height * size.y;
+			inset3.rectTransform.sizeDelta = size;
+			inset3.CrossFadeAlpha ( 1, 0.3f, false );
+		} else
+		if ( inset3 != null )
+		{
+			inset3.CrossFadeAlpha ( 0, 0.3f, false );
 		}
 		EmitTelemetry(obj);
 	}
@@ -105,7 +149,9 @@ public class CommandServer : MonoBehaviour
 				data["speed"] = robotController.Speed.ToString("N4");
 				Vector3 pos = robotController.Position;
 				data["position"] = pos.x.ToString ("N4") + "," + pos.z.ToString ("N4");
-				data["orientation"] = robotController.Orientation.ToString ("N4");
+				data["pitch"] = robotController.Pitch.ToString ("N4");
+				data["yaw"] = robotController.Yaw.ToString ("N4");
+				data["roll"] = robotController.Roll.ToString ("N4");
 				data["fixed_turn"] = robotController.IsTurningInPlace ? "1" : "0";
 				data["near_sample"] = robotController.IsNearObjective ? "1" : "0";
 				data["picking_up"] = robotController.IsPickingUpSample ? "1" : "0";

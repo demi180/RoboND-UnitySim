@@ -11,7 +11,9 @@ internal class RobotSample
 	public float throttle;
 	public float brake;
 	public float speed;
+	public float pitch;
 	public float yaw;
+	public float roll;
 	public float steerAngle;
 	public float verticalAngle;
 	public string timestamp;
@@ -49,7 +51,9 @@ public abstract class IRobotController : MonoBehaviour
 	public float VerticalAngle { get; protected set; }
 	public bool IsNearObjective { get; protected set; }
 	public Vector3 Position { get { return transform.position; } }
-	public float Orientation { get { return transform.eulerAngles.y; } }
+	public float Yaw { get { return transform.localEulerAngles.y; } }
+	public float Pitch { get { return transform.localEulerAngles.x; } }
+	public float Roll { get { return transform.localEulerAngles.z; } }
 	public bool IsTurningInPlace { get; protected set; }
 	public float PickupProgress { get; set; }
 	public bool IsPickingUpSample { get; protected set; }
@@ -139,7 +143,7 @@ public abstract class IRobotController : MonoBehaviour
 		yield return null;
 		if ( samples.Count > 0 )
 		{
-			string row = "Path,SteerAngle,Throttle,Brake,Speed,X_Position,Y_Position,Yaw" + newLine;
+			string row = "Path,SteerAngle,Throttle,Brake,Speed,X_Position,Y_Position,Pitch,Yaw,Roll" + newLine;
 			File.AppendAllText (Path.Combine (m_saveLocation, CSVFileName), row);
 
 			int count = samples.Count;
@@ -151,7 +155,7 @@ public abstract class IRobotController : MonoBehaviour
 				string camPath = WriteImage ( recordingCam, "robocam", sample.timestamp );
 
 				row = camPath + "," + sample.steerAngle + "," + sample.throttle + "," + sample.brake + "," + sample.speed + "," +
-					sample.position.x + "," + sample.position.z + "," + sample.yaw + newLine;
+					sample.position.x + "," + sample.position.z + "," + sample.pitch + "," + sample.yaw + "," + sample.roll + newLine;
 				File.AppendAllText (Path.Combine (m_saveLocation, CSVFileName), row);
 				yield return null;
 			}
@@ -235,7 +239,9 @@ public abstract class IRobotController : MonoBehaviour
 				sample.throttle = ThrottleInput;
 				sample.brake = BrakeInput;
 				sample.speed = Speed;
-				sample.yaw = Orientation;
+				sample.pitch = Pitch;
+				sample.yaw = Yaw;
+				sample.roll = Roll;
 				sample.position = transform.position;
 				sample.rotation = transform.rotation;
 //				Debug.Log ( "Throt " + sample.throttle + " brake " + sample.brake + " pos " + sample.position + " yaw " + sample.yaw );
@@ -266,7 +272,9 @@ public abstract class IRobotController : MonoBehaviour
 			sample.throttle = ThrottleInput;
 			sample.brake = BrakeInput;
 			sample.speed = Speed;
-			sample.yaw = Orientation;
+			sample.pitch = Pitch;
+			sample.yaw = Yaw;
+			sample.roll = Roll;
 			sample.position = transform.position;
 			sample.rotation = transform.rotation;
 			Debug.Log ( "Throt " + sample.throttle + " brake " + sample.brake + " pos " + sample.position + " yaw " + sample.yaw );

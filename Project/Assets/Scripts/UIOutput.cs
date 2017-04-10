@@ -39,13 +39,17 @@ public class UIOutput : MonoBehaviour
 		float throttle = controller.ThrottleInput;
 		Vector2 position = new Vector2 ( controller.Position.x, controller.Position.z );
 //		Vector3 position = controller.Position;
-		float orientation = controller.Orientation;
+		float pitch = controller.Pitch;
+		float yaw = controller.Yaw;
+		float roll = controller.Roll;
 
 		sb.Append ( "Throttle: " + throttle.ToString ( "F1" ) + "\n" );
 		sb.Append ( "Steer angle: " + steer.ToString ( "F4" ) + "\n" );
 		sb.Append ( "Ground speed: " + speed.ToString ( "F1" ) + "m/s\n" );
 		sb.Append ( "Position: " + position.ToString () + "\n" );
-		sb.Append ( "Yaw angle: " + orientation.ToString ( "F2" ) + "\n" );
+		sb.Append ( "Pitch angle: " + pitch.ToString ( "F2" ) + "\n" );
+		sb.Append ( "Yaw angle: " + yaw.ToString ( "F2" ) + "\n" );
+		sb.Append ( "Roll angle: " + roll.ToString ( "F2" ) + "\n" );
 		sb.Append ( "Camera zoom: " + controller.Zoom.ToString ( "F1" ) + "x\n" );
 		sb.Append ( "Is near objective: " + ( controller.IsNearObjective ? "Yes" : "No" ) );
 		infoText.text = sb.ToString ();
