@@ -76,7 +76,7 @@ public class CommandServer : MonoBehaviour
 		} else
 		if ( inset1 != null )
 		{
-			if ( tex.width == 1 || tex.height == 1 )
+//			if ( tex.width == 1 || tex.height == 1 )
 				inset1.CrossFadeAlpha ( 0, 0.0f, true );
 		}
 		// try to load image2
@@ -95,7 +95,7 @@ public class CommandServer : MonoBehaviour
 		} else
 		if ( inset2 != null )
 		{
-			if ( tex.width == 1 || tex.height == 1 )
+//			if ( tex.width == 1 || tex.height == 1 )
 				inset2.CrossFadeAlpha ( 0, 0.0f, true );
 		}
 		// try to load image3
@@ -114,7 +114,7 @@ public class CommandServer : MonoBehaviour
 		} else
 		if ( inset3 != null )
 		{
-			if ( tex.width == 1 || tex.height == 1 )
+//			if ( tex.width == 1 || tex.height == 1 )
 				inset3.CrossFadeAlpha ( 0, 0.0f, true );
 		}
 		EmitTelemetry(obj);
