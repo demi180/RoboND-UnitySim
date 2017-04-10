@@ -62,10 +62,12 @@ public class CommandServer : MonoBehaviour
 		// try to load image1
 		bool loaded = false;
 		Vector2 size = Vector2.zero;
+		Texture2D tex = new Texture2D ( 1, 1 );
 		if ( jsonObject.HasField ( "inset_image" ) )
-			loaded = inset1Tex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image" ).str ), true );
-		if ( loaded && inset1 != null )
+			loaded = tex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image" ).str ), true );
+		if ( loaded && inset1 != null && tex.width != 1 && tex.height != 1 )
 		{
+			inset1Tex = tex;
 			inset1.texture = inset1Tex;
 			size = inset1.rectTransform.sizeDelta;
 			size.x = 1f * inset1Tex.width / inset1Tex.height * size.y;
@@ -74,14 +76,17 @@ public class CommandServer : MonoBehaviour
 		} else
 		if ( inset1 != null )
 		{
-			inset1.CrossFadeAlpha ( 0, 0.3f, false );
+			if ( tex.width == 1 || tex.height == 1 )
+				inset1.CrossFadeAlpha ( 0, 0.0f, true );
 		}
 		// try to load image2
 		loaded = false;
+		tex = new Texture2D ( 1, 1 );
 		if ( jsonObject.HasField ( "inset_image2" ) )
-			loaded = inset2Tex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image2" ).str ), true );
-		if ( loaded && inset2Tex != null )
+			loaded = tex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image2" ).str ), true );
+		if ( loaded && inset2Tex != null && tex.width != 1 && tex.height != 1 )
 		{
+			inset2Tex = tex;
 			inset2.texture = inset2Tex;
 			size = inset2.rectTransform.sizeDelta;
 			size.x = 1f * inset2Tex.width / inset2Tex.height * size.y;
@@ -90,14 +95,17 @@ public class CommandServer : MonoBehaviour
 		} else
 		if ( inset2 != null )
 		{
-			inset2.CrossFadeAlpha ( 0, 0.3f, false );
+			if ( tex.width == 1 || tex.height == 1 )
+				inset2.CrossFadeAlpha ( 0, 0.0f, true );
 		}
 		// try to load image3
 		loaded = false;
+		tex = new Texture2D ( 1, 1 );
 		if ( jsonObject.HasField ( "inset_image3" ) )
 			loaded = inset3Tex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image3" ).str ), true );
-		if ( loaded && inset3Tex != null )
+		if ( loaded && inset3Tex != null && tex.width != 1 && tex.height != 1 )
 		{
+			inset3Tex = tex;
 			inset3.texture = inset3Tex;
 			size = inset3.rectTransform.sizeDelta;
 			size.x = 1f * inset3Tex.width / inset3Tex.height * size.y;
@@ -106,7 +114,8 @@ public class CommandServer : MonoBehaviour
 		} else
 		if ( inset3 != null )
 		{
-			inset3.CrossFadeAlpha ( 0, 0.3f, false );
+			if ( tex.width == 1 || tex.height == 1 )
+				inset3.CrossFadeAlpha ( 0, 0.0f, true );
 		}
 		EmitTelemetry(obj);
 	}
