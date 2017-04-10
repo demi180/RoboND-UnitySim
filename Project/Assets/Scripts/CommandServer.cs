@@ -63,9 +63,15 @@ public class CommandServer : MonoBehaviour
 		bool loaded = false;
 		Vector2 size = Vector2.zero;
 		Texture2D tex = new Texture2D ( 1, 1 );
+		string imageInfo = "";
+		byte[] imageBytes = null;
 		if ( jsonObject.HasField ( "inset_image" ) )
-			loaded = tex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image" ).str ), true );
-		if ( loaded && inset1 != null && tex.width != 1 && tex.height != 1 )
+			imageInfo = jsonObject.GetField ( "inset_image" ).str;
+		if ( !string.IsNullOrEmpty ( imageInfo ) )
+			imageBytes = Convert.FromBase64String ( imageInfo );
+		if ( imageBytes != null && imageBytes.Length != 0 )
+			loaded = tex.LoadImage ( imageBytes, true );
+		if ( loaded && inset1 != null && tex.width > 1 && tex.height > 1 )
 		{
 			inset1Tex = tex;
 			inset1.texture = inset1Tex;
@@ -77,14 +83,20 @@ public class CommandServer : MonoBehaviour
 		if ( inset1 != null )
 		{
 //			if ( tex.width == 1 || tex.height == 1 )
-				inset1.CrossFadeAlpha ( 0, 0.0f, true );
+//				inset1.CrossFadeAlpha ( 0, 0.0f, true );
 		}
 		// try to load image2
 		loaded = false;
 		tex = new Texture2D ( 1, 1 );
+		imageInfo = "";
+		imageBytes = null;
 		if ( jsonObject.HasField ( "inset_image2" ) )
-			loaded = tex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image2" ).str ), true );
-		if ( loaded && inset2Tex != null && tex.width != 1 && tex.height != 1 )
+			imageInfo = jsonObject.GetField ( "inset_image2" ).str;
+		if ( !string.IsNullOrEmpty ( imageInfo ) )
+			imageBytes = Convert.FromBase64String ( imageInfo );
+		if ( imageBytes != null && imageBytes.Length != 0 )
+			loaded = tex.LoadImage ( imageBytes, true );
+		if ( loaded && inset2Tex != null && tex.width > 1 && tex.height > 1 )
 		{
 			inset2Tex = tex;
 			inset2.texture = inset2Tex;
@@ -96,14 +108,20 @@ public class CommandServer : MonoBehaviour
 		if ( inset2 != null )
 		{
 //			if ( tex.width == 1 || tex.height == 1 )
-				inset2.CrossFadeAlpha ( 0, 0.0f, true );
+//				inset2.CrossFadeAlpha ( 0, 0.0f, true );
 		}
 		// try to load image3
 		loaded = false;
 		tex = new Texture2D ( 1, 1 );
+		imageInfo = "";
+		imageBytes = null;
 		if ( jsonObject.HasField ( "inset_image3" ) )
-			loaded = inset3Tex.LoadImage ( Convert.FromBase64String ( jsonObject.GetField ( "inset_image3" ).str ), true );
-		if ( loaded && inset3Tex != null && tex.width != 1 && tex.height != 1 )
+			imageInfo = jsonObject.GetField ( "inset_image3" ).str;
+		if ( !string.IsNullOrEmpty ( imageInfo ) )
+			imageBytes = Convert.FromBase64String ( imageInfo );
+		if ( imageBytes != null && imageBytes.Length != 0 )
+			loaded = tex.LoadImage ( imageBytes, true );
+		if ( loaded && inset3Tex != null && tex.width > 1 && tex.height > 1 )
 		{
 			inset3Tex = tex;
 			inset3.texture = inset3Tex;
@@ -115,7 +133,7 @@ public class CommandServer : MonoBehaviour
 		if ( inset3 != null )
 		{
 //			if ( tex.width == 1 || tex.height == 1 )
-				inset3.CrossFadeAlpha ( 0, 0.0f, true );
+//				inset3.CrossFadeAlpha ( 0, 0.0f, true );
 		}
 		EmitTelemetry(obj);
 	}
