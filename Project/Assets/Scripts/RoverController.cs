@@ -253,8 +253,8 @@ public class RoverController : IRobotController
 
 		isSteeringInput = false;
 		lastAngle = 0;
-		SteerAngle = 0;
-		ThrottleInput = 0;
+//		SteerAngle = 0;
+//		ThrottleInput = 0;
 		isMotorInput = false;
 		lastMoveInput = 0;
 		lastSteerInput = 0;

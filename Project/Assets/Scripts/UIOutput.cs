@@ -50,7 +50,7 @@ public class UIOutput : MonoBehaviour
 		sb.Append ( "Pitch angle: " + pitch.ToString ( "F2" ) + "\n" );
 		sb.Append ( "Yaw angle: " + yaw.ToString ( "F2" ) + "\n" );
 		sb.Append ( "Roll angle: " + roll.ToString ( "F2" ) + "\n" );
-		sb.Append ( "Camera zoom: " + controller.Zoom.ToString ( "F1" ) + "x\n" );
+//		sb.Append ( "Camera zoom: " + controller.Zoom.ToString ( "F1" ) + "x\n" );
 		sb.Append ( "Is near objective: " + ( controller.IsNearObjective ? "Yes" : "No" ) );
 		infoText.text = sb.ToString ();
 
