@@ -63,6 +63,7 @@ public class Menu : MonoBehaviour
 //			playerInput.controller.SwitchCamera (); // set to 3rd person camera by default
 			playerInput.DisableFocus = false;
 			trainingUI.SetTrainingMode ( false );
+			playerInput.controller.transform.eulerAngles = new Vector3 ( 0, Random.Range ( 0f, 360f ), 0 );
 		}
 
 		playerInput.controller.SwitchCamera ();
