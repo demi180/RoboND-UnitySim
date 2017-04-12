@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class ObjectiveSpawner : MonoBehaviour
 {
+	public static GameObject[] samples;
+
 	public GameObject[] prefabs;
 	GameObject[] objectives;
 	public int spawnCount;
@@ -35,13 +37,23 @@ public class ObjectiveSpawner : MonoBehaviour
 //			objectives [ i ].SetActive ( false );
 		}
 
+		List<GameObject> activeSamples = new List<GameObject> ();
 		for ( int i = 0; i < spawnCount; i++ )
 		{
 			int index = Random.Range ( 0, indices.Count );
 			GameObject ob = objectives [ indices [ index ] ];
 			ob.SetActive ( true );
+			activeSamples.Add ( ob );
 //			ob.GetComponent<Renderer> ().material.SetColor ( colorProp, colors [ Random.Range ( 0, colors.Length ) ] );
 			indices.RemoveAt ( index );
 		}
+		samples = activeSamples.ToArray ();
+	}
+
+	public static void RemoveSample (GameObject go)
+	{
+		List<GameObject> l = new List<GameObject> ( samples );
+		l.Remove ( go );
+		samples = l.ToArray ();
 	}
 }

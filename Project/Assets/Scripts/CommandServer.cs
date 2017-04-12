@@ -29,6 +29,7 @@ public class CommandServer : MonoBehaviour
 		_socket.On("manual", onManual);
 		_socket.On ( "fixed_turn", OnFixedTurn );
 		_socket.On ( "pickup", OnPickup );
+		_socket.On ( "get_samples", GetSamplePositions );
 		robotController = robotRemoteControl.robot;
 		frontFacingCamera = robotController.recordingCam;
 		inset1Tex = new Texture2D ( 1, 1 );
@@ -161,53 +162,47 @@ public class CommandServer : MonoBehaviour
 		UnityMainThreadDispatcher.Instance().Enqueue(() =>
 		{
 			print("Attempting to Send...");
-			// send only if it's not being manually driven
-			if ((Input.GetKey(KeyCode.W)) || (Input.GetKey(KeyCode.S))) {
-				_socket.Emit("telemetry", new JSONObject());
-			}
-			else {
-				// Collect Data from the Car
-				Dictionary<string, string> data = new Dictionary<string, string>();
 
-				data["steering_angle"] = robotController.SteerAngle.ToString("N4");
-//				data["vert_angle"] = robotController.VerticalAngle.ToString ("N4");
-				data["throttle"] = robotController.ThrottleInput.ToString("N4");
-				data["brake"] = robotController.BrakeInput.ToString ("N4");
-				data["speed"] = robotController.Speed.ToString("N4");
-				Vector3 pos = robotController.Position;
-				data["position"] = pos.x.ToString ("N4") + "," + pos.z.ToString ("N4");
-				data["pitch"] = robotController.Pitch.ToString ("N4");
-				data["yaw"] = robotController.Yaw.ToString ("N4");
-				data["roll"] = robotController.Roll.ToString ("N4");
-				data["fixed_turn"] = robotController.IsTurningInPlace ? "1" : "0";
-				data["near_sample"] = robotController.IsNearObjective ? "1" : "0";
-				data["picking_up"] = robotController.IsPickingUpSample ? "1" : "0";
-				data["image"] = Convert.ToBase64String(CameraHelper.CaptureFrame(frontFacingCamera));
-//				Debug.Log ("sangle " + data["steering_angle"] + " vert " + data["vert_angle"] + " throt " + data["throttle"] + " speed " + data["speed"] + " image " + data["image"]);
-				_socket.Emit("telemetry", new JSONObject(data));
-			}
+			// Collect Data from the Car
+			Dictionary<string, string> data = new Dictionary<string, string>();
+
+			data["steering_angle"] = robotController.SteerAngle.ToString("N4");
+//			data["vert_angle"] = robotController.VerticalAngle.ToString ("N4");
+			data["throttle"] = robotController.ThrottleInput.ToString("N4");
+			data["brake"] = robotController.BrakeInput.ToString ("N4");
+			data["speed"] = robotController.Speed.ToString("N4");
+			Vector3 pos = robotController.Position;
+			data["position"] = pos.x.ToString ("N4") + "," + pos.z.ToString ("N4");
+			data["pitch"] = robotController.Pitch.ToString ("N4");
+			data["yaw"] = robotController.Yaw.ToString ("N4");
+			data["roll"] = robotController.Roll.ToString ("N4");
+			data["fixed_turn"] = robotController.IsTurningInPlace ? "1" : "0";
+			data["near_sample"] = robotController.IsNearObjective ? "1" : "0";
+			data["picking_up"] = robotController.IsPickingUpSample ? "1" : "0";
+			data["image"] = Convert.ToBase64String(CameraHelper.CaptureFrame(frontFacingCamera));
+
+//			Debug.Log ("sangle " + data["steering_angle"] + " vert " + data["vert_angle"] + " throt " + data["throttle"] + " speed " + data["speed"] + " image " + data["image"]);
+			_socket.Emit("telemetry", new JSONObject(data));
 		});
+	}
 
-		//    UnityMainThreadDispatcher.Instance().Enqueue(() =>
-		//    {
-		//      	
-		//      
-		//
-		//		// send only if it's not being manually driven
-		//		if ((Input.GetKey(KeyCode.W)) || (Input.GetKey(KeyCode.S))) {
-		//			_socket.Emit("telemetry", new JSONObject());
-		//		}
-		//		else {
-		//			// Collect Data from the Car
-		//			Dictionary<string, string> data = new Dictionary<string, string>();
-		//			data["steering_angle"] = _carController.CurrentSteerAngle.ToString("N4");
-		//			data["throttle"] = _carController.AccelInput.ToString("N4");
-		//			data["speed"] = _carController.CurrentSpeed.ToString("N4");
-		//			data["image"] = Convert.ToBase64String(CameraHelper.CaptureFrame(FrontFacingCamera));
-		//			_socket.Emit("telemetry", new JSONObject(data));
-		//		}
-		//      
-		////      
-		//    });
+	void GetSamplePositions (SocketIOEvent obj)
+	{
+		UnityMainThreadDispatcher.Instance ().Enqueue ( () =>
+		{
+			Debug.Log ("Sending sample positions");
+
+			Dictionary<string, string> data = new Dictionary<string, string> ();
+
+			int count = ObjectiveSpawner.samples.Length;
+			data[ "sample_count" ] = count.ToString ("N4");
+			for (int i = 0; i < count; i++ )
+			{
+				GameObject go = ObjectiveSpawner.samples[i];
+				data[ "sample" + i + "_pos_x" ] = go.transform.position.x.ToString ("N4");
+				data[ "sample" + i + "_pos_y" ] = go.transform.position.z.ToString ("N4");
+			}
+			_socket.Emit ("sample_positions", new JSONObject(data));
+		} );
 	}
 }

@@ -508,6 +508,7 @@ public class RoverController : IRobotController
 		IsPickingUpSample = isPickingUp;
 		rb.isKinematic = false;
 //		PickupProgress = -1;
+		ObjectiveSpawner.RemoveSample ( curObjective.gameObject );
 		yield break;
 
 /*		grabbingObject = false;
