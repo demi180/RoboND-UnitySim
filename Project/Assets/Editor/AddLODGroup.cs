@@ -5,7 +5,7 @@ using UnityEditor;
 
 public class AddLODGroup : MonoBehaviour
 {
-	[MenuItem ("Utility/Add LODGroup")]
+	[MenuItem ("Utility/Add LODGroup", false, 20)]
 	static void AddLG ()
 	{
 		GameObject[] gobs = Selection.gameObjects;
@@ -20,7 +20,7 @@ public class AddLODGroup : MonoBehaviour
 		}
 	}
 
-	[MenuItem ("Utility/Add Multi-renderer LG")]
+	[MenuItem ("Utility/Add Multi-renderer LG", false, 21)]
 	static void AddMRLG ()
 	{
 		GameObject[] gobs = Selection.gameObjects;
@@ -35,7 +35,7 @@ public class AddLODGroup : MonoBehaviour
 		}
 	}
 
-	[MenuItem ("Utility/Add Bridge LG")]
+	[MenuItem ("Utility/Add Bridge LG", false, 22)]
 	static void AddBridgeLG ()
 	{
 		GameObject[] gobs = Selection.gameObjects;
