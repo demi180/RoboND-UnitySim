@@ -37,6 +37,14 @@ public class CommandServer : MonoBehaviour
 		inset3Tex = new Texture2D ( 1, 1 );
 	}
 
+	void Update ()
+	{
+		if ( Input.GetKeyDown ( KeyCode.P ) )
+		{
+			GetSamplePositions ( null );
+		}
+	}
+
 	void OnOpen(SocketIOEvent obj)
 	{
 //		Debug.Log("Connection Open");
@@ -195,13 +203,26 @@ public class CommandServer : MonoBehaviour
 			Dictionary<string, string> data = new Dictionary<string, string> ();
 
 			int count = ObjectiveSpawner.samples.Length;
-			data[ "sample_count" ] = count.ToString ("N4");
+			data[ "sample_count" ] = count.ToString ();
+			string x = "";
+			string y = "";
+
 			for (int i = 0; i < count; i++ )
 			{
 				GameObject go = ObjectiveSpawner.samples[i];
-				data[ "sample" + i + "_pos_x" ] = go.transform.position.x.ToString ("N4");
-				data[ "sample" + i + "_pos_y" ] = go.transform.position.z.ToString ("N4");
+				x += go.transform.position.x.ToString ("N2") + ",";
+				y += go.transform.position.z.ToString ("N2") + ",";
+//				data[ "sample" + i + "_pos_x" ] = go.transform.position.x.ToString ("N4");
+//				data[ "sample" + i + "_pos_y" ] = go.transform.position.z.ToString ("N4");
 			}
+			x = x.TrimEnd (',');
+			y = y.TrimEnd (',');
+			data["samples_x"] = x;
+			data["samples_y"] = y;
+//			Debug.Log (x + "\n" + y);
+
+//			foreach (KeyValuePair<string, string> pair in data)
+//				Debug.Log ("key: " + pair.Key + " value: " + pair.Value + "\n");
 			_socket.Emit ("sample_positions", new JSONObject(data));
 		} );
 	}
