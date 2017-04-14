@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class TrainingUI : MonoBehaviour
 {
+	public RoverStatus roverStatus { get; set; }
+	public bool showROSStatus { get; set; }
+
 	public bool isTrainingMode;
 
 	public FPSRobotInput robotInput;
@@ -18,6 +21,9 @@ public class TrainingUI : MonoBehaviour
 	public RawImage inset1Tex;
 	public RawImage inset2Tex;
 	public RawImage inset3Tex;
+	public Text roverStatusText;
+	[System.NonSerialized]
+	public RoverStatus lastStatus;
 
 	float roboCamAlpha = 1;
 	bool recording;
@@ -28,6 +34,8 @@ public class TrainingUI : MonoBehaviour
 		robotController = robotInput.controller;
 		SetTrainingMode ( isTrainingMode );
 		saveStatus.text = "";
+		roverStatusText.text = "ROS status: " + roverStatus.ToString ();
+		roverStatusText.enabled = false;
 	}
 
 	void LateUpdate ()

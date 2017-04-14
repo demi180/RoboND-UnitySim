@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using System.Threading;
 using Ros_CSharp;
 using rbyte = Messages.std_msgs.Byte;
+using empty = Messages.std_msgs.Empty;
 
 public class RoverRosInput : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class RoverRosInput : MonoBehaviour
 	NodeHandle nh;
 	Thread pubthread;
 	Publisher<rbyte> pub;
+	ServiceClient<empty, empty> srvClient;
 
 	byte dataToSend;
 
@@ -70,6 +72,13 @@ public class RoverRosInput : MonoBehaviour
 		pubthread = new Thread ( Publish );
 		pubthread.Start ();
 		Debug.Log ("Started publish thread");
+//		srvClient = nh.serviceClient<empty, empty> ( "/RoverInputListener" );
+
+//		if ( srvClient.IsValid )
+//		{
+//			empty dummy = new empty ();
+//			srvClient.call (null, ref dummy);
+//		}
 	}
 
 	void Publish ()

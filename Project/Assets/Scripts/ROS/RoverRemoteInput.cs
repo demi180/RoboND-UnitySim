@@ -17,31 +17,40 @@ using rbyte = Messages.std_msgs.Byte;
 public class RoverRemoteInput : MonoBehaviour
 {
 	public RobotRemoteControl rover;
-	public ConnectionListener listener;
 	[System.NonSerialized]
 	public NodeHandle nh;
 
 	Subscriber<rbyte> inputSubscriber;
 	bool init;
+	[System.NonSerialized]
+	public bool wasSubscribed;
 
-//	void Awake ()
-//	{
-//		if ( nh == null )
-//		{
-//			nh = new NodeHandle ();
-//			ROSController.AddNode ( nh );
-//		}
-////		ROSController.StartROS ( OnROSInit );
-//	}
+	public bool IsSubscribed { get { return inputSubscriber != null && inputSubscriber.NumPublishers > 0; } }
+	public bool IsSubscriberNull { get { return inputSubscriber == null; } }
+
 
 	void Start ()
 	{
 		ROSController.StartROS ( OnROSInit );
 	}
 
+	void Update ()
+	{
+		if ( wasSubscribed && !IsSubscribed )
+		{
+			rover.ThrottleInput = rover.BrakeInput = rover.SteeringAngle = 0;
+			rover.robot.Stop ();
+		}
+	}
+
+	void LateUpdate ()
+	{
+		// moved to LateUpdate so listener can update status text
+		wasSubscribed = IsSubscribed;
+	}
+
 	void OnDestroy ()
 	{
-		nh.Dispose ();
 		ROSController.StopROS ();
 	}
 
@@ -57,7 +66,8 @@ public class RoverRemoteInput : MonoBehaviour
 			nh = new NodeHandle ();
 			ROSController.AddNode ( nh );
 		}
-		inputSubscriber = nh.subscribe<rbyte> ( "/RoverInput", 10, OnReceivedInput );
+		Subscribe ();
+//		inputSubscriber = nh.subscribe<rbyte> ( "/RoverInput", 10, OnReceivedInput );
 	}
 
 	void OnReceivedInput (rbyte input)
@@ -86,5 +96,11 @@ public class RoverRemoteInput : MonoBehaviour
 			0;
 	}
 
-
+	public void Subscribe ()
+	{
+		if ( inputSubscriber == null  || inputSubscriber.NumPublishers == 0 )
+		{
+			inputSubscriber = nh.subscribe<rbyte> ( "/RoverInput", 10, OnReceivedInput );
+		}
+	}
 }

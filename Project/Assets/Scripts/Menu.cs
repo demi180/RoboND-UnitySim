@@ -52,6 +52,7 @@ public class Menu : MonoBehaviour
 			playerInput.Focus ();
 			remoteControl.enabled = false;
 			trainingUI.SetTrainingMode ( true );
+			trainingUI.showROSStatus = false;
 		}
 
 		// autonomous
@@ -67,6 +68,7 @@ public class Menu : MonoBehaviour
 			playerInput.DisableFocus = false;
 			trainingUI.SetTrainingMode ( false );
 			playerInput.controller.transform.eulerAngles = new Vector3 ( 0, Random.Range ( 0f, 360f ), 0 );
+			trainingUI.showROSStatus = false;
 		}
 
 		// ros
@@ -80,6 +82,7 @@ public class Menu : MonoBehaviour
 			playerInput.Focus ();
 			remoteControl.enabled = true;
 			trainingUI.SetTrainingMode ( false );
+			trainingUI.showROSStatus = true;
 		}
 
 		playerInput.controller.SwitchCamera ();

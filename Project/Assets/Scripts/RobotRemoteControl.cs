@@ -46,6 +46,11 @@ public class RobotRemoteControl : MonoBehaviour
 		robot.PickupObjective ( null );
 	}
 
+	public void Stop ()
+	{
+		robot.Stop ();
+	}
+
 //	void FixedUpdate ()
 //	{
 //		if ( useFixedUpdate )

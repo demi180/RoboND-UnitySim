@@ -34,6 +34,7 @@ public abstract class IRobotController : MonoBehaviour
 	public virtual void PickupObjective (System.Action<PickupSample> onPickup) {}
 	public virtual void CarryObjective (GameObject objective) { Destroy ( objective ); }
 	public virtual void FixedTurn (float angle, float time) {}
+	public virtual void Stop () {}
 
 	public Transform robotBody;
 	public Transform cameraHAxis;

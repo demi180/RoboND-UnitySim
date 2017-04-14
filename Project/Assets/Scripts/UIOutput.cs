@@ -21,9 +21,11 @@ public class UIOutput : MonoBehaviour
 		}
 //		infoText.gameObject.SetActive ( false );
 //		infoText.gameObject.SetActive ( true );
-		infoText.text = "";
-		infoText.transform.parent.gameObject.SetActive ( false );
-		infoText.transform.parent.gameObject.SetActive ( true );
+		infoText.text = "WaitingForInput";
+//		infoText.transform.parent.gameObject.SetActive ( false );
+//		infoText.transform.parent.gameObject.SetActive ( true );
+//		infoText.enabled = false;
+//		infoText.enabled = true;
 	}
 
 	void Update ()

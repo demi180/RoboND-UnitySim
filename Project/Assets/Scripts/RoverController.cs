@@ -330,6 +330,11 @@ public class RoverController : IRobotController
 		}
 	}
 
+	public override void Stop ()
+	{
+		rb.velocity = Vector3.zero;
+	}
+
 	public override void RotateCamera (float horizontal, float vertical)
 	{
 		if ( curCamera == 0 )
@@ -350,7 +355,6 @@ public class RoverController : IRobotController
 //			euler.y = euler.z = 0;
 			tpsPosition.localEulerAngles = euler;
 		}
-
 	}
 
 	public override void ZoomCamera (float amount)
@@ -510,43 +514,7 @@ public class RoverController : IRobotController
 //		PickupProgress = -1;
 		ObjectiveSpawner.RemoveSample ( curObjective.gameObject );
 		yield break;
-
-/*		grabbingObject = false;
-		armActuator.SetTarget ( 1, curObjective.GetCenterPosition () );
-//		armActuator.SetTarget ( curObjective.transform.position );
-		armActuator.Unfold ( false );
-//		armActuator.MoveToTarget ();
-//		yield return StartCoroutine ( RotateTo ( curObjective.transform.position ) );
-		yield return new WaitForSeconds ( 3 );
-		OnPickup ();
-//		while ( !grabbingObject )
-//			yield return null;
-		IsNearObjective = false;
-		armActuator.Fold ();
-		yield return new WaitForSeconds ( 3 );
-		Vector3 pos = GetPositionOnFlatbed ();
-		armActuator.MoveTarget ( pos );
-		yield return new WaitForSeconds ( 3 );
-		curObjective.transform.rotation = Quaternion.identity;
-		curObjective.transform.parent = robotBody;
-		Collider c = curObjective.Collider;
-		float bottomY = c.bounds.min.y;
-		curObjective.transform.position = pos;
-		grabbingObject = false;
-		rb.isKinematic = false;
-		armActuator.Fold ( false );
-		yield return new WaitForSeconds ( 3 );
-		isPickingUp = false;
-//		Time.timeScale = 1;*/
 	}
-
-/*	public void OnPickup ()
-	{
-		Debug.Log ( "!!" );
-		curObjective.transform.position = robotGrabPoint.position;
-		curObjective.transform.parent = robotGrabPoint;
-		grabbingObject = !grabbingObject;
-	}*/
 
 	Vector3 GetPositionOnFlatbed ()
 	{

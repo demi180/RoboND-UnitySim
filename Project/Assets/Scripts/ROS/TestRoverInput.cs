@@ -43,8 +43,11 @@ public class TestRoverInput : MonoBehaviour
 
 	void OnDestroy ()
 	{
-		nh.Dispose ();
-		ROSController.StopROS ();
+		if ( enabled )
+		{
+			nh.Dispose ();
+			ROSController.StopROS ();
+		}
 	}
 
 	void OnRosInit ()
