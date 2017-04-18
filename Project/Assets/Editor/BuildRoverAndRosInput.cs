@@ -25,4 +25,25 @@ public class BuildRoverAndRosInput : MonoBehaviour
 		levels [ 0 ] = "Assets/Scenes/ros_rover_control.unity";
 			BuildPipeline.BuildPlayer ( levels, buildOutput + fileName, EditorUserBuildSettings.activeBuildTarget, BuildOptions.ShowBuiltPlayer );
 	}
+
+	[MenuItem ("Build/Build Quad and ROS Input", false, 10)]
+	static void BuildQuadAndInput ()
+	{
+		string buildOutput = "Builds/ROS/";
+		string fileName = "proto4-ros";
+		if ( EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows || EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows64 )
+			fileName += ".exe";
+		else
+			fileName += ".app";
+		string[] levels = new string[1] { "Assets/Scenes/proto4.unity" };
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName, EditorUserBuildSettings.activeBuildTarget, BuildOptions.None );
+
+		fileName = "ros-quad-input";
+		if ( EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows || EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows64 )
+			fileName += ".exe";
+		else
+			fileName += ".app";
+		levels [ 0 ] = "Assets/Scenes/ros_quad_control.unity";
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName, EditorUserBuildSettings.activeBuildTarget, BuildOptions.ShowBuiltPlayer );
+	}
 }
