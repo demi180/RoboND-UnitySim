@@ -7,6 +7,7 @@ public class Menu : MonoBehaviour
 	public Canvas canvas;
 	public FPSRobotInput playerInput;
 	public TrainingUI trainingUI;
+	public ShowHideURIInput rosUI;
 
 	public GameObject socketObject;
 	public GameObject serverObject;
@@ -22,6 +23,7 @@ public class Menu : MonoBehaviour
 	void Start ()
 	{
 		EnableCanvas ();
+		rosUI.enabled = false;
 	}
 
 	void LateUpdate ()
@@ -83,6 +85,7 @@ public class Menu : MonoBehaviour
 			remoteControl.enabled = true;
 			trainingUI.SetTrainingMode ( false );
 			trainingUI.showROSStatus = true;
+			rosUI.enabled = true;
 		}
 
 		playerInput.controller.SwitchCamera ();

@@ -10,9 +10,10 @@ using UnityEditor;
 
 public class ROSController : MonoBehaviour
 {
-	static ROSController instance;
+	public static ROSController instance;
 	static Queue<Action> callbacks = new Queue<Action> ();
 	static Queue<NodeHandle> nodes = new Queue<NodeHandle> ();
+	public static bool delayedStart;
 
 	bool starting;
 	bool stopping;
@@ -27,6 +28,10 @@ public class ROSController : MonoBehaviour
 			return;
 		}
 
+//		Debug.Log ( "ros master is " + ROS.ROS_MASTER_URI );
+		if ( string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.User ) ) &&
+			string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.Machine ) ) )
+			delayedStart = true;
 		instance = this;
 		StartROS ();
 	}
@@ -97,7 +102,11 @@ public class ROSController : MonoBehaviour
 		
 		if ( instance.starting )
 			return;
-		
+
+		// this gets set when the environment variable ROS_MASTER_URI isn't set
+		if ( delayedStart )
+			return;
+
 		string timeString = DateTime.UtcNow.ToString ( "MM_dd_yy_HH_MM_ss" );
 //		Debug.Log ( timeString );
 		instance.starting = true;
