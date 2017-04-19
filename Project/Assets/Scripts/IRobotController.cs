@@ -16,6 +16,11 @@ internal class RobotSample
 	public float roll;
 	public float steerAngle;
 	public float verticalAngle;
+	public Vector3 curSamplePosition;
+	public Quaternion curSampleRotation;
+	public GameObject curSample;
+	public bool triggerPickup;
+	public bool stopPickup;
 	public string timestamp;
 }
 
@@ -147,17 +152,35 @@ public abstract class IRobotController : MonoBehaviour
 			string row = "Path,SteerAngle,Throttle,Brake,Speed,X_Position,Y_Position,Pitch,Yaw,Roll" + newLine;
 			File.AppendAllText (Path.Combine (m_saveLocation, CSVFileName), row);
 
+			ObjectiveSpawner.SetInitialPositions ();
 			int count = samples.Count;
 			for ( int i = 0; i < count; i++ )
 			{
 				RobotSample sample = samples.Dequeue ();
 				transform.position = sample.position;
 				transform.rotation = sample.rotation;
+//				ObjectiveSpawner.LoadSample ();
+				if ( sample.triggerPickup )
+				{
+					curObjective = sample.curSample.GetComponent<PickupSample> ();
+					curObjective.transform.parent = null;
+					PickupObjective ( null );
+//					while ( IsPickingUpSample )
+//					{
+//						yield return null;
+//						string path = WriteImage ( recordingCam, "robocam", sample.timestamp );
+//
+//						row = path + "," + sample.steerAngle + "," + sample.throttle + "," + sample.brake + "," + sample.speed + "," +
+//							sample.position.x + "," + sample.position.z + "," + sample.pitch + "," + sample.yaw + "," + sample.roll + newLine;
+//						File.AppendAllText (Path.Combine (m_saveLocation, CSVFileName), row);
+//					}
+				}
 				string camPath = WriteImage ( recordingCam, "robocam", sample.timestamp );
 
 				row = camPath + "," + sample.steerAngle + "," + sample.throttle + "," + sample.brake + "," + sample.speed + "," +
 					sample.position.x + "," + sample.position.z + "," + sample.pitch + "," + sample.yaw + "," + sample.roll + newLine;
 				File.AppendAllText (Path.Combine (m_saveLocation, CSVFileName), row);
+
 				yield return null;
 			}
 
@@ -225,9 +248,9 @@ public abstract class IRobotController : MonoBehaviour
 		return isSaving;
 	}
 
-	public void GetSample ()
+	public void GetSample (bool force = false)
 	{
-		if ( Time.time > nextRecordTime )
+		if ( Time.time > nextRecordTime || force )
 		{
 			if (m_saveLocation != "")
 			{
@@ -235,7 +258,7 @@ public abstract class IRobotController : MonoBehaviour
 				
 				sample.timestamp = System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss_fff");
 				sample.steerAngle = SteerAngle;
-				//			sample.steerAngle = m_SteerAngle / m_MaximumSteerAngle;
+//				sample.steerAngle = m_SteerAngle / m_MaximumSteerAngle;
 				sample.verticalAngle = VerticalAngle;
 				sample.throttle = ThrottleInput;
 				sample.brake = BrakeInput;
@@ -250,13 +273,37 @@ public abstract class IRobotController : MonoBehaviour
 				samples.Enqueue(sample);
 				
 				sample = null;
-				//may or may not be needed
+
+//				ObjectiveSpawner.Sample ();
 			}
 			nextRecordTime = Time.time + recordTime;
 		}
 	}
 
-	public IEnumerator Sample()
+	public void TriggerPickup ()
+	{
+		var iter = samples.GetEnumerator ();
+		RobotSample s = null;
+		while ( iter.MoveNext () )
+		{
+			s = iter.Current;
+		}
+		s.triggerPickup = true;
+		s.curSample = curObjective.gameObject;
+	}
+
+	public void StopPickup ()
+	{
+		var iter = samples.GetEnumerator ();
+		RobotSample s = null;
+		while ( iter.MoveNext () )
+		{
+			s = iter.Current;
+		}
+		s.stopPickup = true;
+	}
+
+/*	public IEnumerator Sample()
 	{
 		// Start the Coroutine to Capture Data Every Second.
 		// Persist that Information to a CSV and Perist the Camera Frame
@@ -292,7 +339,7 @@ public abstract class IRobotController : MonoBehaviour
 			StartCoroutine(Sample());
 		}
 
-	}
+	}*/
 
 	private void OpenFolder(string location)
 	{

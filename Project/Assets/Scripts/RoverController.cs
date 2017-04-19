@@ -57,6 +57,7 @@ public class RoverController : IRobotController
 	// gizmo drawing vars
 	Vector3 point1, point2;
 	float radius;
+	Dictionary<GameObject, Vector3> finalPositions = new Dictionary<GameObject, Vector3> ();
 
 	void Awake ()
 	{
@@ -198,10 +199,10 @@ public class RoverController : IRobotController
 
 	void Update ()
 	{
-		if ( IsRecording )
+		if ( IsRecording && !isPickingUp )
 			GetSample ();
 		
-		if ( !isPickingUp )
+		if ( !isPickingUp && !getSaveStatus () )
 		{
 			// check for objectives. only if not already picking one up
 			// start by building a capsule of the player's size
@@ -408,6 +409,11 @@ public class RoverController : IRobotController
 		armActuator.enabled = true;
 //		Time.timeScale = 0.2f;
 //		PickupProgress = 0;
+		if ( IsRecording && !getSaveStatus () )
+		{
+			GetSample ( true );
+			TriggerPickup ();
+		}
 		StartCoroutine ( DoPickup () );
 	}
 
@@ -428,6 +434,8 @@ public class RoverController : IRobotController
 		t = 0;
 		while ( t < 1 )
 		{
+			if ( IsRecording )
+				GetSample ( true );
 			yield return null;
 //			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
@@ -447,6 +455,8 @@ public class RoverController : IRobotController
 		t = 0;
 		while ( t < 1.5f )
 		{
+			if ( IsRecording )
+				GetSample ( true );
 			yield return null;
 //			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
@@ -463,13 +473,17 @@ public class RoverController : IRobotController
 		t = 0;
 		while ( t < 1.5f )
 		{
+			if ( IsRecording )
+				GetSample ( true );
 			yield return null;
 //			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
 		}
 //		yield return new WaitForSeconds ( 3 );
 		// find a place to put the sample
-		Vector3 newPos = GetPositionOnFlatbed ();
+		Vector3 newPos = getSaveStatus () ? finalPositions[curObjective.gameObject] : GetPositionOnFlatbed ();
+		if ( IsRecording )
+			finalPositions.Add ( curObjective.gameObject, newPos );
 		toTarget = newPos - centerPos;
 		toTarget.y = 0;
 		// move the folded position to turn the arm around
@@ -477,6 +491,8 @@ public class RoverController : IRobotController
 		t = 0;
 		while ( t < 1.5f )
 		{
+			if ( IsRecording )
+				GetSample ( true );
 			yield return null;
 //			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
@@ -490,6 +506,8 @@ public class RoverController : IRobotController
 		t = 0;
 		while ( t < 1.5f )
 		{
+			if ( IsRecording )
+				GetSample ( true );
 			yield return null;
 //			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
@@ -503,6 +521,8 @@ public class RoverController : IRobotController
 		t = 0;
 		while ( t < 3 )
 		{
+			if ( IsRecording )
+				GetSample ( true );
 			yield return null;
 //			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
@@ -512,7 +532,13 @@ public class RoverController : IRobotController
 		IsPickingUpSample = isPickingUp;
 		rb.isKinematic = false;
 //		PickupProgress = -1;
-		ObjectiveSpawner.RemoveSample ( curObjective.gameObject );
+		if ( IsRecording )
+		{
+			GetSample ( true );
+			StopPickup ();
+		}
+		if ( !getSaveStatus () )
+			ObjectiveSpawner.RemoveSample ( curObjective.gameObject );
 		yield break;
 	}
 

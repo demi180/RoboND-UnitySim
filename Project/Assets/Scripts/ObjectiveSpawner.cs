@@ -2,9 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 
+internal class SampleSample
+{
+	public GameObject[] activeSamples;
+	public Vector3[] positions;
+	public Quaternion[] rotations;
+}
+
 public class ObjectiveSpawner : MonoBehaviour
 {
 	public static GameObject[] samples;
+	static Queue<SampleSample> storedSamples;
+	static Dictionary<GameObject, Vector3> initialPositions;
 
 	public GameObject[] prefabs;
 	GameObject[] objectives;
@@ -48,6 +57,10 @@ public class ObjectiveSpawner : MonoBehaviour
 			indices.RemoveAt ( index );
 		}
 		samples = activeSamples.ToArray ();
+		initialPositions = new Dictionary<GameObject, Vector3> ();
+		for ( int i = 0; i < samples.Length; i++ )
+			initialPositions.Add ( samples [ i ], samples [ i ].transform.position );
+//		storedSamples = new Queue<SampleSample> ();
 	}
 
 	public static void RemoveSample (GameObject go)
@@ -56,4 +69,40 @@ public class ObjectiveSpawner : MonoBehaviour
 		l.Remove ( go );
 		samples = l.ToArray ();
 	}
+
+	public static void SetInitialPositions ()
+	{
+		foreach ( KeyValuePair<GameObject, Vector3> pair in initialPositions )
+		{
+			pair.Key.transform.parent = null;
+			pair.Key.transform.position = pair.Value;
+		}
+	}
+
+/*	public static void Sample ()
+	{
+		SampleSample s = new SampleSample ();
+		int count = samples.Length;
+		s.activeSamples = new GameObject[count];
+		s.positions = new Vector3[count];
+		s.rotations = new Quaternion[count];
+		for ( int i = 0; i < count; i++ )
+		{
+			s.activeSamples [ i ] = samples [ i ];
+			s.positions [ i ] = samples [ i ].transform.position;
+			s.rotations [ i ] = samples [ i ].transform.rotation;
+		}
+		storedSamples.Enqueue ( s );
+	}
+
+	public static void LoadSample ()
+	{
+		SampleSample s = storedSamples.Dequeue ();
+		int count = s.activeSamples.Length;
+		for (int i = 0; i < count; i++)
+		{
+			s.activeSamples [ i ].transform.position = s.positions [ i ];
+			s.activeSamples [ i ].transform.rotation = s.rotations [ i ];
+		}
+	}*/
 }
