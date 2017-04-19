@@ -75,7 +75,7 @@ public class TrainingUI : MonoBehaviour
 
 		} else
 		{
-			if ( robotController.CheckSaveLocation ( OnBeginRecord ) )
+			if ( robotController.CheckSaveLocation ( OnBeginRecord, OnCancelRecord ) )
 			{
 				OnBeginRecord ();
 //				recording = true;
@@ -97,6 +97,16 @@ public class TrainingUI : MonoBehaviour
 		robotController.IsRecording = true;
 		recordStatus.text = "RECORDING";
 		recordStatus.color = Color.green;
+		robotInput.DisableFocus = false;
+		robotInput.Focus ();
+	}
+
+	void OnCancelRecord ()
+	{
+//		recording = false;
+//		robotController.IsRecording = false;
+//		recordStatus.text = "Not Recording";
+//		recordStatus.color = Color.red;
 		robotInput.DisableFocus = false;
 		robotInput.Focus ();
 	}

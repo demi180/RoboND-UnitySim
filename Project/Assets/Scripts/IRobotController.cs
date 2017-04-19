@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-internal class RobotSample
+public class RobotSample
 {
 	public Vector2 Position2 { get { return new Vector2 ( position.x, position.z ); } }
 	public Quaternion rotation;
@@ -124,7 +124,7 @@ public abstract class IRobotController : MonoBehaviour
 		}
 	}
 
-	public bool CheckSaveLocation(System.Action saveCallback)
+	public bool CheckSaveLocation(System.Action saveCallback, SimpleFileBrowser.OnCancel cancelCallback)
 	{
 		if (m_saveLocation != "") 
 		{
@@ -133,7 +133,7 @@ public abstract class IRobotController : MonoBehaviour
 		else
 		{
 			beginRecordCallback = saveCallback;
-			SimpleFileBrowser.ShowSaveDialog (OpenFolder, null, true, null, "Select Output Folder", "Select");
+			SimpleFileBrowser.ShowSaveDialog (OpenFolder, cancelCallback, true, null, "Select Output Folder", "Select");
 		}
 		return false;
 	}
@@ -154,26 +154,38 @@ public abstract class IRobotController : MonoBehaviour
 
 			ObjectiveSpawner.SetInitialPositions ();
 			int count = samples.Count;
+			RobotSample sample = null;
+			int badPickupCount = 0;
+			bool isPickingUp = false;
 			for ( int i = 0; i < count; i++ )
 			{
-				RobotSample sample = samples.Dequeue ();
+				// hack: for some reason there are lots of extra samples during the pickup, so artificially advance and drop them
+				if ( !IsPickingUpSample && isPickingUp )
+				{
+					do
+					{
+						sample = samples.Dequeue ();
+						i++;
+						badPickupCount++;
+					} while ( !sample.stopPickup && samples.Count > 0 && i < count );
+					isPickingUp = false;
+				}
+				sample = samples.Dequeue ();
 				transform.position = sample.position;
 				transform.rotation = sample.rotation;
-//				ObjectiveSpawner.LoadSample ();
 				if ( sample.triggerPickup )
 				{
+					isPickingUp = true;
+//					Debug.Log ( "recorded pickup" );
 					curObjective = sample.curSample.GetComponent<PickupSample> ();
 					curObjective.transform.parent = null;
+					curObjective.Collider.enabled = true;
 					PickupObjective ( null );
-//					while ( IsPickingUpSample )
-//					{
-//						yield return null;
-//						string path = WriteImage ( recordingCam, "robocam", sample.timestamp );
-//
-//						row = path + "," + sample.steerAngle + "," + sample.throttle + "," + sample.brake + "," + sample.speed + "," +
-//							sample.position.x + "," + sample.position.z + "," + sample.pitch + "," + sample.yaw + "," + sample.roll + newLine;
-//						File.AppendAllText (Path.Combine (m_saveLocation, CSVFileName), row);
-//					}
+				}
+				if ( sample.stopPickup )
+				{
+					Debug.Log ( "STOP!!" );
+					isPickingUp = false;
 				}
 				string camPath = WriteImage ( recordingCam, "robocam", sample.timestamp );
 
@@ -183,7 +195,7 @@ public abstract class IRobotController : MonoBehaviour
 
 				yield return null;
 			}
-
+			Debug.Log ( "bad pickup count: " + badPickupCount );
 			isSaving = false;
 			//need to reset the car back to its position before ending recording, otherwise sometimes the car ended up in strange areas
 			transform.position = saved_position;
@@ -248,13 +260,15 @@ public abstract class IRobotController : MonoBehaviour
 		return isSaving;
 	}
 
-	public void GetSample (bool force = false)
+	public RobotSample GetSample (bool force = false)
 	{
+		RobotSample sample = null;
 		if ( Time.time > nextRecordTime || force )
 		{
 			if (m_saveLocation != "")
 			{
-				RobotSample sample = new RobotSample();
+//				Debug.Log ( "Recording!" );
+				sample = new RobotSample();
 				
 				sample.timestamp = System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss_fff");
 				sample.steerAngle = SteerAngle;
@@ -271,36 +285,39 @@ public abstract class IRobotController : MonoBehaviour
 //				Debug.Log ( "Throt " + sample.throttle + " brake " + sample.brake + " pos " + sample.position + " yaw " + sample.yaw );
 				
 				samples.Enqueue(sample);
-				
-				sample = null;
-
 //				ObjectiveSpawner.Sample ();
 			}
 			nextRecordTime = Time.time + recordTime;
 		}
+		return sample;
 	}
 
 	public void TriggerPickup ()
 	{
-		var iter = samples.GetEnumerator ();
-		RobotSample s = null;
-		while ( iter.MoveNext () )
-		{
-			s = iter.Current;
-		}
+		RobotSample s = GetSample ( true );
 		s.triggerPickup = true;
 		s.curSample = curObjective.gameObject;
+//		var iter = samples.GetEnumerator ();
+//		RobotSample s = null;
+//		while ( iter.MoveNext () )
+//		{
+//			s = iter.Current;
+//		}
+//		s.triggerPickup = true;
+//		s.curSample = curObjective.gameObject;
 	}
 
 	public void StopPickup ()
 	{
-		var iter = samples.GetEnumerator ();
-		RobotSample s = null;
-		while ( iter.MoveNext () )
-		{
-			s = iter.Current;
-		}
+		RobotSample s = GetSample ( true );
 		s.stopPickup = true;
+//		var iter = samples.GetEnumerator ();
+//		RobotSample s = null;
+//		while ( iter.MoveNext () )
+//		{
+//			s = iter.Current;
+//		}
+//		s.stopPickup = true;
 	}
 
 /*	public IEnumerator Sample()

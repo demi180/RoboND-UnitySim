@@ -199,8 +199,8 @@ public class RoverController : IRobotController
 
 	void Update ()
 	{
-		if ( IsRecording && !isPickingUp )
-			GetSample ();
+		if ( IsRecording )// && !isPickingUp )
+			GetSample ( isPickingUp );
 		
 		if ( !isPickingUp && !getSaveStatus () )
 		{
@@ -411,7 +411,7 @@ public class RoverController : IRobotController
 //		PickupProgress = 0;
 		if ( IsRecording && !getSaveStatus () )
 		{
-			GetSample ( true );
+//			GetSample ( true );
 			TriggerPickup ();
 		}
 		StartCoroutine ( DoPickup () );
@@ -434,8 +434,8 @@ public class RoverController : IRobotController
 		t = 0;
 		while ( t < 1 )
 		{
-			if ( IsRecording )
-				GetSample ( true );
+//			if ( IsRecording )
+//				GetSample ( true );
 			yield return null;
 //			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
@@ -455,8 +455,8 @@ public class RoverController : IRobotController
 		t = 0;
 		while ( t < 1.5f )
 		{
-			if ( IsRecording )
-				GetSample ( true );
+//			if ( IsRecording )
+//				GetSample ( true );
 			yield return null;
 //			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
@@ -473,8 +473,8 @@ public class RoverController : IRobotController
 		t = 0;
 		while ( t < 1.5f )
 		{
-			if ( IsRecording )
-				GetSample ( true );
+//			if ( IsRecording )
+//				GetSample ( true );
 			yield return null;
 //			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
@@ -491,8 +491,8 @@ public class RoverController : IRobotController
 		t = 0;
 		while ( t < 1.5f )
 		{
-			if ( IsRecording )
-				GetSample ( true );
+//			if ( IsRecording )
+//				GetSample ( true );
 			yield return null;
 //			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
@@ -506,8 +506,8 @@ public class RoverController : IRobotController
 		t = 0;
 		while ( t < 1.5f )
 		{
-			if ( IsRecording )
-				GetSample ( true );
+//			if ( IsRecording )
+//				GetSample ( true );
 			yield return null;
 //			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
@@ -521,8 +521,8 @@ public class RoverController : IRobotController
 		t = 0;
 		while ( t < 3 )
 		{
-			if ( IsRecording )
-				GetSample ( true );
+//			if ( IsRecording )
+//				GetSample ( true );
 			yield return null;
 //			PickupProgress += Time.deltaTime / total;
 			t += Time.deltaTime;
@@ -534,7 +534,7 @@ public class RoverController : IRobotController
 //		PickupProgress = -1;
 		if ( IsRecording )
 		{
-			GetSample ( true );
+//			GetSample ( true );
 			StopPickup ();
 		}
 		if ( !getSaveStatus () )
