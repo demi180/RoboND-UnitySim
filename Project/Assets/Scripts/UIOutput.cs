@@ -42,7 +42,9 @@ public class UIOutput : MonoBehaviour
 		Vector2 position = new Vector2 ( controller.Position.x, controller.Position.z );
 //		Vector3 position = controller.Position;
 		float pitch = controller.Pitch;
-		float yaw = controller.Yaw;
+		// new: set yaw angle counter-clockwise and relative to positive-x
+		float yaw = IRobotController.ConvertAngleToCCWXBased ( controller.Yaw );
+//		float yaw = controller.Yaw;
 		float roll = controller.Roll;
 
 		sb.Append ( "Throttle: " + throttle.ToString ( "F1" ) + "\n" );

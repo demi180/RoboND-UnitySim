@@ -278,7 +278,8 @@ public abstract class IRobotController : MonoBehaviour
 				sample.brake = BrakeInput;
 				sample.speed = Speed;
 				sample.pitch = Pitch;
-				sample.yaw = Yaw;
+				// new: convert yaw angle to CCW, x-based
+				sample.yaw = ConvertAngleToCCWXBased ( Yaw );
 				sample.roll = Roll;
 				sample.position = transform.position;
 				sample.rotation = transform.rotation;
@@ -382,5 +383,29 @@ public abstract class IRobotController : MonoBehaviour
 		File.WriteAllBytes (path, image);
 		image = null;
 		return path;
+	}
+
+	public static float ConvertAngleToCCWXBased (float angle)
+	{
+		angle = -angle + 90f;
+
+		while ( angle > 360f )
+			angle -= 360f;
+		while ( angle < 0f )
+			angle += 360f;
+
+		return angle;
+	}
+
+	public static float ConvertAngleToCWZBased (float angle)
+	{
+		angle = -angle - 90f;
+
+		while ( angle > 360f )
+			angle -= 360f;
+		while ( angle < 0f )
+			angle += 360f;
+
+		return angle;
 	}
 }

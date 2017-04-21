@@ -61,7 +61,7 @@ public class CommandServer : MonoBehaviour
 	{
 //		Debug.Log ( "Steer" );
 		JSONObject jsonObject = obj.data;
-		robotRemoteControl.SteeringAngle = float.Parse(jsonObject.GetField("steering_angle").str);
+		robotRemoteControl.SteeringAngle = -float.Parse(jsonObject.GetField("steering_angle").str); // he wanted the angles CCW
 		robotRemoteControl.ThrottleInput = float.Parse(jsonObject.GetField("throttle").str);
 		if ( jsonObject.HasField ( "brake" ) )
 			robotRemoteControl.BrakeInput = float.Parse ( jsonObject.GetField ( "brake" ).str );
@@ -182,7 +182,8 @@ public class CommandServer : MonoBehaviour
 			Vector3 pos = robotController.Position;
 			data["position"] = pos.x.ToString ("N4") + "," + pos.z.ToString ("N4");
 			data["pitch"] = robotController.Pitch.ToString ("N4");
-			data["yaw"] = robotController.Yaw.ToString ("N4");
+			// new: convert the angle to CCW, x-based
+			data["yaw"] = IRobotController.ConvertAngleToCCWXBased ( robotController.Yaw ).ToString ("N4");
 			data["roll"] = robotController.Roll.ToString ("N4");
 			data["fixed_turn"] = robotController.IsTurningInPlace ? "1" : "0";
 			data["near_sample"] = robotController.IsNearObjective ? "1" : "0";
