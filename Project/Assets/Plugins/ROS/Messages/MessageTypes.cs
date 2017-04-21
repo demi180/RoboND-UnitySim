@@ -392,7 +392,16 @@ namespace Messages
 		baxter_core_msgs__OpenCamera__Request,
 		baxter_core_msgs__OpenCamera__Response,
 		baxter_core_msgs__SolvePositionIK__Request,
-		baxter_core_msgs__SolvePositionIK__Response
+		baxter_core_msgs__SolvePositionIK__Response,
+
+		// hector stuff
+		hector_uav_msgs__Altimeter = 1000,
+		hector_uav_msgs__Attitudecommand,
+		hector_uav_msgs__Compass,
+		hector_uav_msgs__ControllerState,
+		hector_uav_msgs__EnableMotors__Request,
+		hector_uav_msgs__EnableMotors__Response,
+
 	}
 
 	public enum SrvTypes
@@ -458,7 +467,10 @@ namespace Messages
 		baxter_core_msgs__CloseCamera,
 		baxter_core_msgs__ListCameras,
 		baxter_core_msgs__OpenCamera,
-		baxter_core_msgs__SolvePositionIK
+		baxter_core_msgs__SolvePositionIK,
+
+		// hector stuff
+		hector_uav_msgs__EnableMotors = 1000,
 	}
 
 }
