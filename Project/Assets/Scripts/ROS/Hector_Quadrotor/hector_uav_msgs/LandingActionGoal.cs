@@ -1,50 +1,51 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System;
-using UnityEngine;
-using Ros_CSharp;
+using uint8 = System.Byte;
 using Messages;
-using Header_t = Messages.std_msgs.Header;
+using hector_uav_msgs;
 
 namespace hector_uav_msgs
 {
-	public class AttitudeCommand : IRosMessage
+	#if !TRACE
+	[System.Diagnostics.DebuggerStepThrough]
+	#endif
+	public class LandingActionGoal : IRosMessage
 	{
-		public Header_t header;
-		public float roll;
-		public float pitch;
+		public Messages.std_msgs.Header header;
+		public Messages.actionlib_msgs.GoalID goal_id;
+		public hector_uav_msgs.LandingGoal goal;
 
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override string MD5Sum() { return "cceacd88dad80f3e3fd1466d24264ec6"; }
+		public override string MD5Sum() { return "f5e95feb07d8f5f21d989eb34d7c3243"; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override bool HasHeader() { return true; }
+		public override bool HasHeader() { return false; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override bool IsMetaType() { return false; }
+		public override bool IsMetaType() { return true; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override string MessageDefinition() { return @"header header 
-float32 roll
-float32 pitch"; }
+		public override string MessageDefinition() { return @"Header header
+actionlib_msgs/GoalID goal_id
+hector_uav_msgs/LandingGoal goal"; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override MsgTypes msgtype() { return MsgTypes.hector_uav_msgs__Attitudecommand; }
+		public override MsgTypes msgtype() { return MsgTypes.hector_uav_msgs__LandingActionGoal; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override bool IsServiceComponent() { return false; }
 
 		[System.Diagnostics.DebuggerStepThrough]
-		public AttitudeCommand()
+		public LandingActionGoal()
 		{
 
 		}
 
 		[System.Diagnostics.DebuggerStepThrough]
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public AttitudeCommand(byte[] SERIALIZEDSTUFF)
+		public LandingActionGoal(byte[] SERIALIZEDSTUFF)
 		{
 			Deserialize(SERIALIZEDSTUFF);
 		}
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public AttitudeCommand(byte[] SERIALIZEDSTUFF, ref int currentIndex)
+		public LandingActionGoal(byte[] SERIALIZEDSTUFF, ref int currentIndex)
 		{
 			Deserialize(SERIALIZEDSTUFF, ref currentIndex);
 		}
@@ -55,11 +56,9 @@ float32 pitch"; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override void Deserialize(byte[] SERIALIZEDSTUFF, ref int currentIndex)
 		{
-			header = new Header_t (SERIALIZEDSTUFF, ref currentIndex);
-			roll = BitConverter.ToSingle ( SERIALIZEDSTUFF, currentIndex );
-			currentIndex += sizeof (float);
-			pitch = BitConverter.ToSingle ( SERIALIZEDSTUFF, currentIndex );
-			currentIndex += sizeof (float);
+			header = new Messages.std_msgs.Header ( SERIALIZEDSTUFF, ref currentIndex );
+			goal_id = new Messages.actionlib_msgs.GoalID ( SERIALIZEDSTUFF, ref currentIndex );
+			goal = new LandingGoal ( SERIALIZEDSTUFF, ref currentIndex );
 		}
 
 		[System.Diagnostics.DebuggerStepThrough]
@@ -68,35 +67,37 @@ float32 pitch"; }
 		{
 			int pos = 0;
 			byte[] headerBytes = header.Serialize ();
-			int headerSize = headerBytes.Length;
-			int floatSize = sizeof (float);
-			byte[] bytes = new byte[headerSize + 2 * floatSize];
+			byte[] goalIDBytes = goal_id.Serialize ();
+			byte[] goalBytes = goal.Serialize ();
+
+			byte[] bytes = new byte[ headerBytes.Length + goalBytes.Length + goalIDBytes.Length ];
 			headerBytes.CopyTo ( bytes, 0 );
-			pos += headerSize;
-			BitConverter.GetBytes ( roll ).CopyTo ( bytes, pos );
-			pos += floatSize;
-			BitConverter.GetBytes ( pitch ).CopyTo ( bytes, pos );
-			pos += floatSize;
+			pos = headerBytes.Length;
+			goalIDBytes.CopyTo ( bytes, pos );
+			pos += goalIDBytes.Length;
+			goalBytes.CopyTo ( bytes, pos );
 
 			return bytes;
 		}
 
 		public override void Randomize()
 		{
+			header = new Messages.std_msgs.Header ();
 			header.Randomize ();
-			roll = UnityEngine.Random.Range ( float.MinValue, float.MaxValue );
-			pitch = UnityEngine.Random.Range ( float.MinValue, float.MaxValue );
+			goal_id = new Messages.actionlib_msgs.GoalID ();
+			goal_id.Randomize ();
+			goal = new LandingGoal ();
+			goal.Randomize ();
 		}
 
 		public override bool Equals(IRosMessage ____other)
 		{
 			if (____other == null) return false;
 			bool ret = true;
-			AttitudeCommand other = (AttitudeCommand)____other;
+			hector_uav_msgs.LandingActionGoal other = (hector_uav_msgs.LandingActionGoal)____other;
 
-			ret &= header == other.header;
-			ret &= roll == other.roll;
-			ret &= pitch == other.pitch;
+			ret &= goal.Equals(other.goal);
+			ret &= goal_id.Equals(other.goal_id);
 			return ret;
 		}
 	}

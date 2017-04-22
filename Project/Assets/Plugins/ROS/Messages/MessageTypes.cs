@@ -401,7 +401,23 @@ namespace Messages
 		hector_uav_msgs__ControllerState,
 		hector_uav_msgs__EnableMotors__Request,
 		hector_uav_msgs__EnableMotors__Response,
-
+		hector_uav_msgs__RC,
+		hector_uav_msgs__HeadingCommand,
+		hector_uav_msgs__HeightCommand,
+		hector_uav_msgs__LandingAction,
+		hector_uav_msgs__LandingActionGoal,
+		hector_uav_msgs__LandingActionResult,
+		hector_uav_msgs__LandingActionFeedback,
+		hector_uav_msgs__LandingGoal,
+		hector_uav_msgs__LandingResult,
+		hector_uav_msgs__LandingFeedback,
+		hector_uav_msgs__MotorCommand,
+		hector_uav_msgs__MotorPWM,
+		hector_uav_msgs__MotorStatus,
+		// more stuff here
+		hector_uav_msgs__VelocityXYCommand,
+		hector_uav_msgs__VelocityZCommand,
+		hector_uav_msgs__YawRateCommand,
 	}
 
 	public enum SrvTypes
