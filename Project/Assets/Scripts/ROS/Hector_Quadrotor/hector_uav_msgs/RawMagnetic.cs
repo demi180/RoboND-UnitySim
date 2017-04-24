@@ -1,56 +1,49 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Runtime.InteropServices;
-using uint8 = System.Byte;
-using Messages.geometry_msgs;
-using Messages.sensor_msgs;
-using Messages.actionlib_msgs;
+using System;
+using UnityEngine;
+using Ros_CSharp;
 using Messages;
-using Messages.std_msgs;
-using String=System.String;
-using hector_uav_msgs;
+using Header_t = Messages.std_msgs.Header;
+using uint8 = System.Byte;
 
 namespace hector_uav_msgs
 {
-	#if !TRACE
-	[System.Diagnostics.DebuggerStepThrough]
-	#endif
-	public class LandingFeedback : IRosMessage
+	public class RawMagnetic : IRosMessage
 	{
-		PoseStamped current_pose;
+		public Header_t header;
+		public double[] channel = new double[3];
 
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override string MD5Sum() { return "dd7058fae6e1bf2400513fe092a44c92"; }
+		public override string MD5Sum() { return "babd510868ac7b486e2097c79e1384c9"; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override bool HasHeader() { return false; }
+		public override bool HasHeader() { return true; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override bool IsMetaType() { return false; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override string MessageDefinition() { return @"PoseFeedback current_pose"; }
+		public override string MessageDefinition() { return @"header header 
+float64[3] channel"; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override MsgTypes msgtype() { return MsgTypes.hector_uav_msgs__LandingFeedback; }
+		public override MsgTypes msgtype() { return MsgTypes.hector_uav_msgs__RawMagnetic; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override bool IsServiceComponent() { return false; }
 
 		[System.Diagnostics.DebuggerStepThrough]
-		public LandingFeedback()
+		public RawMagnetic()
 		{
 
 		}
 
 		[System.Diagnostics.DebuggerStepThrough]
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public LandingFeedback(byte[] SERIALIZEDSTUFF)
+		public RawMagnetic(byte[] SERIALIZEDSTUFF)
 		{
 			Deserialize(SERIALIZEDSTUFF);
 		}
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public LandingFeedback(byte[] SERIALIZEDSTUFF, ref int currentIndex)
+		public RawMagnetic(byte[] SERIALIZEDSTUFF, ref int currentIndex)
 		{
 			Deserialize(SERIALIZEDSTUFF, ref currentIndex);
 		}
@@ -61,28 +54,50 @@ namespace hector_uav_msgs
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override void Deserialize(byte[] SERIALIZEDSTUFF, ref int currentIndex)
 		{
-			current_pose = new PoseStamped ( SERIALIZEDSTUFF, ref currentIndex );
+			header = new Header_t (SERIALIZEDSTUFF, ref currentIndex);
+			for ( int i = 0; i < 3; i++ )
+			{
+				channel [ i ] = BitConverter.ToDouble ( SERIALIZEDSTUFF, currentIndex );
+				currentIndex += 8;
+			}
 		}
 
 		[System.Diagnostics.DebuggerStepThrough]
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override byte[] Serialize(bool partofsomethingelse)
 		{
-			return current_pose.Serialize ( partofsomethingelse );
+			int pos = 0;
+			byte[] headerBytes = header.Serialize ();
+			int headerSize = headerBytes.Length;
+			byte[] bytes = new byte[headerSize + 24];
+			headerBytes.CopyTo ( bytes, 0 );
+			pos += headerSize;
+			for ( int i = 0; i < 3; i++ )
+			{
+				BitConverter.GetBytes ( channel [ i ] ).CopyTo ( bytes, pos );
+				pos += 8;
+			}
+
+			return bytes;
 		}
 
 		public override void Randomize()
 		{
-			current_pose.Randomize ();
-
+			header.Randomize ();
+			System.Random r = new System.Random ();
+			for ( int i = 0; i < 3; i++ )
+				channel [ i ] = r.NextDouble ();
 		}
 
 		public override bool Equals(IRosMessage ____other)
 		{
 			if (____other == null) return false;
-			hector_uav_msgs.LandingFeedback other = (hector_uav_msgs.LandingFeedback)____other;
+			bool ret = true;
+			RawMagnetic other = (RawMagnetic)____other;
 
-			return current_pose.Equals ( other.current_pose );
+			ret &= header == other.header;
+			ret &= channel.Equals ( other.channel );
+			return ret;
 		}
 	}
 }

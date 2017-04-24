@@ -14,10 +14,39 @@ namespace hector_uav_msgs
 	#endif
 	public class Altimeter : IRosMessage
 	{
+		public const float STANDARD_PRESSURE = 1013.25f;
+
 		public Header_t header;
 		public float altitude;
 		public float pressure;
 		public float qnh;
+
+		public static float AltitudeFromPressure (float pressure, float qnh = Altimeter.STANDARD_PRESSURE)
+		{
+			return (float) ( 288.15 / 0.0065 * ( 1.0 - System.Math.Pow ( pressure / qnh, 1.0 / 5.255 ) ) );
+		}
+
+		public static float PressureFromAltitude (float altitude, float qnh = Altimeter.STANDARD_PRESSURE)
+		{
+			return (float) ( qnh * System.Math.Pow ( 1.0 - ( 0.0065 * altitude ) / 288.15, 5.255 ) );
+		}
+
+		public static Altimeter AltitudeFromPressure (Altimeter altimeter)
+		{
+			if ( altimeter.qnh == 0f )
+				altimeter.qnh = STANDARD_PRESSURE;
+			altimeter.altitude = AltitudeFromPressure ( altimeter.pressure, altimeter.qnh );
+			return altimeter;
+		}
+
+		static Altimeter PressureFromAltitude (Altimeter altimeter)
+		{
+			if ( altimeter.qnh == 0f ) 
+				altimeter.qnh = STANDARD_PRESSURE;
+			altimeter.pressure = PressureFromAltitude ( altimeter.altitude, altimeter.qnh );
+			return altimeter;
+		}
+
 
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -28,9 +57,9 @@ namespace hector_uav_msgs
 		public override bool IsMetaType() { return false; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override string MessageDefinition() { return @"header header 
-float altitude
-float pressure
-float qnh"; }
+float32 altitude
+float32 pressure
+float32 qnh"; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override MsgTypes msgtype() { return MsgTypes.hector_uav_msgs__Altimeter; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]

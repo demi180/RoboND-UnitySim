@@ -13,44 +13,45 @@ using Messages.std_msgs;
 using String=System.String;
 using hector_uav_msgs;
 
+// WTF?? completely empty struct..
+
 namespace hector_uav_msgs
 {
 	#if !TRACE
 	[System.Diagnostics.DebuggerStepThrough]
 	#endif
-	public class LandingFeedback : IRosMessage
+	public class PoseResult : IRosMessage
 	{
-		PoseStamped current_pose;
 
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override string MD5Sum() { return "dd7058fae6e1bf2400513fe092a44c92"; }
+		public override string MD5Sum() { return "d41d8cd98f00b204e9800998ecf8427e"; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override bool HasHeader() { return false; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override bool IsMetaType() { return false; }
+		public override bool IsMetaType() { return true; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override string MessageDefinition() { return @"PoseFeedback current_pose"; }
+		public override string MessageDefinition() { return @""; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override MsgTypes msgtype() { return MsgTypes.hector_uav_msgs__LandingFeedback; }
+		public override MsgTypes msgtype() { return MsgTypes.hector_uav_msgs__PoseResult; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override bool IsServiceComponent() { return false; }
 
 		[System.Diagnostics.DebuggerStepThrough]
-		public LandingFeedback()
+		public PoseResult()
 		{
 
 		}
 
 		[System.Diagnostics.DebuggerStepThrough]
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public LandingFeedback(byte[] SERIALIZEDSTUFF)
+		public PoseResult(byte[] SERIALIZEDSTUFF)
 		{
 			Deserialize(SERIALIZEDSTUFF);
 		}
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public LandingFeedback(byte[] SERIALIZEDSTUFF, ref int currentIndex)
+		public PoseResult(byte[] SERIALIZEDSTUFF, ref int currentIndex)
 		{
 			Deserialize(SERIALIZEDSTUFF, ref currentIndex);
 		}
@@ -61,28 +62,23 @@ namespace hector_uav_msgs
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override void Deserialize(byte[] SERIALIZEDSTUFF, ref int currentIndex)
 		{
-			current_pose = new PoseStamped ( SERIALIZEDSTUFF, ref currentIndex );
 		}
 
 		[System.Diagnostics.DebuggerStepThrough]
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override byte[] Serialize(bool partofsomethingelse)
 		{
-			return current_pose.Serialize ( partofsomethingelse );
+			return new byte[0];
 		}
 
 		public override void Randomize()
 		{
-			current_pose.Randomize ();
-
 		}
 
 		public override bool Equals(IRosMessage ____other)
 		{
 			if (____other == null) return false;
-			hector_uav_msgs.LandingFeedback other = (hector_uav_msgs.LandingFeedback)____other;
-
-			return current_pose.Equals ( other.current_pose );
+			return true;
 		}
 	}
 }

@@ -18,7 +18,7 @@ namespace hector_uav_msgs
 	#if !TRACE
 	[System.Diagnostics.DebuggerStepThrough]
 	#endif
-	public class LandingFeedback : IRosMessage
+	public class TakeoffFeedback : IRosMessage
 	{
 		PoseStamped current_pose;
 
@@ -30,27 +30,27 @@ namespace hector_uav_msgs
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override bool IsMetaType() { return false; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override string MessageDefinition() { return @"PoseFeedback current_pose"; }
+		public override string MessageDefinition() { return @"PoseStamped current_pose"; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override MsgTypes msgtype() { return MsgTypes.hector_uav_msgs__LandingFeedback; }
+		public override MsgTypes msgtype() { return MsgTypes.hector_uav_msgs__TakeoffFeedback; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override bool IsServiceComponent() { return false; }
 
 		[System.Diagnostics.DebuggerStepThrough]
-		public LandingFeedback()
+		public TakeoffFeedback()
 		{
 
 		}
 
 		[System.Diagnostics.DebuggerStepThrough]
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public LandingFeedback(byte[] SERIALIZEDSTUFF)
+		public TakeoffFeedback(byte[] SERIALIZEDSTUFF)
 		{
 			Deserialize(SERIALIZEDSTUFF);
 		}
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public LandingFeedback(byte[] SERIALIZEDSTUFF, ref int currentIndex)
+		public TakeoffFeedback(byte[] SERIALIZEDSTUFF, ref int currentIndex)
 		{
 			Deserialize(SERIALIZEDSTUFF, ref currentIndex);
 		}
@@ -80,7 +80,7 @@ namespace hector_uav_msgs
 		public override bool Equals(IRosMessage ____other)
 		{
 			if (____other == null) return false;
-			hector_uav_msgs.LandingFeedback other = (hector_uav_msgs.LandingFeedback)____other;
+			hector_uav_msgs.TakeoffFeedback other = (hector_uav_msgs.TakeoffFeedback)____other;
 
 			return current_pose.Equals ( other.current_pose );
 		}

@@ -1,56 +1,51 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Runtime.InteropServices;
-using uint8 = System.Byte;
-using Messages.geometry_msgs;
-using Messages.sensor_msgs;
-using Messages.actionlib_msgs;
+using System;
+using UnityEngine;
+using Ros_CSharp;
 using Messages;
-using Messages.std_msgs;
-using String=System.String;
-using hector_uav_msgs;
+using Header_t = Messages.std_msgs.Header;
+using uint8 = System.Byte;
 
 namespace hector_uav_msgs
 {
-	#if !TRACE
-	[System.Diagnostics.DebuggerStepThrough]
-	#endif
-	public class LandingFeedback : IRosMessage
+	public class PositionXYCommand : IRosMessage
 	{
-		PoseStamped current_pose;
+		public Header_t header;
+		public float x;
+		public float y;
 
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override string MD5Sum() { return "dd7058fae6e1bf2400513fe092a44c92"; }
+		public override string MD5Sum() { return "7b4d52af2aa98221d9bb260976d6a201"; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override bool HasHeader() { return false; }
+		public override bool HasHeader() { return true; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override bool IsMetaType() { return false; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override string MessageDefinition() { return @"PoseFeedback current_pose"; }
+		public override string MessageDefinition() { return @"header header 
+float32 x
+float32 y"; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public override MsgTypes msgtype() { return MsgTypes.hector_uav_msgs__LandingFeedback; }
+		public override MsgTypes msgtype() { return MsgTypes.hector_uav_msgs__PositionXYCommand; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override bool IsServiceComponent() { return false; }
 
 		[System.Diagnostics.DebuggerStepThrough]
-		public LandingFeedback()
+		public PositionXYCommand()
 		{
 
 		}
 
 		[System.Diagnostics.DebuggerStepThrough]
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public LandingFeedback(byte[] SERIALIZEDSTUFF)
+		public PositionXYCommand(byte[] SERIALIZEDSTUFF)
 		{
 			Deserialize(SERIALIZEDSTUFF);
 		}
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public LandingFeedback(byte[] SERIALIZEDSTUFF, ref int currentIndex)
+		public PositionXYCommand(byte[] SERIALIZEDSTUFF, ref int currentIndex)
 		{
 			Deserialize(SERIALIZEDSTUFF, ref currentIndex);
 		}
@@ -61,28 +56,48 @@ namespace hector_uav_msgs
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override void Deserialize(byte[] SERIALIZEDSTUFF, ref int currentIndex)
 		{
-			current_pose = new PoseStamped ( SERIALIZEDSTUFF, ref currentIndex );
+			header = new Header_t (SERIALIZEDSTUFF, ref currentIndex);
+			x = BitConverter.ToSingle ( SERIALIZEDSTUFF, currentIndex );
+			currentIndex += sizeof (float);
+			y = BitConverter.ToSingle ( SERIALIZEDSTUFF, currentIndex );
+			currentIndex += sizeof (float);
 		}
 
 		[System.Diagnostics.DebuggerStepThrough]
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override byte[] Serialize(bool partofsomethingelse)
 		{
-			return current_pose.Serialize ( partofsomethingelse );
+			int pos = 0;
+			byte[] headerBytes = header.Serialize ();
+			int headerSize = headerBytes.Length;
+			byte[] bytes = new byte[headerSize + 2 * sizeof (float)];
+			headerBytes.CopyTo ( bytes, 0 );
+			pos += headerSize;
+			BitConverter.GetBytes ( x ).CopyTo ( bytes, pos );
+			pos += sizeof (float);
+			BitConverter.GetBytes ( y ).CopyTo ( bytes, pos );
+			pos += sizeof (float);
+
+			return bytes;
 		}
 
 		public override void Randomize()
 		{
-			current_pose.Randomize ();
-
+			header.Randomize ();
+			x = UnityEngine.Random.value;
+			y = UnityEngine.Random.value;
 		}
 
 		public override bool Equals(IRosMessage ____other)
 		{
 			if (____other == null) return false;
-			hector_uav_msgs.LandingFeedback other = (hector_uav_msgs.LandingFeedback)____other;
+			bool ret = true;
+			PositionXYCommand other = (PositionXYCommand)____other;
 
-			return current_pose.Equals ( other.current_pose );
+			ret &= header == other.header;
+			ret &= x == other.x;
+			ret &= y == other.y;
+			return ret;
 		}
 	}
 }
