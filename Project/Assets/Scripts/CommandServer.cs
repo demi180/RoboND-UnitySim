@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections;
 using SocketIO;
-using UnityStandardAssets.Vehicles.Car;
 using System;
 using System.Security.AccessControl;
 using UnityEngine.UI;
