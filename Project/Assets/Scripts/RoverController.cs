@@ -292,17 +292,44 @@ public class RoverController : IRobotController
 //		rb.velocity = direction;
 	}
 
-	public override void Rotate (float angle)
+	// provide input in angle
+	public override void RotateRaw (float angle)
 	{
 		if ( isFixedTurning || isPickingUp )
 			return;
-		angle = Mathf.Clamp ( angle, -1f, 1f );
-		SteerAngle = angle * maxSteering;
+
+		angle = Mathf.Clamp ( angle, -maxSteering, maxSteering );
+		SteerAngle = angle;
 		if ( angle != 0 )
 		{
-			lastSteerInput = angle;
+			lastSteerInput = angle / maxSteering;
 			lastSteerTime = Time.time;
-			lastAngle = angle * maxSteering;
+			lastAngle = angle;
+			lastAngle = Mathf.Clamp ( lastAngle, -maxSteering, maxSteering );
+			isSteeringInput = true;
+			if ( !isPickingUp )
+				armActuator.enabled = false;
+		} else
+		{
+			lastAngle = 0;
+			SteerAngle = 0;
+			isSteeringInput = false;
+			isTurningInPlace = false;
+		}
+	}
+
+	// provide input in percent
+	public override void Rotate (float anglePercent)
+	{
+		if ( isFixedTurning || isPickingUp )
+			return;
+		anglePercent = Mathf.Clamp ( anglePercent, -1f, 1f );
+		SteerAngle = anglePercent * maxSteering;
+		if ( anglePercent != 0 )
+		{
+			lastSteerInput = anglePercent;
+			lastSteerTime = Time.time;
+			lastAngle = anglePercent * maxSteering;
 			lastAngle = Mathf.Clamp ( lastAngle, -maxSteering, maxSteering );
 			isSteeringInput = true;
 			if ( !isPickingUp )

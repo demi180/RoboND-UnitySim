@@ -31,9 +31,8 @@ public class RobotRemoteControl : MonoBehaviour
 		float brake = BrakeInput;
 		float steer = SteeringAngle;
 		robot.Move ( throttle, brake );
-//		robot.Move ( throttle );
-		robot.Rotate ( steer );
-//		robot.RotateCamera ( 0, VerticalAngle );
+		robot.RotateRaw ( steer );
+//		robot.Rotate ( steer );
 	}
 
 	public void FixedTurn (float angle, float time = 0)

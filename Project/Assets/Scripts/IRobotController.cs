@@ -30,7 +30,8 @@ public abstract class IRobotController : MonoBehaviour
 	public abstract void Move (float input);
 	public virtual void Move (float throttle, float brake) {}
 	public abstract void Move (Vector3 direction);
-	public abstract void Rotate (float angle);
+	public abstract void Rotate (float anglePercent);
+	public virtual void RotateRaw (float angle) {}
 	public abstract void RotateCamera (float horizontal, float vertical);
 	public abstract void ZoomCamera (float amount);
 	public abstract void ResetZoom ();
