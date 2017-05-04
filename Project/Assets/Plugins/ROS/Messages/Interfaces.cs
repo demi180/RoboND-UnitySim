@@ -254,5 +254,22 @@ namespace Messages
         {
             return (sec == timer.sec && nsec == timer.nsec);
         }
+
+		public double toSec ()
+		{
+			return (double) sec + 1e-9 * (double) nsec;
+		}
+
+		public static TimeData fromSec (double sec)
+		{
+			uint usec = (uint) sec;
+			uint nsec = (uint) ( ( sec - usec ) * 1e9 );
+			return new TimeData ( usec, nsec );
+		}
+
+		public static TimeData operator + (TimeData lhs, TimeData rhs)
+		{
+			return new TimeData ( lhs.sec + rhs.sec, lhs.nsec + rhs.nsec );
+		}
     }
 }

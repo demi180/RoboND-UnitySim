@@ -56,6 +56,13 @@ namespace Ros_CSharp
                 TopicManager.Instance.publish(p, msg);
             }
         }
+
+		public int getNumSubscribers ()
+		{
+			if ( p == null )
+				return 0;
+			return p.NumSubscribers;
+			}
     }
 
     public class IPublisher

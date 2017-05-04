@@ -128,5 +128,42 @@ namespace Messages.std_msgs
             //    ret &= {st.Name} == other.{st.Name};
             return ret;
         }
+
+		public static bool operator < (Duration lhs, Duration rhs)
+		{
+			if ( ReferenceEquals ( lhs, rhs ) )
+				return false;
+
+			return lhs.data.toSec () < rhs.data.toSec ();
+		}
+
+		public static bool operator > (Duration lhs, Duration rhs)
+		{
+			if ( ReferenceEquals ( lhs, rhs ) )
+				return false;
+
+			return lhs.data.toSec () > rhs.data.toSec ();
+		}
+
+		public static bool operator <= (Duration lhs, Duration rhs)
+		{
+			if ( ReferenceEquals ( lhs, rhs ) )
+				return true;
+
+			return lhs.data.toSec () <= rhs.data.toSec ();
+		}
+
+		public static bool operator >= (Duration lhs, Duration rhs)
+		{
+			if ( ReferenceEquals ( lhs, rhs ) )
+				return true;
+
+			return lhs.data.toSec () >= rhs.data.toSec ();
+		}
+
+		public static implicit operator Time (Duration d)
+		{
+			return new Time ( d.data );
+		}
     }
 }

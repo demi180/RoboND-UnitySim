@@ -532,7 +532,8 @@ namespace Ros_CSharp
 #if !TRACE
         [DebuggerStepThrough]
 #endif
-        private string resolveName(string name)
+		public string resolveName (string name)
+//        private string resolveName(string name)
         {
             return resolveName(name, true);
         }

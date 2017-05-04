@@ -128,5 +128,25 @@ namespace Messages.std_msgs
             //    ret &= {st.Name} == other.{st.Name};
             return ret;
         }
+
+		public static Time operator - (Time lhs, Time rhs)
+		{
+			double nsecLeft = (double) lhs.data.nsec + (double) lhs.data.sec * 1e9;
+			double nsecRight = (double) rhs.data.nsec + (double) rhs.data.sec * 1e9;
+			double nsecTotal = nsecLeft - nsecRight;
+			uint sec = (uint) ( nsecTotal - (ulong) nsecTotal / 1e9 );
+			uint nsec = (uint) ( nsecTotal - sec );
+			return new Time ( new TimeData ( sec, nsec ) );
+		}
+
+		public static implicit operator Duration (Time t)
+		{
+			return new Duration ( t.data );
+		}
+
+		public static Time operator + (Time lhs, Duration rhs)
+		{
+			return new Time ( lhs.data + rhs.data );
+		}
     }
 }

@@ -36,6 +36,9 @@ using Messages.geometry_msgs;
 using Messages.tf2_msgs;
 using Messages.sensor_msgs;
 using hector_uav_msgs;
+using LandingClient = actionlib.SimpleActionClient<hector_uav_msgs.LandingAction>;
+using TakeoffClient = actionlib.SimpleActionClient<hector_uav_msgs.TakeoffAction>;
+using PoseClient = actionlib.SimpleActionClient<hector_uav_msgs.PoseAction>;
 
 public class QuadrotorTeleop : MonoBehaviour
 {
@@ -69,10 +72,6 @@ public class QuadrotorTeleop : MonoBehaviour
 	}
 
 
-//	private:
-//	typedef actionlib::SimpleActionClient<LandingAction> LandingClient;
-//	typedef actionlib::SimpleActionClient<TakeoffAction> TakeoffClient;
-//	typedef actionlib::SimpleActionClient<PoseAction> PoseClient;
 
 	NodeHandle nh;
 	Subscriber<Joy> joySubscriber;
@@ -81,9 +80,9 @@ public class QuadrotorTeleop : MonoBehaviour
 	Publisher<YawRateCommand> yawRatePublisher;
 	Publisher<ThrustCommand> thrustPublisher;
 	ServiceClient<EnableMotors> motorEnableService;
-//	boost::shared_ptr<LandingClient> landingClient;
-//	boost::shared_ptr<TakeoffClient> takeoffClient;
-//	boost::shared_ptr<PoseClient> poseClient;
+	LandingClient landingClient;
+	TakeoffClient takeoffClient;
+	PoseClient poseClient;
 
 	PoseStamped pose;
 	double yaw;
@@ -100,7 +99,7 @@ public class QuadrotorTeleop : MonoBehaviour
 		ThrustCommand thrust = new ThrustCommand ();
 		YawRateCommand yawrate = new YawRateCommand ();
 
-//		attitude.header.stamp = thrust.header.stamp = yawrate.header.stamp = Time::now();
+		attitude.header.stamp = thrust.header.stamp = yawrate.header.stamp = ROS.GetTime ();
 		attitude.header.frame_id = yawrate.header.frame_id = baseStabilizedFrame;
 		thrust.header.frame_id = baseLinkFrame;
 
@@ -138,7 +137,7 @@ public class QuadrotorTeleop : MonoBehaviour
 	{
 		TwistStamped velocity = new TwistStamped ();
 		velocity.header.frame_id = baseStabilizedFrame;
-//		velocity.header.stamp = Time::now();
+		velocity.header.stamp = ROS.GetTime ();
 
 		velocity.twist.linear.x = getAxis(joy, sAxes.x);
 		velocity.twist.linear.y = getAxis(joy, sAxes.y);
@@ -165,38 +164,39 @@ public class QuadrotorTeleop : MonoBehaviour
 
 	void joyPoseCallback(Joy joy)
 	{
-//		Time now = Time::now();
+		Messages.std_msgs.Time now = ROS.GetTime ();
 		double dt = 0.0;
-//		if (!pose.header.stamp.isZero()) {
-//			dt = Math.Max(0.0, Math.Min(1.0, (now - pose.header.stamp).toSec()));
-//		}
+		if ( ( pose.header.stamp.data.sec == 0 && pose.header.stamp.data.nsec == 0 ) )
+		{
+			TimeData td = ( now - pose.header.stamp ).data;
+			double sec = td.toSec ();
+			dt = Mathf.Max ( 0, Mathf.Min ( 1f, (float) sec ) );
+		}
 
 		if (getButton(joy, sButtons.go))
 		{
-//			pose.header.stamp = now;
+			pose.header.stamp = ROS.GetTime ();
 			pose.header.frame_id = worldFrame;
 			pose.pose.position.x += (Math.Cos(yaw) * getAxis(joy, sAxes.x) - Math.Sin(yaw) * getAxis(joy, sAxes.y)) * dt;
 			pose.pose.position.y += (Math.Cos(yaw) * getAxis(joy, sAxes.y) + Math.Sin(yaw) * getAxis(joy, sAxes.x)) * dt;
 			pose.pose.position.z += getAxis(joy, sAxes.z) * dt;
 			yaw += getAxis(joy, sAxes.yaw) * Math.PI/180.0 * dt;
 			tf.net.emQuaternion q = tf.net.emQuaternion.FromRPY ( new tf.net.emVector3 ( 0, 0, yaw ) );
-//			tf2::Quaternion q;
-//			q.setRPY(0.0, 0.0, yaw);
 
 			pose.pose.orientation = q.ToMsg ();
-//			pose.pose.orientation = tf2::toMsg(q);
 
 
-			PoseGoal goal;
-//			goal.target_pose = pose;
-//			poseClient.sendGoal(goal);
+			PoseGoal goal = new PoseGoal ();
+			goal.target_pose = pose;
+			poseClient.sendGoal(goal);
 		}
 		if (getButton(joy, sButtons.interrupt))
 		{
-//			poseClient.cancelGoalsAtAndBeforeTime(Time::now());
+			poseClient.cancelGoalsAtAndBeforeTime(ROS.GetTime ());
 		}
 		if (getButton(joy, sButtons.stop))
 		{
+			landingClient.sendGoalAndWait ( new LandingAction (), new Messages.std_msgs.Duration ( new TimeData ( 10, 0 ) ), new Messages.std_msgs.Duration ( new TimeData ( 10, 0 ) ) );
 //			landingClient.sendGoalAndWait(LandingGoal(), Duration(10.0), Duration(10.0));
 		}
 	}
@@ -233,6 +233,7 @@ public class QuadrotorTeleop : MonoBehaviour
 
 	public bool enableMotors(bool enable)
 	{
+//		if ( !motorEnableService )
 //		if (!motorEnableService.waitForExistence(Duration(5.0)))
 //		{
 //			ROS.Warn("Motor enable service not found");
@@ -246,22 +247,22 @@ public class QuadrotorTeleop : MonoBehaviour
 
 	public void stop()
 	{
-//		if (velocityPublisher.getNumSubscribers() > 0)
-//		{
-//			velocityPublisher.publish(TwistStamped());
-//		}
-//		if (attitudePublisher.getNumSubscribers() > 0)
-//		{
-//			attitudePublisher.publish(AttitudeCommand());
-//		}
-//		if (thrustPublisher.getNumSubscribers() > 0)
-//		{
-//			thrustPublisher.publish(ThrustCommand());
-//		}
-//		if (yawRatePublisher.getNumSubscribers() > 0)
-//		{
-//			yawRatePublisher.publish(new YawRateCommand());
-//		}
+		if (velocityPublisher.getNumSubscribers() > 0)
+		{
+			velocityPublisher.publish(new TwistStamped());
+		}
+		if (attitudePublisher.getNumSubscribers() > 0)
+		{
+			attitudePublisher.publish(new AttitudeCommand());
+		}
+		if (thrustPublisher.getNumSubscribers() > 0)
+		{
+			thrustPublisher.publish(new ThrustCommand());
+		}
+		if (yawRatePublisher.getNumSubscribers() > 0)
+		{
+			yawRatePublisher.publish(new YawRateCommand());
+		}
 	}
 
 	void Awake ()
@@ -354,6 +355,9 @@ public class QuadrotorTeleop : MonoBehaviour
 
 		motorEnableService = robot_nh.serviceClient<EnableMotors>(
 			"enable_motors");
+		takeoffClient = new TakeoffClient ( robot_nh, "action/takeoff" );
+		landingClient = new LandingClient ( robot_nh, "action/landing" );
+		poseClient = new PoseClient ( robot_nh, "action/pose" );
 //		takeoffClient = boost::shared_ptr<TakeoffClient>(new TakeoffClient(robot_nh, "action/takeoff"));
 //		landingClient = boost::shared_ptr<LandingClient>(new LandingClient(robot_nh, "action/landing"));
 //		poseClient = boost::shared_ptr<PoseClient>(new PoseClient(robot_nh, "action/pose"));

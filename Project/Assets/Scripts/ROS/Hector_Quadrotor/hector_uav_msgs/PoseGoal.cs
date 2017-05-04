@@ -20,7 +20,7 @@ namespace hector_uav_msgs
 	#endif
 	public class PoseGoal : IRosMessage
 	{
-		PoseStamped target_pose;
+		public PoseStamped target_pose;
 
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]

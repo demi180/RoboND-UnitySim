@@ -439,6 +439,9 @@ namespace Messages
 		hector_uav_msgs__VelocityXYCommand,
 		hector_uav_msgs__VelocityZCommand,
 		hector_uav_msgs__YawRateCommand,
+
+		// test
+		MessageEvent
 	}
 
 	public enum SrvTypes
