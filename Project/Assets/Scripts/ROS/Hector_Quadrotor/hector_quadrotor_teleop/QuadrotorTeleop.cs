@@ -279,79 +279,71 @@ public class QuadrotorTeleop : MonoBehaviour
 	{
 		NodeHandle privateNH = new NodeHandle("~");
 
-		privateNH.param<int>("x_axis", sAxes.x.axis, 5);
-		privateNH.param<int>("y_axis", sAxes.y.axis, 4);
-		privateNH.param<int>("z_axis", sAxes.z.axis, 2);
-		privateNH.param<int>("thrust_axis", sAxes.thrust.axis, -3);
-		privateNH.param<int>("yaw_axis", sAxes.yaw.axis, 1);
-//
-		privateNH.param<double>("yaw_velocity_max", sAxes.yaw.factor, 90.0);
-//
-		privateNH.param<int>("slow_button", sButtons.slow.button, 4);
-		privateNH.param<int>("go_button", sButtons.go.button, 1);
-		privateNH.param<int>("stop_button", sButtons.stop.button, 2);
-		privateNH.param<int>("interrupt_button", sButtons.interrupt.button, 3);
-		privateNH.param<double>("slow_factor", slowFactor, 0.2);
+		privateNH.param<int>("x_axis", ref sAxes.x.axis, 5);
+		privateNH.param<int>("y_axis", ref sAxes.y.axis, 4);
+		privateNH.param<int>("z_axis", ref sAxes.z.axis, 2);
+		privateNH.param<int>("thrust_axis", ref sAxes.thrust.axis, -3);
+		privateNH.param<int>("yaw_axis", ref sAxes.yaw.axis, 1);
+
+		privateNH.param<double>("yaw_velocity_max", ref sAxes.yaw.factor, 90.0);
+
+		privateNH.param<int>("slow_button", ref sButtons.slow.button, 4);
+		privateNH.param<int>("go_button", ref sButtons.go.button, 1);
+		privateNH.param<int>("stop_button", ref sButtons.stop.button, 2);
+		privateNH.param<int>("interrupt_button", ref sButtons.interrupt.button, 3);
+		privateNH.param<double>("slow_factor", ref slowFactor, 0.2);
 
 		// TODO dynamic reconfig
-		string control_mode;
-		privateNH.param<string>("control_mode", control_mode, "twist");
+		string control_mode = "";
+		privateNH.param<string>("control_mode", ref control_mode, "twist");
 
 		NodeHandle robot_nh = new NodeHandle ();
 
 		// TODO factor out
-		robot_nh.param<string>("base_link_frame", baseLinkFrame, "base_link");
-		robot_nh.param<string>("world_frame", worldFrame, "world");
-		robot_nh.param<string>("base_stabilized_frame", baseStabilizedFrame, "base_stabilized");
+		robot_nh.param<string>("base_link_frame", ref baseLinkFrame, "base_link");
+		robot_nh.param<string>("world_frame", ref worldFrame, "world");
+		robot_nh.param<string>("base_stabilized_frame", ref baseStabilizedFrame, "base_stabilized");
 
-//		if (control_mode == "attitude")
-//		{
-			privateNH.param<double>("pitch_max", sAxes.x.factor, 30.0);
-			privateNH.param<double>("roll_max", sAxes.y.factor, 30.0);
-			privateNH.param<double>("thrust_max", sAxes.thrust.factor, 10.0);
-			privateNH.param<double>("thrust_offset", sAxes.thrust.offset, 10.0);
-//
-//			joySubscriber = nh.subscribe<sensor_msgs::Joy>("joy", 1,
-//				boost::bind(&Teleop::joyAttitudeCallback, this, _1));
-//			attitudePublisher = robot_nh.advertise<AttitudeCommand>(
-//				"command/attitude", 10);
-//			yawRatePublisher = robot_nh.advertise<YawRateCommand>(
-//				"command/yawrate", 10);
-//			thrustPublisher = robot_nh.advertise<ThrustCommand>("command/thrust",
-//				10);
-//		}
-//		else if (control_mode == "velocity")
-//		{
-			privateNH.param<double>("x_velocity_max", sAxes.x.factor, 2.0);
-			privateNH.param<double>("y_velocity_max", sAxes.y.factor, 2.0);
-			privateNH.param<double>("z_velocity_max", sAxes.z.factor, 2.0);
-//
-//			joySubscriber = nh.subscribe<sensor_msgs::Joy>("joy", 1,
-//				boost::bind(&Teleop::joyTwistCallback, this, _1));
-//			velocityPublisher = robot_nh.advertise<TwistStamped>("command/twist",
-//				10);
-//		}
-//		else if (control_mode == "position")
-//		{
-			privateNH.param<double>("x_velocity_max", sAxes.x.factor, 2.0);
-			privateNH.param<double>("y_velocity_max", sAxes.y.factor, 2.0);
-			privateNH.param<double>("z_velocity_max", sAxes.z.factor, 2.0);
-//
-//			joySubscriber = nh.subscribe<sensor_msgs::Joy>("joy", 1,
-//				boost::bind(&Teleop::joyPoseCallback, this, _1));
-//
-//			pose.pose.position.x = 0;
-//			pose.pose.position.y = 0;
-//			pose.pose.position.z = 0;
-//			pose.pose.orientation.x = 0;
-//			pose.pose.orientation.y = 0;
-//			pose.pose.orientation.z = 0;
-//			pose.pose.orientation.w = 1;
-//		}
-//		else
-//		{
-//			ROS.Error("Unsupported control mode: " + control_mode);
-//		}
+		if (control_mode == "attitude")
+		{
+			privateNH.param<double>("pitch_max", ref sAxes.x.factor, 30.0);
+			privateNH.param<double>("roll_max", ref sAxes.y.factor, 30.0);
+			privateNH.param<double>("thrust_max", ref sAxes.thrust.factor, 10.0);
+			privateNH.param<double>("thrust_offset", ref sAxes.thrust.offset, 10.0);
+			joySubscriber = nh.subscribe<Joy> ( "joy", 1, joyAttitudeCallback );
+			attitudePublisher = robot_nh.advertise<AttitudeCommand> ( "command/attitude", 10 );
+			yawRatePublisher = robot_nh.advertise<YawRateCommand> ( "command/yawrate", 10 );
+			thrustPublisher = robot_nh.advertise<ThrustCommand> ( "command/thrust", 10 );
+		}
+		else if (control_mode == "velocity")
+		{
+			privateNH.param<double>("x_velocity_max", ref sAxes.x.factor, 2.0);
+			privateNH.param<double>("y_velocity_max", ref sAxes.y.factor, 2.0);
+			privateNH.param<double>("z_velocity_max", ref sAxes.z.factor, 2.0);
+
+			joySubscriber = nh.subscribe<Joy> ( "joy", 1, joyTwistCallback );
+			velocityPublisher = robot_nh.advertise<TwistStamped> ( "command/twist", 10 );
+		}
+		else if (control_mode == "position")
+		{
+			privateNH.param<double>("x_velocity_max", ref sAxes.x.factor, 2.0);
+			privateNH.param<double>("y_velocity_max", ref sAxes.y.factor, 2.0);
+			privateNH.param<double>("z_velocity_max", ref sAxes.z.factor, 2.0);
+
+			joySubscriber = nh.subscribe<Joy> ( "joy", 1, joyPoseCallback );
+
+			pose.pose.position.x = 0;
+			pose.pose.position.y = 0;
+			pose.pose.position.z = 0;
+			pose.pose.orientation.x = 0;
+			pose.pose.orientation.y = 0;
+			pose.pose.orientation.z = 0;
+			pose.pose.orientation.w = 1;
+		}
+		else
+		{
+			ROS.Error("Unsupported control mode: " + control_mode);
+		}
 
 		motorEnableService = robot_nh.serviceClient<EnableMotors>(
 			"enable_motors");
