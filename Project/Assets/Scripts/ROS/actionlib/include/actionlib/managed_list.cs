@@ -45,8 +45,10 @@ namespace actionlib
 	/*******************************************************************************
 	* ManagedList
 	*******************************************************************************/
-	public class ManagedList<T>
+	public class ManagedList<T> where T : class
 	{
+		public int Count { get { return list.Count; } }
+
 		List<TrackedElement> list = new List<TrackedElement> ();
 
 		/*******************************************************************************
@@ -149,11 +151,12 @@ namespace actionlib
 
 			List<TrackedElement>.Enumerator enumerator;
 
-			Iterator () {}
+//			Iterator () {}
 
-			public Iterator (List<TrackedElement> list)
+			internal Iterator (ManagedList<T> list)
+//			public Iterator (List<TrackedElement> list)
 			{
-				enumerator = list.GetEnumerator ();
+				enumerator = list.list.GetEnumerator ();
 			}
 
 			public Handle CreateHandle ()
@@ -173,6 +176,12 @@ namespace actionlib
 					return enumerator.Current.element;
 				return null;
 			}
+
+			public static Iterator operator ++(Iterator a)
+			{
+				a.enumerator.MoveNext ();
+				return a;
+			}
 		}
 
 		/*******************************************************************************
@@ -182,12 +191,28 @@ namespace actionlib
 		{
 			TrackedElement t = new TrackedElement ( element );
 			list.Add ( t );
-			return Handle.CreateHandle ( t );
+			return Handle.CreateHandle ( t, GetIterator () );
 		}
 
 		public void Remove (T element)
 		{
 			
+		}
+
+		public void Clear ()
+		{
+			list.Clear ();
+		}
+
+		public T this [int index]
+		{
+			get { return list [ index ].element; }
+			set { list [ index ].element = value; }
+		}
+
+		public Iterator GetIterator ()
+		{
+			return new Iterator ( this );
 		}
 	}
 

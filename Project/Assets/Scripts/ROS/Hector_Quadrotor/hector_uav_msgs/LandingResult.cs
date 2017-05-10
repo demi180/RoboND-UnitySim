@@ -12,6 +12,7 @@ using Messages;
 using Messages.std_msgs;
 using String=System.String;
 using hector_uav_msgs;
+using actionlib;
 
 // WTF?? completely empty struct..
 
@@ -20,9 +21,16 @@ namespace hector_uav_msgs
 	#if !TRACE
 	[System.Diagnostics.DebuggerStepThrough]
 	#endif
-	public class LandingResult : IRosMessage
+	public class LandingResult : AResult
+//	public class LandingResult : IRosMessage
 	{
-		
+
+		LandingResult (LandingResult lr) {}
+
+		public override AResult Clone ()
+		{
+			return new LandingResult ( this );
+		}
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override string MD5Sum() { return "d41d8cd98f00b204e9800998ecf8427e"; }

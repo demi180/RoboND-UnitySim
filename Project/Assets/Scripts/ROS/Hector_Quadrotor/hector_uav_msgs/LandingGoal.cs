@@ -12,14 +12,17 @@ using Messages;
 using Messages.std_msgs;
 using String=System.String;
 using hector_uav_msgs;
+using actionlib;
 
 namespace hector_uav_msgs
 {
 	#if !TRACE
 	[System.Diagnostics.DebuggerStepThrough]
 	#endif
-	public class LandingGoal : IRosMessage
+	public class LandingGoal : AGoal
+//	public class LandingGoal : IRosMessage
 	{
+		
 		public string target_frame;
 		public string source_frame;
 		public Time source_time;
@@ -27,6 +30,85 @@ namespace hector_uav_msgs
 		public Time target_time;
 		public string fixed_frame;
 		public bool advanced;
+
+		public override void SetValue (string valueName, object value)
+		{
+			switch ( valueName )
+			{
+			case "target_frame":
+				target_frame = (string) value;
+				break;
+
+			case "source_frame":
+				source_frame = (string) value;
+				break;
+
+			case "source_time":
+				source_time = (Time) value;
+				break;
+
+			case "timeout":
+				timeout = (Duration) value;
+				break;
+
+			case "target_time":
+				target_time = (Time) value;
+				break;
+
+			case "fixed_frame":
+				fixed_frame = (string) value;
+				break;
+
+			case "advanced":
+				advanced = (bool) value;
+				break;
+			}
+		}
+
+		public override object GetValue (string valueName)
+		{
+			switch ( valueName )
+			{
+			case "target_frame":
+				return target_frame;
+
+			case "source_frame":
+				return source_frame;
+
+			case "source_time":
+				return source_time;
+
+			case "timeout":
+				return timeout;
+
+			case "target_time":
+				return target_time;
+
+			case "fixed_frame":
+				return fixed_frame;
+
+			case "advanced":
+				return advanced;
+			}
+
+			return 0;
+		}
+
+		LandingGoal (LandingGoal g)
+		{
+			target_frame = g.target_frame;
+			source_frame = g.source_frame;
+			source_time = new Time ( g.source_time.data );
+			timeout = new Duration ( g.timeout.data );
+			target_time = new Time ( g.target_time.data );
+			fixed_frame = g.fixed_frame;
+			advanced = g.advanced;
+		}
+
+		public override AGoal Clone ()
+		{
+			return new LandingGoal ( this );
+		}
 
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]

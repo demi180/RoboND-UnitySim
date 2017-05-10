@@ -12,19 +12,41 @@ using Messages;
 using Messages.std_msgs;
 using String=System.String;
 using hector_uav_msgs;
+using actionlib;
 
 namespace hector_uav_msgs
 {
 	#if !TRACE
 	[System.Diagnostics.DebuggerStepThrough]
 	#endif
-	public class TakeoffActionResult : IRosMessage
+	public class TakeoffActionResult : AActionResult
 	{
+		public override Header Header { get { return header; } }
+		public override GoalStatus GoalStatus { get { return status; } }
+		public override AResult Result { get { return result; } }
 
 		public Header header;
 		public Messages.actionlib_msgs.GoalStatus status;
-		public hector_uav_msgs.PoseResult result;
+		public hector_uav_msgs.TakeoffResult result;
 
+
+		public override AActionResult Clone ()
+		{
+			TakeoffActionResult tar = new TakeoffActionResult ();
+			tar.header = new Header ();
+			tar.header.frame_id = header.frame_id;
+			tar.header.seq = header.seq;
+			tar.header.stamp = new Time ( header.stamp.data );
+			tar.GoalStatus = new GoalStatus ();
+			tar.GoalStatus.goal_id = new GoalID ();
+			tar.GoalStatus.goal_id.id = status.goal_id.id;
+			tar.GoalStatus.goal_id.stamp = new Time ( status.goal_id.stamp.data );
+			tar.GoalStatus.status = status.status;
+			tar.GoalStatus.text = status.text;
+			tar.result = (TakeoffResult) result.Clone ();
+
+			return tar;
+		}
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override string MD5Sum() { return "1eb06eeff08fa7ea874431638cb52332"; }
@@ -35,7 +57,7 @@ namespace hector_uav_msgs
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override string MessageDefinition() { return @"std_msgs/Header header
 actionlib_msgs/GoalStatus status
-PoseResult result"; }
+TakeoffResult result"; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override MsgTypes msgtype() { return MsgTypes.hector_uav_msgs__TakeoffActionResult; }
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -78,7 +100,7 @@ PoseResult result"; }
 			//status
 			status = new Messages.actionlib_msgs.GoalStatus(SERIALIZEDSTUFF, ref currentIndex);
 			//result
-			result = new hector_uav_msgs.PoseResult(SERIALIZEDSTUFF, ref currentIndex);
+			result = new hector_uav_msgs.TakeoffResult(SERIALIZEDSTUFF, ref currentIndex);
 		}
 
 		[System.Diagnostics.DebuggerStepThrough]
@@ -101,7 +123,7 @@ PoseResult result"; }
 			pieces.Add(status.Serialize(true));
 			//result
 			if (result == null)
-				result = new hector_uav_msgs.PoseResult();
+				result = new hector_uav_msgs.TakeoffResult();
 			pieces.Add(result.Serialize(true));
 			//combine every array in pieces into one array and return it
 			int __a_b__f = pieces.Sum((__a_b__c)=>__a_b__c.Length);
@@ -129,7 +151,7 @@ PoseResult result"; }
 			status = new Messages.actionlib_msgs.GoalStatus();
 			status.Randomize();
 			//result
-			result = new hector_uav_msgs.PoseResult();
+			result = new hector_uav_msgs.TakeoffResult();
 			result.Randomize();
 		}
 

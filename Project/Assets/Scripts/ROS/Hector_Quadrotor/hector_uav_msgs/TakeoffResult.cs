@@ -12,6 +12,7 @@ using Messages;
 using Messages.std_msgs;
 using String=System.String;
 using hector_uav_msgs;
+using actionlib;
 
 // WTF?? completely empty struct..
 
@@ -20,8 +21,15 @@ namespace hector_uav_msgs
 	#if !TRACE
 	[System.Diagnostics.DebuggerStepThrough]
 	#endif
-	public class TakeoffResult : IRosMessage
+	public class TakeoffResult : AResult
 	{
+
+		TakeoffResult (TakeoffResult tr) {}
+
+		public override AResult Clone ()
+		{
+			return new TakeoffResult ( this );
+		}
 
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]

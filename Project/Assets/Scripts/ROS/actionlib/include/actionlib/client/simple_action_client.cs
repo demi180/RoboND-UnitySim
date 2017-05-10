@@ -32,7 +32,8 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 using System;
-using System.Diagnostics;
+//using System.Diagnostics;
+using System.Threading;
 using Ros_CSharp;
 using Messages;
 using Messages.std_msgs;
@@ -50,7 +51,7 @@ public static class DurationExtension
 	public static Duration fromSec (this Duration d, double sec)
 	{
 		uint usec = (uint) sec;
-		uint nsec = (uint) ( sec - usec ) * 1e9;
+		uint nsec = (uint) ( ( sec - usec ) * 1e9 );
 		return new Duration ( new TimeData ( usec, nsec ) );
 	}
 }
@@ -64,11 +65,11 @@ namespace actionlib
 	 * for the user. Note that the concept of GoalHandles has been completely hidden from the user, and that
 	 * they must query the SimplyActionClient directly in order to monitor a goal.
 	 */
-	public class SimpleActionClient<T>
+	public class SimpleActionClient<ActionSpec> where ActionSpec : AAction, new ()
 	{
-		public delegate void SimpleDoneCallback (SimpleClientGoalState state, int result);
+		public delegate void SimpleDoneCallback (SimpleClientGoalState state, AResult result);
 		public delegate void SimpleActiveCallback ();
-		public delegate void SimpleFeedbackCallback (T feedback);
+		public delegate void SimpleFeedbackCallback (AFeedback feedback);
 
 		protected SimpleActionClient () {}
 		/**
@@ -81,7 +82,7 @@ namespace actionlib
 		 */
 		public SimpleActionClient (string name, bool spin_thread = true)
 		{
-			goalState = SimpleGoalState.StateEnum.PENDING;
+			goalState = new SimpleGoalState ( SimpleGoalState.StateEnum.PENDING );
 			initSimpleClient (nodeHandle, name, spin_thread);
 		}
 
@@ -97,13 +98,13 @@ namespace actionlib
 		 */
 		public SimpleActionClient (NodeHandle n, string name, bool spin_thread = true)
 		{
-			goalState = SimpleGoalState.StateEnum.PENDING;
+			goalState = new SimpleGoalState ( SimpleGoalState.StateEnum.PENDING );
 			initSimpleClient (n, name, spin_thread);
 		}
 
 		~SimpleActionClient()
 		{
-			if (spinThread)
+			if ( spinThread != null )
 			{
 				{
 					lock ( terminateMutex )
@@ -113,8 +114,8 @@ namespace actionlib
 				}
 				spinThread.Join ();
 			}
-			goalHandle = goalHandle.reset ();
-			actionClient = default (ActionClient<T>);
+			goalHandle.reset ();
+			actionClient = null;
 		}
 
 		/**
@@ -154,7 +155,7 @@ namespace actionlib
 		 * \param active_cb   Callback that gets called on transitions to Active
 		 * \param feedback_cb Callback that gets called whenever feedback for this goal is received
 		 */
-		public void sendGoal (Action<T>.ActionGoal goal, SimpleDoneCallback done_cb = null, SimpleActiveCallback active_cb = null, SimpleFeedbackCallback feedback_cb = null)
+		public void sendGoal (AGoal goal, SimpleDoneCallback done_cb = null, SimpleActiveCallback active_cb = null, SimpleFeedbackCallback feedback_cb = null)
 		{
 			// Reset the old GoalHandle, so that our callbacks won't get called anymore
 			goalHandle.reset();
@@ -181,7 +182,7 @@ namespace actionlib
 		 * \param preempt_timeout  Time to wait after a preempt is sent. 0 implies wait forever
 		 * \return The state of the goal when this call is completed
 		 */
-		public SimpleClientGoalState sendGoalAndWait (T goal, Duration execute_timeout, Duration preempt_timeout)
+		public SimpleClientGoalState sendGoalAndWait (AGoal goal, Duration execute_timeout, Duration preempt_timeout)
 		{
 			sendGoal ( goal );
 
@@ -209,15 +210,15 @@ namespace actionlib
 		 * \brief Get the Result of the current goal
 		 * \return shared pointer to the result. Note that this pointer will NEVER be NULL
 		 */
-		public Action<T>.ActionResult getResult()
+		public AResult getResult ()
 		{
 			if (goalHandle.isExpired())
 				ROS.Error("actionlib", "Trying to getResult() when no goal is running. You are incorrectly using SimpleActionClient");
 
 			if ( goalHandle.getResult () != null )
 				return goalHandle.getResult ();
-
-			return new Action<T>.ActionResult ();
+			
+			return null;
 		}
 
 		/**
@@ -331,19 +332,20 @@ namespace actionlib
 		{
 			if (goalHandle.isExpired())
 				ROS.Error("actionlib", "Trying to stopTrackingGoal() when no goal is running. You are incorrectly using SimpleActionClient");
-			goalHandle = new ClientGoalHandle<T> ();
+			goalHandle = new ClientGoalHandle<ActionSpec> ();
 //			goalHandle.reset();
 		}
 
 		NodeHandle nodeHandle;
-		ClientGoalHandle<T> goalHandle;
+		ClientGoalHandle<ActionSpec> goalHandle;
 
 		SimpleGoalState goalState;
 
 		// Signalling Stuff
-		object doneCondition;
+		AutoResetEvent doneCondition;
+//		object doneCondition;
 //		object doneMutex;
-		System.Threading.Mutex doneMutex;
+		Mutex doneMutex;
 //		boost.condition doneCondition;
 
 		// User Callbacks
@@ -352,13 +354,13 @@ namespace actionlib
 		SimpleFeedbackCallback feedbackCallback;
 
 		// Spin Thread Stuff
-		System.Threading.Mutex terminateMutex;
+		Mutex terminateMutex;
 		bool needToTerminate;
-		System.Threading.Thread spinThread;
+		Thread spinThread;
 		Ros_CSharp.CallbackQueue callback_queue;
 //		ros.CallbackQueue callback_queue;
 
-		ActionClient<T> actionClient; // Action client depends on callback_queue, so it must be destroyed before callback_queue
+		ActionClient<ActionSpec> actionClient; // Action client depends on callback_queue, so it must be destroyed before callback_queue
 
 		// ***** Private Funcs *****
 		void initSimpleClient (NodeHandle n, string name, bool spin_thread)
@@ -367,21 +369,21 @@ namespace actionlib
 			{
 				ROS.Debug("actionlib", "Spinning up a thread for the SimpleActionClient");
 				needToTerminate = false;
-				spinThread = new System.Threading.Thread ( this );
+				spinThread = new Thread ( DoSpin );
 //				spinThread = new boost.thread(boost.bind(&SimpleActionClient<ActionSpec>.spinThread, this));
-				actionClient = new ActionClient<T> ( n, name, callback_queue );
+				actionClient = new ActionClient<ActionSpec> ( n, name, callback_queue );
 //				actionClient.reset(new ActionClient<T>(n, name, &callback_queue));
 			}
 			else
 			{
 				spinThread = null;
-				actionClient = new ActionClient<T> ( n, name );
+				actionClient = new ActionClient<ActionSpec> ( n, name );
 //				actionClient.reset(new ActionClient<T>(n, name));
 			}
 		}
 
 
-		void handleTransition(ClientGoalHandle<T> gh)
+		void handleTransition(ClientGoalHandle<ActionSpec> gh)
 		{
 			CommState commState = gh.getCommState ();
 			switch (commState.state)
@@ -456,7 +458,8 @@ namespace actionlib
 					if ( doneCallback != null )
 						doneCallback ( getState (), gh.getResult () );
 
-					doneCondition.notify_all();
+					doneCondition.Set ();
+//					doneCondition.notify_all();
 					break;
 				case SimpleGoalState.StateEnum.DONE:
 					ROS.Error("actionlib", "BUG: Got a second transition to DONE");
@@ -474,7 +477,7 @@ namespace actionlib
 		}
 
 
-		public void handleFeedback<T> (ClientGoalHandle<T> gh, T feedback)
+		public void handleFeedback (ClientGoalHandle<ActionSpec> gh, AFeedback feedback)
 		{
 			if (goalHandle != gh)
 				ROS.Error("actionlib", @"Got a callback on a goalHandle that we're not tracking.
@@ -562,6 +565,7 @@ namespace actionlib
 					}
 				}
 				callback_queue.callAvailable(100);
+				Thread.Sleep ( 1 );
 			}
 		}
 	}

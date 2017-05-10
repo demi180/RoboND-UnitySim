@@ -196,7 +196,7 @@ public class QuadrotorTeleop : MonoBehaviour
 		}
 		if (getButton(joy, sButtons.stop))
 		{
-			landingClient.sendGoalAndWait ( new LandingAction (), new Messages.std_msgs.Duration ( new TimeData ( 10, 0 ) ), new Messages.std_msgs.Duration ( new TimeData ( 10, 0 ) ) );
+			landingClient.sendGoalAndWait ( new LandingGoal (), new Messages.std_msgs.Duration ( new TimeData ( 10, 0 ) ), new Messages.std_msgs.Duration ( new TimeData ( 10, 0 ) ) );
 //			landingClient.sendGoalAndWait(LandingGoal(), Duration(10.0), Duration(10.0));
 		}
 	}
@@ -279,37 +279,37 @@ public class QuadrotorTeleop : MonoBehaviour
 	{
 		NodeHandle privateNH = new NodeHandle("~");
 
-//		privateNH.param<int>("x_axis", sAxes.x.axis, 5);
-//		privateNH.param<int>("y_axis", sAxes.y.axis, 4);
-//		privateNH.param<int>("z_axis", sAxes.z.axis, 2);
-//		privateNH.param<int>("thrust_axis", sAxes.thrust.axis, -3);
-//		privateNH.param<int>("yaw_axis", sAxes.yaw.axis, 1);
+		privateNH.param<int>("x_axis", sAxes.x.axis, 5);
+		privateNH.param<int>("y_axis", sAxes.y.axis, 4);
+		privateNH.param<int>("z_axis", sAxes.z.axis, 2);
+		privateNH.param<int>("thrust_axis", sAxes.thrust.axis, -3);
+		privateNH.param<int>("yaw_axis", sAxes.yaw.axis, 1);
 //
-//		privateNH.param<double>("yaw_velocity_max", sAxes.yaw.factor, 90.0);
+		privateNH.param<double>("yaw_velocity_max", sAxes.yaw.factor, 90.0);
 //
-//		privateNH.param<int>("slow_button", sButtons.slow.button, 4);
-//		privateNH.param<int>("go_button", sButtons.go.button, 1);
-//		privateNH.param<int>("stop_button", sButtons.stop.button, 2);
-//		privateNH.param<int>("interrupt_button", sButtons.interrupt.button, 3);
-//		privateNH.param<double>("slow_factor", slowFactor, 0.2);
+		privateNH.param<int>("slow_button", sButtons.slow.button, 4);
+		privateNH.param<int>("go_button", sButtons.go.button, 1);
+		privateNH.param<int>("stop_button", sButtons.stop.button, 2);
+		privateNH.param<int>("interrupt_button", sButtons.interrupt.button, 3);
+		privateNH.param<double>("slow_factor", slowFactor, 0.2);
 
 		// TODO dynamic reconfig
 		string control_mode;
-//		privateNH.param<std::string>("control_mode", control_mode, "twist");
+		privateNH.param<string>("control_mode", control_mode, "twist");
 
 		NodeHandle robot_nh = new NodeHandle ();
 
 		// TODO factor out
-//		robot_nh.param<std::string>("base_link_frame", baseLinkFrame, "base_link");
-//		robot_nh.param<std::string>("world_frame", worldFrame, "world");
-//		robot_nh.param<std::string>("base_stabilized_frame", baseStabilizedFrame, "base_stabilized");
+		robot_nh.param<string>("base_link_frame", baseLinkFrame, "base_link");
+		robot_nh.param<string>("world_frame", worldFrame, "world");
+		robot_nh.param<string>("base_stabilized_frame", baseStabilizedFrame, "base_stabilized");
 
 //		if (control_mode == "attitude")
 //		{
-//			privateNH.param<double>("pitch_max", sAxes.x.factor, 30.0);
-//			privateNH.param<double>("roll_max", sAxes.y.factor, 30.0);
-//			privateNH.param<double>("thrust_max", sAxes.thrust.factor, 10.0);
-//			privateNH.param<double>("thrust_offset", sAxes.thrust.offset, 10.0);
+			privateNH.param<double>("pitch_max", sAxes.x.factor, 30.0);
+			privateNH.param<double>("roll_max", sAxes.y.factor, 30.0);
+			privateNH.param<double>("thrust_max", sAxes.thrust.factor, 10.0);
+			privateNH.param<double>("thrust_offset", sAxes.thrust.offset, 10.0);
 //
 //			joySubscriber = nh.subscribe<sensor_msgs::Joy>("joy", 1,
 //				boost::bind(&Teleop::joyAttitudeCallback, this, _1));
@@ -322,9 +322,9 @@ public class QuadrotorTeleop : MonoBehaviour
 //		}
 //		else if (control_mode == "velocity")
 //		{
-//			privateNH.param<double>("x_velocity_max", sAxes.x.factor, 2.0);
-//			privateNH.param<double>("y_velocity_max", sAxes.y.factor, 2.0);
-//			privateNH.param<double>("z_velocity_max", sAxes.z.factor, 2.0);
+			privateNH.param<double>("x_velocity_max", sAxes.x.factor, 2.0);
+			privateNH.param<double>("y_velocity_max", sAxes.y.factor, 2.0);
+			privateNH.param<double>("z_velocity_max", sAxes.z.factor, 2.0);
 //
 //			joySubscriber = nh.subscribe<sensor_msgs::Joy>("joy", 1,
 //				boost::bind(&Teleop::joyTwistCallback, this, _1));
@@ -333,9 +333,9 @@ public class QuadrotorTeleop : MonoBehaviour
 //		}
 //		else if (control_mode == "position")
 //		{
-//			privateNH.param<double>("x_velocity_max", sAxes.x.factor, 2.0);
-//			privateNH.param<double>("y_velocity_max", sAxes.y.factor, 2.0);
-//			privateNH.param<double>("z_velocity_max", sAxes.z.factor, 2.0);
+			privateNH.param<double>("x_velocity_max", sAxes.x.factor, 2.0);
+			privateNH.param<double>("y_velocity_max", sAxes.y.factor, 2.0);
+			privateNH.param<double>("z_velocity_max", sAxes.z.factor, 2.0);
 //
 //			joySubscriber = nh.subscribe<sensor_msgs::Joy>("joy", 1,
 //				boost::bind(&Teleop::joyPoseCallback, this, _1));

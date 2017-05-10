@@ -12,15 +12,41 @@ using Messages;
 using Messages.std_msgs;
 using String=System.String;
 using hector_uav_msgs;
+using actionlib;
 
 namespace hector_uav_msgs
 {
 	#if !TRACE
 	[System.Diagnostics.DebuggerStepThrough]
 	#endif
-	public class PoseFeedback : IRosMessage
+	public class PoseFeedback : AFeedback
 	{
 		PoseStamped current_pose;
+
+
+		PoseFeedback (PoseFeedback pf)
+		{
+			current_pose = new PoseStamped ();
+			current_pose.pose = new Pose ();
+			current_pose.pose.orientation = new Quaternion ();
+			current_pose.pose.orientation.x = pf.current_pose.pose.orientation.x;
+			current_pose.pose.orientation.y = pf.current_pose.pose.orientation.y;
+			current_pose.pose.orientation.z = pf.current_pose.pose.orientation.z;
+			current_pose.pose.orientation.w = pf.current_pose.pose.orientation.w;
+			current_pose.pose.position = new Point ();
+			current_pose.pose.position.x = pf.current_pose.pose.position.x;
+			current_pose.pose.position.y = pf.current_pose.pose.position.y;
+			current_pose.pose.position.z = pf.current_pose.pose.position.z;
+			current_pose.header = new Header ();
+			current_pose.header.frame_id = pf.current_pose.header.frame_id;
+			current_pose.header.seq = pf.current_pose.header.seq;
+			current_pose.header.stamp = new Time ( pf.current_pose.header.stamp.data );
+		}
+
+		public override AFeedback Clone ()
+		{
+			return new PoseFeedback ( this );
+		}
 
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]

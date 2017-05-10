@@ -12,14 +12,19 @@ using Messages;
 using Messages.std_msgs;
 using String=System.String;
 using hector_uav_msgs;
+using actionlib;
 
 namespace hector_uav_msgs
 {
 	#if !TRACE
 	[System.Diagnostics.DebuggerStepThrough]
 	#endif
-	public class LandingActionFeedback : IRosMessage
+	public class LandingActionFeedback : AActionFeedback
+//	public class LandingActionFeedback : IRosMessage
 	{
+		public override Header Header { get { return header; } }
+		public override GoalStatus GoalStatus { get { return status; } }
+		public override AFeedback Feedback { get { return feedback; } }
 
 		public Header header;
 		public Messages.actionlib_msgs.GoalStatus status;

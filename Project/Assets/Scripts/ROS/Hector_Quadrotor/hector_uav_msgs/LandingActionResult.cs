@@ -12,18 +12,41 @@ using Messages;
 using Messages.std_msgs;
 using String=System.String;
 using hector_uav_msgs;
+using actionlib;
 
 namespace hector_uav_msgs
 {
 	#if !TRACE
 	[System.Diagnostics.DebuggerStepThrough]
 	#endif
-	public class LandingActionResult : IRosMessage
+	public class LandingActionResult : AActionResult
+//	public class LandingActionResult : IRosMessage
 	{
+		public override Header Header { get { return header; } }
+		public override GoalStatus GoalStatus { get { return status; } }
+		public override AResult Result { get { return result; } }
 
 		public Header header;
 		public Messages.actionlib_msgs.GoalStatus status;
 		public hector_uav_msgs.LandingResult result;
+
+		public override AActionResult Clone ()
+		{
+			LandingActionResult lar = new LandingActionResult ();
+			lar.header = new Header ();
+			lar.header.frame_id = header.frame_id;
+			lar.header.seq = header.seq;
+			lar.header.stamp = new Time ( header.stamp.data );
+			lar.GoalStatus = new GoalStatus ();
+			lar.GoalStatus.goal_id = new GoalID ();
+			lar.GoalStatus.goal_id.id = status.goal_id.id;
+			lar.GoalStatus.goal_id.stamp = new Time ( status.goal_id.stamp.data );
+			lar.GoalStatus.status = status.status;
+			lar.GoalStatus.text = status.text;
+			lar.result = (LandingResult) result.Clone ();
+
+			return lar;
+		}
 
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]

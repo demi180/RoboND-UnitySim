@@ -12,16 +12,41 @@ using Messages;
 using Messages.std_msgs;
 using String=System.String;
 using hector_uav_msgs;
+using actionlib;
 
 namespace hector_uav_msgs
 {
 	#if !TRACE
 	[System.Diagnostics.DebuggerStepThrough]
 	#endif
-	public class PoseGoal : IRosMessage
+	public class PoseGoal : AGoal
 	{
 		public PoseStamped target_pose;
 
+
+		PoseGoal (PoseGoal pg)
+		{
+			target_pose = new PoseStamped ();
+			target_pose.pose = new Pose ();
+			target_pose.pose.orientation = new Quaternion ();
+			target_pose.pose.orientation.x = pg.target_pose.pose.orientation.x;
+			target_pose.pose.orientation.y = pg.target_pose.pose.orientation.y;
+			target_pose.pose.orientation.z = pg.target_pose.pose.orientation.z;
+			target_pose.pose.orientation.w = pg.target_pose.pose.orientation.w;
+			target_pose.pose.position = new Point ();
+			target_pose.pose.position.x = pg.target_pose.pose.position.x;
+			target_pose.pose.position.y = pg.target_pose.pose.position.y;
+			target_pose.pose.position.z = pg.target_pose.pose.position.z;
+			target_pose.header = new Header ();
+			target_pose.header.frame_id = pg.target_pose.header.frame_id;
+			target_pose.header.seq = pg.target_pose.header.seq;
+			target_pose.header.stamp = new Time ( pg.target_pose.header.stamp.data );
+		}
+
+		public override AGoal Clone ()
+		{
+			return new PoseGoal ( this );
+		}
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public override string MD5Sum() { return "257d089627d7eb7136c24d3593d05a16"; }

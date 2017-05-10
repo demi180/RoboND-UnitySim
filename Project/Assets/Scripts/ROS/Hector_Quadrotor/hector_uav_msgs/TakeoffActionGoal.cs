@@ -2,15 +2,22 @@
 using System.Collections.Generic;
 using uint8 = System.Byte;
 using Messages;
+using Messages.actionlib_msgs;
+using Messages.std_msgs;
 using hector_uav_msgs;
+using actionlib;
 
 namespace hector_uav_msgs
 {
 	#if !TRACE
 	[System.Diagnostics.DebuggerStepThrough]
 	#endif
-	public class TakeoffActionGoal : IRosMessage
+	public class TakeoffActionGoal : AActionGoal
 	{
+		public override Header Header { get { return header; } }
+		public override GoalID GoalID { get { return goal_id; } }
+		public override AGoal Goal { get { return goal; } }
+
 		public Messages.std_msgs.Header header;
 		public Messages.actionlib_msgs.GoalID goal_id;
 		public hector_uav_msgs.TakeoffGoal goal;

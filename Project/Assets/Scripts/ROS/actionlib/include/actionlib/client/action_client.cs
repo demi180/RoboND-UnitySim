@@ -34,8 +34,12 @@
 using System.Threading;
 using Ros_CSharp;
 using actionlib;
+using Messages;
+using Messages.std_msgs;
+using Messages.actionlib_msgs;
 using goalid = Messages.actionlib_msgs.GoalID;
 using duration = Messages.std_msgs.Duration;
+//using gstat = Messages.actionlib_msgs.GoalStatus;
 using gsa = Messages.actionlib_msgs.GoalStatusArray;
 
 namespace actionlib
@@ -48,13 +52,29 @@ namespace actionlib
 	 * the client side state machine.
 	*/
 
-	public class ActionClient<ActionSpec>
+	public class ActionClient<ActionSpec> where ActionSpec : AAction, new ()
 	{
-		public delegate void MessageEventDelegate<M> (MessageEvent<M> ev);
-		public delegate void TransitionCallback<T> (ClientGoalHandle<T> goalHandle);
-		public delegate void FeedbackCallback<T> (ClientGoalHandle<T> goalHandle);
-		public delegate void SendGoalDelegate (Action<ActionSpec>.ActionGoal goal);
-		public delegate void CancelDelegate (Messages.actionlib_msgs.GoalID goalID);
+		public delegate void MessageEventDelegate<M> (MessageEvent<M> ev) where M : IRosMessage;
+		public delegate void TransitionCallback (ClientGoalHandle<ActionSpec> goalHandle);
+		public delegate void FeedbackCallback (ClientGoalHandle<ActionSpec> goalHandle);
+		public delegate void SendGoalDelegate (AActionGoal goal);
+		public delegate void CancelDelegate (GoalID goalID);
+
+
+		NodeHandle nodeHandle;
+		DestructionGuard guard_;
+		GoalManager<ActionSpec> goalManager;
+
+
+		Subscriber<MessageEvent<ActionResultDecorator>> resultSubscriber;
+		Subscriber<MessageEvent<ActionFeedbackDecorator>> feedbackSubscriber;
+		Subscriber<MessageEvent<gsa>> statusSubscriber;
+
+		Publisher<ActionGoalDecorator> goalPublisher;
+//		Publisher<AActionGoal> goalPublisher;
+		Publisher<goalid> cancelPublisher;
+		ConnectionMonitor connectionMonitor;   // Have to destroy subscribers and publishers before the connectionMonitor, since we call callbacks in the connectionMonitor
+
 
 		/**
 		* \brief Simple constructor
@@ -103,7 +123,7 @@ namespace actionlib
 		* \param transitionCallback Callback that gets called on every client state transition
 		* \param feedbackCallback Callback that gets called whenever feedback for this goal is received
 		*/
-		public ClientGoalHandle<ActionSpec> sendGoal<ActionSpec> (Action<ActionSpec>.ActionGoal goal, TransitionCallback<ActionSpec> transitionCallback, FeedbackCallback<ActionSpec> feedbackCallback )
+		public ClientGoalHandle<ActionSpec> sendGoal<TGoal> (TGoal goal, TransitionCallback<ActionSpec> transitionCallback, FeedbackCallback<ActionSpec> feedbackCallback ) where TGoal : AGoal
 		{
 			ROS.Debug ( "actionlib", "about to start initGoal()" );
 			ClientGoalHandle<ActionSpec> gh = goalManager.initGoal ( goal, transitionCallback, feedbackCallback );
@@ -122,7 +142,7 @@ namespace actionlib
 		{
 			goalid cancel_msg = new goalid ();
 			// CancelAll policy encoded by stamp=0, id=0
-			cancel_msg.stamp = new Messages.std_msgs.Time ();
+			cancel_msg.stamp = new Time ();
 			cancel_msg.id = "";
 			cancelPublisher.publish ( cancel_msg );
 		}
@@ -131,7 +151,7 @@ namespace actionlib
 		* \brief Cancel all goals that were stamped at and before the specified time
 		* \param time All goals stamped at or before `time` will be canceled
 		*/
-		public void cancelGoalsAtAndBeforeTime (Messages.std_msgs.Time time)
+		public void cancelGoalsAtAndBeforeTime (Time time)
 		{
 			goalid cancel_msg = new goalid ();
 			cancel_msg.stamp = time;
@@ -175,23 +195,9 @@ namespace actionlib
 			return connectionMonitor.isServerConnected ();
 		}
 
-		NodeHandle nodeHandle;
-		DestructionGuard guard_;
-		GoalManager<ActionSpec> goalManager;
-
-		
-		Subscriber<Action<ActionSpec>.ActionResult> resultSubscriber;
-		Subscriber<Action<ActionSpec>.ActionFeedback> feedbackSubscriber;
-
-		ConnectionMonitor connectionMonitor;   // Have to destroy subscribers and publishers before the connectionMonitor, since we call callbacks in the connectionMonitor
-
-		Publisher<Action<ActionSpec>.ActionGoal> goalPublisher;
-		Publisher<goalid> cancelPublisher;
-		Subscriber<Messages.actionlib_msgs.GoalStatus> statusSubscriber;
-
-		void SendGoalFunc (Action<ActionSpec>.ActionGoal actionGoal)
+		void SendGoalFunc (AActionGoal actionGoal)
 		{
-			goalPublisher.publish ( actionGoal );
+			goalPublisher.publish ( new ActionGoalDecorator ( actionGoal ) );
 		}
 
 		void sendCancelFunc (goalid cancel_msg)
@@ -204,8 +210,8 @@ namespace actionlib
 			// assume this means wait until ros is good to go?
 //			ros::Time::waitForValid ();
 			// read parameters indicating publish/subscribe queue sizes
-			int pub_queue_size;
-			int sub_queue_size;
+			int pub_queue_size = 10;
+			int sub_queue_size = 1;
 //			nodeHandle.param ( "actionlib_client_pub_queue_size", pub_queue_size, 10 );
 //			nodeHandle.param ( "actionlib_client_sub_queue_size", sub_queue_size, 1 );
 			if ( pub_queue_size < 0 )
@@ -213,15 +219,15 @@ namespace actionlib
 			if ( sub_queue_size < 0 )
 				sub_queue_size = 1;
 
-			statusSubscriber   = queue_subscribe("status", (uint) sub_queue_size, ActionClient<ActionSpec>.statusCb, this, queue );
-			feedbackSubscriber = queue_subscribe("feedback", (uint) sub_queue_size, ActionClient<ActionSpec>.feedbackCb, this, queue);
-			resultSubscriber   = queue_subscribe("result",   (uint) sub_queue_size, ActionClient<ActionSpec>.resultCb, this, queue);
+			statusSubscriber = queue_subscribe<gsa> ("status", (uint) sub_queue_size, statusCb, queue );
+			feedbackSubscriber = queue_subscribe<ActionFeedbackDecorator> ("feedback", (uint) sub_queue_size, feedbackCb, queue);
+			resultSubscriber = queue_subscribe<ActionResultDecorator> ("result",   (uint) sub_queue_size, resultCb, queue);
 
 			connectionMonitor = new ConnectionMonitor ( feedbackSubscriber, resultSubscriber );
 //			connectionMonitor.reset ( new ConnectionMonitor ( feedbackSubscriber, resultSubscriber ) );
 
 			// Start publishers and subscribers
-			goalPublisher = queue_advertise<Action<ActionSpec>.ActionGoal> ( "goal", (uint) pub_queue_size, connectionMonitor.goalConnectCallback, connectionMonitor.goalDisconnectCallback, queue );
+			goalPublisher = queue_advertise<ActionGoalDecorator> ( "goal", (uint) pub_queue_size, connectionMonitor.goalConnectCallback, connectionMonitor.goalDisconnectCallback, queue );
 //			goalPublisher = queue_advertise<ActionGoal>( "goal", (uint) pub_queue_size,
 //			            boost::bind(&ConnectionMonitor::goalConnectCallback,    connectionMonitor, _1),
 //			            boost::bind(&ConnectionMonitor::goalDisconnectCallback, connectionMonitor, _1),
@@ -238,7 +244,7 @@ namespace actionlib
 //			goalManager.registerCancelFunc(boost::bind(&ActionClient<ActionSpec>::sendCancelFunc, this, _1));
 		}
 
-		Publisher<M> queue_advertise<M> (string topic, uint queue_size, SubscriberStatusCallback connect_cb, SubscriberStatusCallback disconnect_cb, CallbackQueueInterface queue)
+		Publisher<M> queue_advertise<M> (string topic, uint queue_size, SubscriberStatusCallback connect_cb, SubscriberStatusCallback disconnect_cb, CallbackQueueInterface queue) where M : IRosMessage, new()
 		{
 			AdvertiseOptions<M> ops = new AdvertiseOptions<M> ( topic, (int) queue_size, connect_cb, disconnect_cb );
 //			ops.tracked_object = ros::VoidPtr();
@@ -247,17 +253,17 @@ namespace actionlib
 			return nodeHandle.advertise ( ops );
 		}
 
-		Subscriber<M> queue_subscribe<M, T> (string topic, uint queue_size, MessageEventDelegate<M> msgEvent, T obj, CallbackQueueInterface queue)
+		Subscriber<MessageEvent<M>> queue_subscribe<M> ( string topic, uint queue_size, MessageEventDelegate<M> msgEvent, CallbackQueueInterface queue ) where M : IRosMessage, new()
 //		Subscriber<M, T> queue_subscribe (string topic, uint queue_size, void(T::*fp)(const ros::MessageEvent<M const>&), T* obj, ros::CallbackQueueInterface* queue)
 		{
-			SubscribeOptions<M> ops = new SubscribeOptions<M> ( topic, queue_size, msgEvent );
+			SubscribeOptions<MessageEvent<M>> ops = new SubscribeOptions<MessageEvent<M>> ( topic, queue_size, new CallbackDelegate<MessageEvent<M>> ( msgEvent ) );
 			ops.callback_queue = queue;
 			ops.topic = topic;
 			ops.queue_size = queue_size;
 			// md5 and datatype get generated in constructor
 //			ops.md5sum = ros::message_traits::md5sum<M>();
 //			ops.datatype = ros::message_traits::datatype<M>();
-			ops.helper = new SubscriptionCallbackHelper<MessageEvent<M>> ( Messages.MsgTypes.MessageEvent, new CallbackDelegate<MessageEvent<M>> (obj) );
+			ops.helper = new SubscriptionCallbackHelper<MessageEvent<M>> ( Messages.MsgTypes.MessageEvent, new CallbackDelegate<MessageEvent<M>> (msgEvent) );
 //			ops.helper = ros::SubscriptionCallbackHelperPtr(
 //				new ros::SubscriptionCallbackHelperT<const ros::MessageEvent<M const>& >(
 //				boost::bind(fp, obj, _1)
@@ -265,7 +271,6 @@ namespace actionlib
 //			);
 			return nodeHandle.subscribe(ops);
 		}
-
 		void statusCb (MessageEvent<gsa> statusArrayEvent)
 		{
 			ROS.Debug ( "actionlib", "Getting status over the wire." );
@@ -274,12 +279,12 @@ namespace actionlib
 			goalManager.updateStatuses ( statusArrayEvent.getMessage () );
 		}
 
-		void feedbackCb (MessageEvent<Action<ActionSpec>.ActionFeedback> actionFeedback)
+		void feedbackCb (MessageEvent<ActionFeedbackDecorator> actionFeedback)
 		{
 			goalManager.updateFeedbacks ( actionFeedback.getMessage () );
 		}
 
-		void resultCb (MessageEvent<Action<ActionSpec>.ActionResult> actionResult)
+		void resultCb (MessageEvent<ActionResultDecorator> actionResult)
 		{
 			goalManager.updateResults ( actionResult.getMessage () );
 		}

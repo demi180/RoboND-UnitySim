@@ -33,6 +33,7 @@
 *********************************************************************/
 using Ros_CSharp;
 using Messages;
+using Messages.actionlib_msgs;
 using actionlib;
 using System.Collections.Generic;
 using gstat = Messages.actionlib_msgs.GoalStatus;
@@ -40,19 +41,19 @@ using gsarray = Messages.actionlib_msgs.GoalStatusArray;
 
 namespace actionlib
 {
-	public delegate void TransitionCallback<T> (ClientGoalHandle<T> goalHandle);
-	public delegate void FeedbackCallback<T> (ClientGoalHandle<T> goalHandle);
-	public delegate void SendGoalDelegate<T> (Action<T>.ActionGoal goal);
+	public delegate void TransitionCallback<T> (ClientGoalHandle<T> goalHandle) where T : AAction, new();
+	public delegate void FeedbackCallback<T> (ClientGoalHandle<T> goalHandle, AFeedback feedback) where T : AAction, new();
+	public delegate void SendGoalDelegate (AActionGoal goal);
 	public delegate void CancelDelegate (Messages.actionlib_msgs.GoalID goalID);
 
 	/*******************************************************************************
 	* GoalManager
 	*******************************************************************************/
-	public class GoalManager<T>
+	public class GoalManager<ActionSpec> where ActionSpec : AAction, new ()
 	{
 		// should be private
-		public ManagedList<CommStateMachine<T>> list = new ManagedList<CommStateMachine<T>> ();
-		public SendGoalDelegate<T> sendGoalDelegate;
+		public ManagedList<CommStateMachine<ActionSpec>> list = new ManagedList<CommStateMachine<ActionSpec>> ();
+		public SendGoalDelegate sendGoalDelegate;
 		public CancelDelegate cancelDelegate;
 
 		DestructionGuard guard;
@@ -67,7 +68,7 @@ namespace actionlib
 			this.guard = guard;
 		}
 
-		public void registerSendGoalDelegate (SendGoalDelegate<T> sendGoalDelegate)
+		public void registerSendGoalDelegate (SendGoalDelegate sendGoalDelegate)
 		{
 			this.sendGoalDelegate = sendGoalDelegate;
 		}
@@ -77,29 +78,33 @@ namespace actionlib
 			this.cancelDelegate = cancelDelegate;
 		}
 
-		public ClientGoalHandle<T> initGoal(T goal, TransitionCallback<T> transitionCallback, FeedbackCallback<T> feedbackCallback )
+		public ClientGoalHandle<ActionSpec> initGoal<TGoal> (TGoal goal, TransitionCallback<ActionSpec> transitionCallback, FeedbackCallback<ActionSpec> feedbackCallback ) where TGoal : AGoal
 		{
-			Action<T>.ActionGoal actionGoal = new Action<T>.ActionGoal ();
-			actionGoal.header.stamp = ROS.GetTime ();
-			actionGoal.goal_id = idGenerator.generateID ();
-			actionGoal.goal = goal;
+			AActionGoal actionGoal = new ActionSpec ().NewActionGoal ();
+//			AActionGoal actionGoal = new AActionGoal ();
+			actionGoal.Header.stamp = ROS.GetTime ();
+			actionGoal.GoalID = idGenerator.generateID ();
+			actionGoal.Goal = goal;
+//			actionGoal.header.stamp = ROS.GetTime ();
+//			actionGoal.goal_id = idGenerator.generateID ();
+//			actionGoal.goal = goal;
 
-			CommStateMachine<T> comm_statemachine = new CommStateMachine<T> (actionGoal, transitionCallback, feedbackCallback);
+			CommStateMachine<ActionSpec> commStateMachine = new CommStateMachine<ActionSpec> (actionGoal, transitionCallback, feedbackCallback);
 
 			lock ( lockObject )
 			{
-				list.Add ( new CommStateMachine<T> (comm_statemachine) );
+				var handle = list.Add ( commStateMachine );
+
+				if ( sendGoalDelegate != null )
+					sendGoalDelegate ( actionGoal );
+				else
+					ROS.Warn ("actionlib", "Possible coding error: sendGoalDelegate set to NULL. Not going to send goal");
+				
+				return new ClientGoalHandle<ActionSpec> ( this, handle, guard );
 			}
-
-			if ( sendGoalDelegate != null )
-				sendGoalDelegate ( actionGoal );
-			else
-				ROS.Warn ("actionlib", "Possible coding error: sendGoalDelegate set to NULL. Not going to send goal");
-
-			return new ClientGoalHandle<T> ( this, comm_statemachine, guard );
 		}
 
-		public void listElemDeleter (List<CommStateMachine<T>>.Enumerator it)
+		public void listElemDeleter (List<CommStateMachine<ActionSpec>>.Enumerator it)
 		{
 			UnityEngine.Debug.Assert ( guard != null );
 			DestructionGuard.ScopedProtector protector = new DestructionGuard.ScopedProtector ( guard );
@@ -121,32 +126,63 @@ namespace actionlib
 		{
 			lock ( lockObject )
 			{
-				foreach ( CommStateMachine<T> item in list )
+				var iter = list.GetIterator ();
+				while ( iter.GetElement () != null )
 				{
-					item.updateStatus ( gh, statusArray );
+					ClientGoalHandle<ActionSpec> gh = new ClientGoalHandle<ActionSpec> ( this, iter.CreateHandle (), guard );
+					iter.GetElement ().updateStatus ( gh, statusArray );
+					iter++;
 				}
+
+//				for ( int i = 0; i < list.Count; i++ )
+//				foreach ( CommStateMachine<ActionSpec> item in list )
+//				{
+//					CommStateMachine<ActionSpec> item = list [ i ];
+//					ClientGoalHandle<ActionSpec> gh = new ClientGoalHandle<ActionSpec> ( this, item.createHandle (), guard );
+//					item.updateStatus ( gh, statusArray );
+//				}
 			}
 		}
 
-		public void updateFeedbacks (Action<T>.ActionFeedback actionFeedback)
+		public void updateFeedbacks (AActionFeedback actionFeedback)
 		{
 			lock ( lockObject )
 			{
-				foreach ( CommStateMachine<T> item in list )
+				var iter = list.GetIterator ();
+				while ( iter.GetElement () != null )
 				{
-					item.updateFeedback ( gh, actionFeedback );
+					ClientGoalHandle<ActionSpec> gh = new ClientGoalHandle<ActionSpec> ( this, iter.CreateHandle (), guard );
+					iter.GetElement ().updateFeedback ( gh, actionFeedback );
+					iter++;
 				}
+//				for ( int i = 0; i < list.Count; i++ )
+//				foreach ( CommStateMachine<ActionSpec> item in list )
+//				{
+//					CommStateMachine<ActionSpec> item = list [ i ];
+//					ClientGoalHandle<ActionSpec> gh = new ClientGoalHandle<ActionSpec> ( this, item.createHandle (), guard );
+//					item.updateFeedback ( gh, actionFeedback );
+//				}
 			}
 		}
 
-		public void updateResults (Action<T>.ActionResult actionResult)
+		public void updateResults (AActionResult actionResult)
 		{
 			lock ( lockObject )
 			{
-				foreach ( CommStateMachine<T> item in list )
+				var iter = list.GetIterator ();
+				while ( iter.GetElement () != null )
 				{
-					item.updateResult ( gh, actionResult );
+					ClientGoalHandle<ActionSpec> gh = new ClientGoalHandle<ActionSpec> ( this, iter.CreateHandle (), guard );
+					iter.GetElement ().updateResult ( gh, actionResult );
+					iter++;
 				}
+//				for ( int i = 0; i < list.Count; i++ )
+//				foreach ( CommStateMachine<ActionSpec> item in list )
+//				{
+//					CommStateMachine<ActionSpec> item = list [ i ];
+//					ClientGoalHandle<ActionSpec> gh = new ClientGoalHandle<ActionSpec> ( this, item.createHandle (), guard );
+//					item.updateResult ( gh, actionResult );
+//				}
 			}
 		}
 
@@ -163,13 +199,13 @@ namespace actionlib
 	/*******************************************************************************
 	* ClientGoalHandle
 	*******************************************************************************/
-	public class ClientGoalHandle<T>
+	public class ClientGoalHandle<ActionSpec> where ActionSpec : AAction, new ()
 	{
 		object lockObject = new object ();
-		GoalManager<T> goalManager;
+		GoalManager<ActionSpec> goalManager;
 		bool isActive;
 		DestructionGuard guard = new DestructionGuard ();
-		ManagedList<CommStateMachine<T>>.Handle listHandle;
+		ManagedList<CommStateMachine<ActionSpec>>.Handle listHandle;
 
 		//typename ManagedListT::iterator it_;
 //		boost::shared_ptr<DestructionGuard> guard;   // Guard must still exist when the listHandle is destroyed
@@ -188,7 +224,7 @@ namespace actionlib
 			isActive = false;
 		}
 
-		ClientGoalHandle (GoalManager<T> gm, ManagedList<T>.Handle handle, DestructionGuard guard)
+		public ClientGoalHandle (GoalManager<ActionSpec> gm, ManagedList<CommStateMachine<ActionSpec>>.Handle handle, DestructionGuard guard)
 		{
 			this.goalManager = gm;
 			this.isActive = true;
@@ -221,8 +257,7 @@ namespace actionlib
 
 				lock ( lockObject )
 				{
-					
-					listHandle.reset();
+//					listHandle.reset(); // not sure what to replace this stuff with
 					isActive = false;
 					goalManager = null;
 				}
@@ -259,7 +294,7 @@ namespace actionlib
 			if ( !protector.isProtected () )
 			{
 				ROS.Error ( "actionlib", "This action client associated with the goal handle has already been destructed. Ignoring this getCommState() call" );
-				return CommState ( CommState.StateEnum.DONE );
+				return new CommState ( CommState.StateEnum.DONE );
 			}
 
 			UnityEngine.Debug.Assert ( goalManager != null );
@@ -303,35 +338,35 @@ namespace actionlib
 				
 				Messages.actionlib_msgs.GoalStatus goal_status = listHandle.GetElement ().getGoalStatus ();
 //				Messages.actionlib_msgs.GoalStatus goal_status = listHandle.getElem()->getGoalStatus();
-			}
 
-			switch ( goal_status.status )
-			{
-			case gstat.PENDING:
-			case gstat.ACTIVE:
-			case gstat.PREEMPTING:
-			case gstat.RECALLING:
-				ROS.Error ( "actionlib", "Asking for terminal state, but latest goal status is %u", goal_status.status );
-				return new TerminalState ( TerminalState.StateEnum.LOST, goal_status.text );
-			case gstat.PREEMPTED:
-				return new TerminalState ( TerminalState.StateEnum.PREEMPTED, goal_status.text );
-			case gstat.SUCCEEDED:
-				return new TerminalState ( TerminalState.StateEnum.SUCCEEDED, goal_status.text );
-			case gstat.ABORTED:
-				return new TerminalState ( TerminalState.StateEnum.ABORTED, goal_status.text );
-			case gstat.REJECTED:
-				return new TerminalState ( TerminalState.StateEnum.REJECTED, goal_status.text );
-			case gstat.RECALLED:
-				return new TerminalState ( TerminalState.StateEnum.RECALLED, goal_status.text );
-			case gstat.LOST:
-				return new TerminalState ( TerminalState.StateEnum.LOST, goal_status.text );
-			default:
-				ROS.Error ( "actionlib", "Unknown goal status: %u", goal_status.status );
-				break;
+				switch ( goal_status.status )
+				{
+				case gstat.PENDING:
+				case gstat.ACTIVE:
+				case gstat.PREEMPTING:
+				case gstat.RECALLING:
+					ROS.Error ( "actionlib", "Asking for terminal state, but latest goal status is %u", goal_status.status );
+					return new TerminalState ( TerminalState.StateEnum.LOST, goal_status.text );
+				case gstat.PREEMPTED:
+					return new TerminalState ( TerminalState.StateEnum.PREEMPTED, goal_status.text );
+				case gstat.SUCCEEDED:
+					return new TerminalState ( TerminalState.StateEnum.SUCCEEDED, goal_status.text );
+				case gstat.ABORTED:
+					return new TerminalState ( TerminalState.StateEnum.ABORTED, goal_status.text );
+				case gstat.REJECTED:
+					return new TerminalState ( TerminalState.StateEnum.REJECTED, goal_status.text );
+				case gstat.RECALLED:
+					return new TerminalState ( TerminalState.StateEnum.RECALLED, goal_status.text );
+				case gstat.LOST:
+					return new TerminalState ( TerminalState.StateEnum.LOST, goal_status.text );
+				default:
+					ROS.Error ( "actionlib", "Unknown goal status: %u", goal_status.status );
+					break;
+				}
+				
+				ROS.Error("actionlib", "Bug in determining terminal state");
+				return new TerminalState ( TerminalState.StateEnum.LOST, goal_status.text);
 			}
-
-			ROS.Error("actionlib", "Bug in determining terminal state");
-			return new TerminalState ( TerminalState.StateEnum.LOST, goal_status.text);
 		}
 
 		/**
@@ -339,7 +374,8 @@ namespace actionlib
 		*
 		* \return NULL if no reseult received.  Otherwise returns shared_ptr to result.
 		*/
-		public Action<T>.ActionResult getResult ()
+		public AResult getResult ()
+//		public AActionResult getResult ()
 		{
 			if ( !isActive )
 				ROS.Error ( "actionlib", "Trying to getResult on an inactive ClientGoalHandle. You are incorrectly using a ClientGoalHandle" );
@@ -349,13 +385,14 @@ namespace actionlib
 			if ( !protector.isProtected () )
 			{
 				ROS.Error ( "actionlib", "This action client associated with the goal handle has already been destructed. Ignoring this getResult() call" );
-				return ClientGoalHandle<T>.ActionResult;
+				return null;
 //				return typename ClientGoalHandle<ActionSpec>::ResultConstPtr() ;
 			}
 
 			lock ( lockObject )
 			{
 				return listHandle.GetElement ().getResult ();
+//				return listHandle.GetElement ().getResult<TResult> ();
 			}
 		}
 
@@ -377,10 +414,11 @@ namespace actionlib
 			}
 
 			UnityEngine.Debug.Assert ( goalManager != null );
-			Action<T>.ActionGoal actionGoal = null;
+			AActionGoal actionGoal = null;
 			lock ( lockObject )
 			{
-				 actionGoal = listHandle.getElem()->getActionGoal();
+				actionGoal = listHandle.GetElement ().getActionGoal ();
+//				actionGoal = listHandle.getElem()->getActionGoal();
 			}
 
 			if ( actionGoal == null )
@@ -414,7 +452,7 @@ namespace actionlib
 
 			lock ( lockObject )
 			{
-				switch ( listHandle.GetElement ().state )
+				switch ( listHandle.GetElement ().getCommState ().state )
 				{
 				case CommState.StateEnum.WAITING_FOR_GOAL_ACK:
 				case CommState.StateEnum.PENDING:
@@ -433,11 +471,12 @@ namespace actionlib
 				}
 			}
 
-			Action<T>.ActionGoal actionGoal = listHandle.GetElement ().getActionGoal ();
+			AActionGoal actionGoal = listHandle.GetElement ().getActionGoal ();
 
 			Messages.actionlib_msgs.GoalID cancelMsg = new Messages.actionlib_msgs.GoalID ();
 			cancelMsg.stamp = ROS.GetTime ();
-			cancelMsg.id = listHandle.GetElement ().getActionGoal ()->goal_id.id;
+			cancelMsg.id = listHandle.GetElement ().getActionGoal ().GoalID.id;
+//			cancelMsg.id = listHandle.GetElement ().getActionGoal ()->goal_id.id;
 
 			if ( goalManager.cancelDelegate != null )
 				goalManager.cancelDelegate ( cancelMsg );
@@ -449,14 +488,14 @@ namespace actionlib
 		* \brief Check if two goal handles point to the same goal
 		* \return TRUE if both point to the same goal. Also returns TRUE if both handles are inactive.
 		*/
-		public static bool operator == (ClientGoalHandle<T> lhs, ClientGoalHandle<T> rhs)
+		public static bool operator == (ClientGoalHandle<ActionSpec> lhs, ClientGoalHandle<ActionSpec> rhs)
 		{
 			if ( object.ReferenceEquals ( lhs, rhs ) )
 				return true;
 			if ( !( lhs.isActive && rhs.isActive ) )
 				return false;
 
-			DestructionGuard.ScopedProtector protector = new DestructionGuard.ScopedProtector ( guard );
+			DestructionGuard.ScopedProtector protector = new DestructionGuard.ScopedProtector ( lhs.guard );
 			if ( !protector.isProtected () )
 			{
 				ROS.Error("actionlib", "This action client associated with the goal handle has already been destructed. Ignoring this operator==() call");
@@ -469,7 +508,7 @@ namespace actionlib
 		/**
 		* \brief !(operator==())
 		*/
-		public static bool operator != (ClientGoalHandle<T> lhs, ClientGoalHandle<T> rhs)
+		public static bool operator != (ClientGoalHandle<ActionSpec> lhs, ClientGoalHandle<ActionSpec> rhs)
 		{
 			return !( lhs == rhs );
 		}
@@ -482,29 +521,29 @@ namespace actionlib
 	/*******************************************************************************
 	* CommStateMachine
 	*******************************************************************************/
-	public class CommStateMachine<T>
+	public class CommStateMachine<ActionSpec> where ActionSpec : AAction, new ()
 	{
 		// State
 		CommState state;
-		Action<T>.ActionGoal actionGoal;
+		AActionGoal actionGoal;
 		Messages.actionlib_msgs.GoalStatus latest_goal_status_;
-		Action<T>.ActionResult latestResult;
+		AActionResult latestResult;
 
 		// Callbacks
-		TransitionCallback<T> transitionCallback;
-		FeedbackCallback<T> feedbackCallback;
+		TransitionCallback<ActionSpec> transitionCallback;
+		FeedbackCallback<ActionSpec> feedbackCallback;
 
 		CommStateMachine () {}
-		public CommStateMachine (Action<T>.ActionGoal actionGoal, TransitionCallback<T> transitionCallback, FeedbackCallback<T> feedbackCallback )
+		public CommStateMachine (AActionGoal actionGoal, TransitionCallback<ActionSpec> transitionCallback, FeedbackCallback<ActionSpec> feedbackCallback )
 		{
 			UnityEngine.Debug.Assert ( actionGoal != null );
-			actionGoal = actionGoal;
+			this.actionGoal = actionGoal;
 			this.transitionCallback = transitionCallback;
 			this.feedbackCallback = feedbackCallback;
 			state = CommState.StateEnum.WAITING_FOR_GOAL_ACK;
 		}
 
-		public Action<T>.ActionGoal getActionGoal ()
+		public AActionGoal getActionGoal ()
 		{
 			return actionGoal;
 		}
@@ -514,18 +553,18 @@ namespace actionlib
 			return state;
 		}
 
-		public Messages.actionlib_msgs.GoalStatus getGoalStatus ()
+		public GoalStatus getGoalStatus ()
 		{
 			return latest_goal_status_;
 		}
 
 
-		public Action<T>.ActionResult getResult ()
+		public AResult getResult ()
 		{
-			Action<T>.ActionResult result = null;
+			AResult result = null;
 			if ( latestResult != null )
 			{
-				result = new Action<T>.ActionResult ( latestResult );
+				result = latestResult.Result.Clone ();// new TResult ( latestResult );
 //				EnclosureDeleter<const ActionResult> d(latestResult);
 //				result = ResultConstPtr(&(latestResult->result), d);
 			}
@@ -533,9 +572,9 @@ namespace actionlib
 		}
 
 		// Transitions caused by messages
-		public void updateStatus (ClientGoalHandle<T> gh, Messages.actionlib_msgs.GoalStatusArray statusArray)
+		public void updateStatus (ClientGoalHandle<ActionSpec> gh, gsarray statusArray)
 		{
-			Messages.actionlib_msgs.GoalStatus goal_status = findGoalStatus ( statusArray.status_list );
+			gstat goal_status = findGoalStatus ( statusArray.status_list );
 
 			// It's possible to receive old GoalStatus messages over the wire, even after receiving Result with a terminal state.
 			//   Thus, we want to ignore all status that we get after we're done, because it is irrelevant. (See trac #2721)
@@ -559,7 +598,7 @@ namespace actionlib
 			{
 			case CommState.StateEnum.WAITING_FOR_GOAL_ACK:
 				{
-					if (goal_status)
+					if ( goal_status != null )
 					{
 						switch ( goal_status.status )
 						{
@@ -816,27 +855,42 @@ namespace actionlib
 		}
 
 
-		public void updateFeedback (ClientGoalHandle<T> gh, Action<T>.ActionFeedback actionFeedback)
+		public void updateFeedback (ClientGoalHandle<ActionSpec> gh, AActionFeedback actionFeedback)
+		{
+			if ( actionGoal.GoalID.id != actionFeedback.GoalStatus.goal_id.id )
+				return;
+
+			if ( feedbackCallback != null )
+			{
+				AFeedback feedback = actionFeedback.Feedback.Clone ();
+				feedbackCallback ( gh, feedback );
+			}
+		}
+
+/*		public void updateFeedback<TFeedback> (ClientGoalHandle<ActionSpec> gh, TFeedback actionFeedback) where TFeedback : AActionFeedback, new()
 		{
 			// Check if this feedback is for us
-			if ( actionGoal.goal_id.id != actionFeedback.status.goal_id.id )
+			if ( actionGoal.GoalID.id != actionFeedback.GoalStatus.goal_id.id )
+//			if ( actionGoal.goal_id.id != actionFeedback.status.goal_id.id )
 				return;
 
 			if ( feedbackCallback != null )
 			{
 //				EnclosureDeleter<const ActionFeedback> d(actionFeedback);
 //				FeedbackConstPtr feedback(&(actionFeedback->feedback), d);
-				T feedback = new T ( actionFeedback.Feedback);
+				AFeedback feedback = actionFeedback.Feedback.Clone ();
 				feedbackCallback ( gh, feedback );
 			}
-		}
+		}*/
 
-		public void updateResult (ClientGoalHandle<T> gh, Action<T>.ActionResult actionResult)
+		public void updateResult (ClientGoalHandle<ActionSpec> gh, AActionResult actionResult)
 		{
 			// Check if this feedback is for us
-			if ( actionGoal.goal_id.id != actionResult.status.goal_id.id )
+			if ( actionGoal.GoalID.id != actionResult.GoalStatus.goal_id.id )
+//			if ( actionGoal.goal_id.id != actionResult.status.goal_id.id )
 				return;
-			latest_goal_status_ = actionResult.status;
+			latest_goal_status_ = actionResult.GoalStatus;
+//			latest_goal_status_ = actionResult.status;
 			latestResult = actionResult;
 			switch ( state.state )
 			{
@@ -849,9 +903,10 @@ namespace actionlib
 			case CommState.StateEnum.PREEMPTING:
 				{
 					// A little bit of hackery to call all the right state transitions before processing result
-					Messages.actionlib_msgs.GoalStatusArray statusArray = new Messages.actionlib_msgs.GoalStatusArray ();
+					gsarray statusArray = new gsarray ();
 					List<gstat> list = new List<gstat> ( statusArray.status_list );
-					list.Add ( actionResult.status );
+					list.Add ( actionResult.GoalStatus );
+//					list.Add ( actionResult.status );
 					statusArray.status_list = list.ToArray ();
 					updateStatus ( gh, statusArray );
 
@@ -868,12 +923,12 @@ namespace actionlib
 		}
 
 		// Forced transitions
-		public void transitionToState (ClientGoalHandle<T> gh, CommState.StateEnum next_state)
+		public void transitionToState (ClientGoalHandle<ActionSpec> gh, CommState.StateEnum next_state)
 		{
 			transitionToState ( gh, new CommState ( next_state ) );
 		}
 
-		public void transitionToState (ClientGoalHandle<T> gh, CommState next_state)
+		public void transitionToState (ClientGoalHandle<ActionSpec> gh, CommState next_state)
 		{
 			ROS.Debug ( "actionlib", "Trying to transition to %s", next_state.toString () );
 			setCommState ( next_state );
@@ -881,7 +936,7 @@ namespace actionlib
 				transitionCallback ( gh );
 		}
 
-		public void processLost (ClientGoalHandle<T> gh)
+		public void processLost (ClientGoalHandle<ActionSpec> gh)
 		{
 			ROS.Warn ( "actionlib", "Transitioning goal to LOST" );
 			latest_goal_status_.status = gstat.LOST;
@@ -901,14 +956,13 @@ namespace actionlib
 			state = state;
 		}
 
-		Messages.actionlib_msgs.GoalStatus findGoalStatus (List<Messages.actionlib_msgs.GoalStatus> statusList)
+		gstat findGoalStatus (gstat[] statusList)
 		{
-			for (int i = 0; i < statusList.Count; i++)
-				if ( statusList[i].goal_id.id == actionGoal.goal_id.id )
+			for (int i = 0; i < statusList.Length; i++)
+				if ( statusList[i].goal_id.id == actionGoal.GoalID.id )
+//				if ( statusList[i].goal_id.id == actionGoal.goal_id.id )
 					return statusList[i];
 			return null;
 		}
-
-
 	}
 }

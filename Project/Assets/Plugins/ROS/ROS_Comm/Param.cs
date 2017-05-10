@@ -271,6 +271,60 @@ namespace Ros_CSharp
             return safeGet(key, ref dest, dest);
         }
 
+		public static bool get<T> (string key, ref List<T> list, bool cached = false)
+		{
+			XmlRpcValue val = new XmlRpcValue ();
+			if ( !safeGet ( key, ref val ) )
+				return false;
+
+			if ( val.Type != XmlRpcValue.ValueType.TypeArray )
+				return false;
+
+			list = new List<T> ( val.Size );
+			for ( int i = 0; i < val.Size; i++ )
+			{
+				list.Add ( val [ i ].Get<T> () );
+			}
+
+			return true;
+		}
+
+		public static bool get<T> (string key, ref Dictionary<string, T> dict, bool cached = false)
+		{
+			XmlRpcValue val = new XmlRpcValue ();
+			if ( !safeGet ( key, ref val ) )
+				return false;
+
+			if ( val.Type != XmlRpcValue.ValueType.TypeStruct )
+				return false;
+
+			dict = new Dictionary<string, T> ( val.asStruct.Count );
+			foreach ( KeyValuePair<string, XmlRpcValue> pair in val.asStruct )
+			{
+				dict.Add ( pair.Key, pair.Value.Get<T> () );
+			}
+
+			return true;
+		}
+
+		public static bool getCached<T> (string key, T dest)
+		{
+			try
+			{
+				XmlRpcValue v = getParam ( key, true );
+				if ( v == null || !v.Valid )
+				{
+					return false;
+				}
+				dest = v.Get<T> ();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
         public static List<string> list()
         {
             List<string> ret = new List<string>();
@@ -482,5 +536,36 @@ namespace Ros_CSharp
 
             return ret;
         }
+
+		public static bool search (string key, ref string result_out)
+		{
+			return search ( this_node.Name, key, ref result_out );
+		}
+		
+		public static bool search (string ns, string key, ref string result_out)
+		{
+			XmlRpcValue parms = new XmlRpcValue (), result = new XmlRpcValue (), payload = new XmlRpcValue ();
+			parms [ 0 ] = new XmlRpcValue ( ns );
+			
+			// searchParam needs a separate form of remapping -- remapping on the unresolved name, rather than the
+			// resolved one.
+			
+			string remapped = key;
+			if ( names.unresolved_remappings.Contains ( key ) )
+				remapped = (string) names.unresolved_remappings [ key ];
+			
+			parms [ 1 ] = new XmlRpcValue ( remapped );
+			// We don't loop here, because validateXmlrpcResponse() returns false
+			// both when we can't contact the master and when the master says, "I
+			// don't have that param."
+			if ( !master.execute ( "searchParam", parms, result, payload, false ) )
+			{
+				return false;
+			}
+			
+			result_out = payload.asString;
+			
+			return true;
+		}
     }
 }

@@ -6,9 +6,9 @@ using System.Collections.Generic;
 
 namespace Ros_CSharp
 {
-	public class MessageEvent<T> where T : IRosMessage
+	public class MessageEvent<T> : IRosMessage where T : IRosMessage
 	{
-		protected MessageEvent () {}
+		public MessageEvent () {}
 		public MessageEvent (T msg)
 		{
 			message = msg;
@@ -23,11 +23,11 @@ namespace Ros_CSharp
 //			receiptTime = ROS.GetTime ();
 //		}
 
-		IRosMessage message;
+		T message;
 		Dictionary<string, string> connectionHeader;
 		Time receiptTime;
 
-		public IRosMessage getMessage () { return message; }
+		public T getMessage () { return message; }
 		public string getConnectionHeader ()
 		{
 			string s = "unknown_publisher";
@@ -36,5 +36,73 @@ namespace Ros_CSharp
 			return s;
 		}
 		public Time getReceiptTime () { return receiptTime; }
+
+		public string getPublisherName () { return "Zippity-doo"; }
+
+		/*******************************************************************************
+		* Overrides from IRosMessage
+		*******************************************************************************/
+
+		public override string MD5Sum ()
+		{
+			return message.MD5Sum ();
+		}
+
+		public override bool Equals (IRosMessage msg)
+		{
+			if ( ReferenceEquals ( msg, null ) )
+				return false;
+
+			bool ret = true;
+			MessageEvent<T> evt = (MessageEvent<T>) msg;
+			ret &= ( evt != null && message == evt.message );
+
+			return ret;
+		}
+
+		public override bool HasHeader ()
+		{
+			return message.HasHeader ();
+		}
+
+		public override int GetHashCode ()
+		{
+			return base.GetHashCode ();
+		}
+
+		public override bool IsMetaType ()
+		{
+			return message.IsMetaType ();
+		}
+
+		public override MsgTypes msgtype ()
+		{
+			return message.msgtype ();
+		}
+
+		public override string MessageDefinition ()
+		{
+			return message.MessageDefinition ();
+		}
+
+		public override void Randomize ()
+		{
+			message.Randomize ();
+		}
+
+		public override void Deserialize (byte[] SERIALIZEDSTUFF, ref int currentIndex)
+		{
+			message.Deserialize (SERIALIZEDSTUFF, ref currentIndex);
+		}
+
+		public override bool IsServiceComponent ()
+		{
+			return message.IsServiceComponent ();
+		}
+
+		public override byte[] Serialize (bool partofsomethingelse)
+		{
+			return message.Serialize (partofsomethingelse);
+		}
 	}
 }

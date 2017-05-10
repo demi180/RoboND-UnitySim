@@ -82,11 +82,11 @@ namespace actionlib
 			return s;
 		}
 
-		Subscriber<Action<ConnectionMonitor>.ActionFeedback> feedbackSubscriber;
-		Subscriber<Action<ConnectionMonitor>.ActionResult> resultSubscriber;
+		Subscriber<MessageEvent<ActionFeedbackDecorator>> feedbackSubscriber;
+		Subscriber<MessageEvent<ActionResultDecorator>> resultSubscriber;
 
 
-		public ConnectionMonitor (Subscriber<Action<ConnectionMonitor>.ActionFeedback> feedback_sub, Subscriber<Action<ConnectionMonitor>.ActionResult> result_sub)
+		public ConnectionMonitor ( Subscriber<MessageEvent<ActionFeedbackDecorator>> feedback_sub, Subscriber<MessageEvent<ActionResultDecorator>> result_sub )
 		{
 			this.feedbackSubscriber = feedback_sub;
 			this.resultSubscriber = result_sub;

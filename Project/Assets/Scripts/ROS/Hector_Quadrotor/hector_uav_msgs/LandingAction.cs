@@ -4,14 +4,20 @@ using uint8 = System.Byte;
 using Messages;
 using hector_uav_msgs;
 using System.Linq;
+using actionlib;
 
 namespace hector_uav_msgs
 {
 	#if !TRACE
 	[System.Diagnostics.DebuggerStepThrough]
 	#endif
-	public class LandingAction : IRosMessage
+	public class LandingAction : AAction
+//	public class LandingAction : IRosMessage
 	{
+		public override AActionGoal ActionGoal { get { return action_goal; } }
+		public override AActionResult ActionResult { get { return action_result; } }
+		public override AActionFeedback ActionFeedback { get { return action_feedback; } }
+
 		public hector_uav_msgs.LandingActionGoal action_goal;
 		public hector_uav_msgs.LandingActionResult action_result;
 		public hector_uav_msgs.LandingActionFeedback action_feedback;
@@ -135,6 +141,11 @@ hector_uav_msgs/LandingActionFeedback action_feedback"; }
 			// for each SingleType st:
 			//    ret &= {st.Name} == other.{st.Name};
 			return ret;
+		}
+
+		public override AActionGoal NewActionGoal ()
+		{
+			return new LandingActionGoal ();
 		}
 	}
 }
