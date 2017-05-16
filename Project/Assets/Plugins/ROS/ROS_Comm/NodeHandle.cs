@@ -605,114 +605,114 @@ namespace Ros_CSharp
 		/*******************************************************************************
 		* PARAM methods
 		*******************************************************************************/
-		void setParam (string key, XmlRpcValue v)
+		public void setParam (string key, XmlRpcValue v)
 		{
 			Param.set ( resolveName ( key ), v );
 		}
 
-		void setParam (string key, string s)
+		public void setParam (string key, string s)
 		{
 			Param.set ( resolveName ( key ), s );
 		}
 
-		void setParam (string key, double d)
+		public void setParam (string key, double d)
 		{
 			Param.set ( resolveName ( key ), d );
 		}
 
-		void setParam (string key, int i)
+		public void setParam (string key, int i)
 		{
 			Param.set ( resolveName ( key ), i );
 		}
 
-		void setParam (string key, bool b)
+		public void setParam (string key, bool b)
 		{
 			Param.set ( resolveName ( key ), b );
 		}
 
-		void setParam (string key, List<string> list)
+		public void setParam (string key, List<string> list)
 		{
 			Param.set ( resolveName ( key ), new XmlRpcValue ( list ) );
 		}
 
-		void setParam (string key, List<double> list)
+		public void setParam (string key, List<double> list)
 		{
 			Param.set ( resolveName ( key ), new XmlRpcValue ( list ) );
 		}
 
-		void setParam (string key, List<float> list)
+		public void setParam (string key, List<float> list)
 		{
 			Param.set ( resolveName ( key ), new XmlRpcValue ( list ) );
 		}
 
-		void setParam (string key, List<int> list)
+		public void setParam (string key, List<int> list)
 		{
 			Param.set ( resolveName ( key ), new XmlRpcValue ( list ) );
 		}
 
-		void setParam (string key, List<bool> list)
+		public void setParam (string key, List<bool> list)
 		{
 			Param.set ( resolveName ( key ), new XmlRpcValue ( list ) );
 		}
 
-		void setParam (string key, Dictionary<string, string> dict)
+		public void setParam (string key, Dictionary<string, string> dict)
 		{
 			Param.set ( resolveName ( key ), new XmlRpcValue ( dict ) );
 		}
 
-		void setParam (string key, Dictionary<string, double> dict)
+		public void setParam (string key, Dictionary<string, double> dict)
 		{
 			Param.set ( resolveName ( key ), new XmlRpcValue ( dict ) );
 		}
 
-		void setParam (string key, Dictionary<string, float> dict)
+		public void setParam (string key, Dictionary<string, float> dict)
 		{
 			Param.set ( resolveName ( key ), new XmlRpcValue ( dict ) );
 		}
 
-		void setParam (string key, Dictionary<string, int> dict)
+		public void setParam (string key, Dictionary<string, int> dict)
 		{
 			Param.set ( resolveName ( key ), new XmlRpcValue ( dict ) );
 		}
 
-		void setParam (string key, Dictionary<string, bool> dict)
+		public void setParam (string key, Dictionary<string, bool> dict)
 		{
 			Param.set ( resolveName ( key ), new XmlRpcValue ( dict ) );
 		}
 
-		bool hasParam (string key)
+		public bool hasParam (string key)
 		{
 			return Param.has ( resolveName ( key ) );
 		}
 
-		bool deleteParam (string key)
+		public bool deleteParam (string key)
 		{
 			return Param.del ( resolveName ( key ) );
 		}
 
-		bool getParamNames (List<string> keys)
+		public bool getParamNames (List<string> keys)
 		{
 			keys = Param.list ();
 			return keys != null;
 //			return Param.getParamNames ( keys );
 		}
 
-		bool getParam (string key, ref XmlRpcValue v)
+		public bool getParam (string key, ref XmlRpcValue v)
 		{
 			return Param.get ( resolveName ( key ), ref  v );
 		}
 
-		bool getParam (string key, ref string s)
+		public bool getParam (string key, ref string s)
 		{
 			return Param.get ( resolveName ( key ), ref s );
 		}
 
-		bool getParam (string key, ref double d)
+		public bool getParam (string key, ref double d)
 		{
 			return Param.get ( resolveName ( key ), ref d );
 		}
 
-		bool getParam (string key, ref float f)
+		public bool getParam (string key, ref float f)
 		{
 			double d = f;
 			bool get = Param.get ( resolveName ( key ), ref d );
@@ -720,147 +720,147 @@ namespace Ros_CSharp
 			return get;
 		}
 
-		bool getParam (string key, ref int i)
+		public bool getParam (string key, ref int i)
 		{
 			return Param.get ( resolveName ( key ), ref i );
 		}
 
-		bool getParam (string key, ref bool b)
+		public bool getParam (string key, ref bool b)
 		{
 			return Param.get ( resolveName ( key ), ref b );
 		}
 
 
-		bool getParam (string key, ref List<string> list)
+		public bool getParam (string key, ref List<string> list)
 		{
 			return Param.get ( resolveName ( key ), ref list );
 		}
 
-		bool getParam (string key, ref List<double> list)
+		public bool getParam (string key, ref List<double> list)
 		{
 			return Param.get ( resolveName ( key ), ref list );
 		}
 
-		bool getParam (string key, ref List<float> list)
+		public bool getParam (string key, ref List<float> list)
 		{
 			return Param.get ( resolveName ( key ), ref list );
 		}
 
-		bool getParam (string key, ref List<int> list)
+		public bool getParam (string key, ref List<int> list)
 		{
 			return Param.get ( resolveName ( key ), ref list );
 		}
 
-		bool getParam (string key, ref List<bool> list)
+		public bool getParam (string key, ref List<bool> list)
 		{
 			return Param.get ( resolveName ( key ), ref list );
 		}
 
-		bool getParam (string key, ref Dictionary<string, string> dict)
+		public bool getParam (string key, ref Dictionary<string, string> dict)
 		{
 			return Param.get ( resolveName ( key ), ref dict );
 		}
 
-		bool getParam (string key, ref Dictionary<string, double> dict)
+		public bool getParam (string key, ref Dictionary<string, double> dict)
 		{
 			return Param.get ( resolveName ( key ), ref dict );
 		}
 
-		bool getParam (string key, ref Dictionary<string, float> dict)
+		public bool getParam (string key, ref Dictionary<string, float> dict)
 		{
 			return Param.get ( resolveName ( key ), ref dict );
 		}
 
-		bool getParam (string key, ref Dictionary<string, int> dict)
+		public bool getParam (string key, ref Dictionary<string, int> dict)
 		{
 			return Param.get ( resolveName ( key ), ref dict );
 		}
 
-		bool getParam (string key, ref Dictionary<string, bool> dict)
+		public bool getParam (string key, ref Dictionary<string, bool> dict)
 		{
 			return Param.get ( resolveName ( key ), ref dict );
 		}
 
-		bool getParamCached (string key, XmlRpcValue v)
+		public bool getParamCached (string key, XmlRpcValue v)
 		{
 			return Param.getCached ( resolveName ( key ), v );
 		}
 
-		bool getParamCached (string key, string s)
+		public bool getParamCached (string key, string s)
 		{
 			return Param.getCached ( resolveName ( key ), s );
 		}
 
-		bool getParamCached (string key, double d)
+		public bool getParamCached (string key, double d)
 		{
 			return Param.getCached ( resolveName ( key ), d );
 		}
 
-		bool getParamCached (string key, float f)
+		public bool getParamCached (string key, float f)
 		{
 			return Param.getCached ( resolveName ( key ), f );
 		}
 
-		bool getParamCached (string key, int i)
+		public bool getParamCached (string key, int i)
 		{
 			return Param.getCached ( resolveName ( key ), i );
 		}
 
-		bool getParamCached (string key, bool b)
+		public bool getParamCached (string key, bool b)
 		{
 			return Param.getCached ( resolveName ( key ), b );
 		}
 
-		bool getParamCached (string key, List<string> list)
+		public bool getParamCached (string key, List<string> list)
 		{
 			return Param.getCached ( resolveName ( key ), list );
 		}
 
-		bool getParamCached (string key, List<double> list)
+		public bool getParamCached (string key, List<double> list)
 		{
 			return Param.getCached ( resolveName ( key ), list );
 		}
 
-		bool getParamCached (string key, List<float> list)
+		public bool getParamCached (string key, List<float> list)
 		{
 			return Param.getCached ( resolveName ( key ), list );
 		}
 
-		bool getParamCached (string key, List<int> list)
+		public bool getParamCached (string key, List<int> list)
 		{
 			return Param.getCached ( resolveName ( key ), list );
 		}
-		bool getParamCached (string key, List<bool> list)
+		public bool getParamCached (string key, List<bool> list)
 		{
 			return Param.getCached ( resolveName ( key ), list );
 		}
 
-		bool getParamCached (string key, Dictionary<string, string> dict)
+		public bool getParamCached (string key, Dictionary<string, string> dict)
 		{
 			return Param.getCached ( resolveName ( key ), dict );
 		}
 
-		bool getParamCached (string key, Dictionary<string, double> dict)
+		public bool getParamCached (string key, Dictionary<string, double> dict)
 		{
 			return Param.getCached ( resolveName ( key ), dict );
 		}
 
-		bool getParamCached (string key, Dictionary<string, float> dict)
+		public bool getParamCached (string key, Dictionary<string, float> dict)
 		{
 			return Param.getCached ( resolveName ( key ), dict );
 		}
 
-		bool getParamCached (string key, Dictionary<string, int> dict)
+		public bool getParamCached (string key, Dictionary<string, int> dict)
 		{
 			return Param.getCached ( resolveName ( key ), dict );
 		}
 
-		bool getParamCached (string key, Dictionary<string, bool> dict)
+		public bool getParamCached (string key, Dictionary<string, bool> dict)
 		{
 			return Param.getCached ( resolveName ( key ), dict );
 		}
 
-		bool searchParam (string key, string result_out)
+		public bool searchParam (string key, string result_out)
 		{
 			// searchParam needs a separate form of remapping -- remapping on the unresolved name, rather than the
 			// resolved one.

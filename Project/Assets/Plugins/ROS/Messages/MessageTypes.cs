@@ -170,6 +170,7 @@ namespace Messages
 		geometry_msgs__TwistStamped,
 		geometry_msgs__TwistWithCovariance,
 		geometry_msgs__TwistWithCovarianceStamped,
+		geometry_msgs__Accel, // added later, hope this doesn't mess up
 		geometry_msgs__Vector3,
 		geometry_msgs__Vector3Stamped,
 		geometry_msgs__Wrench,

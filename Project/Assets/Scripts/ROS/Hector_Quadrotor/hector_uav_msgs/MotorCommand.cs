@@ -12,10 +12,10 @@ namespace hector_uav_msgs
 	public class MotorCommand : IRosMessage
 	{
 		public Header_t header;
-		float[] force;
-		float[] torque;
-		float[] frequency;
-		float[] voltage;
+		public float[] force;
+		public float[] torque;
+		public float[] frequency;
+		public float[] voltage;
 
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]

@@ -133,5 +133,13 @@ Vector3 torque"; }
             //    ret &= {st.Name} == other.{st.Name};
             return ret;
         }
+
+		public static Wrench operator+ (Wrench lhs, Wrench rhs)
+		{
+			Wrench w = new Wrench ();
+			w.force = lhs.force + rhs.force;
+			w.torque = lhs.torque + rhs.torque;
+			return w;
+		}
     }
 }

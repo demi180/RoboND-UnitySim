@@ -178,5 +178,14 @@ float64 z"; }
             //    ret &= {st.Name} == other.{st.Name};
             return ret;
         }
+
+		public static Vector3 operator+ (Vector3 lhs, Vector3 rhs)
+		{
+			Vector3 v = new Vector3 ();
+			v.x = lhs.x + rhs.x;
+			v.y = lhs.y + rhs.y;
+			v.z = lhs.z + rhs.z;
+			return v;
+		}
     }
 }

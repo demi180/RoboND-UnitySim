@@ -148,5 +148,31 @@ namespace Messages.std_msgs
 		{
 			return new Time ( lhs.data + rhs.data );
 		}
+
+		public static bool operator >= (Time lhs, Time rhs)
+		{
+			if ( ReferenceEquals ( lhs, rhs ) )
+				return true;
+
+			return lhs.data.toSec () >= rhs.data.toSec ();
+		}
+
+		public static bool operator <= (Time lhs, Time rhs)
+		{
+			if ( ReferenceEquals ( lhs, rhs ) )
+				return true;
+
+			return lhs.data.toSec () <= rhs.data.toSec ();
+		}
+
+		public static bool operator > (Time lhs, Time rhs)
+		{
+			return !( lhs <= rhs );
+		}
+
+		public static bool operator < (Time lhs, Time rhs)
+		{
+			return !( lhs >= rhs );
+		}
     }
 }
