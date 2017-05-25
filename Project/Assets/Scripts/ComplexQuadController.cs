@@ -68,15 +68,14 @@ public class ComplexQuadController : MonoBehaviour
 		Vector3 up = transform.up;
 		for ( int i = 0; i < 4; i++ )
 			rb.AddForceAtPosition ( up * forces [ i ] * Time.deltaTime, rotors [ i ].position, forceMode );
+		
 
-//		float zAngle = transform.localEulerAngles.z;
-//		while ( zAngle > 180 )
-//			zAngle -= 360;
-//		while ( zAngle < -360 )
-//			zAngle += 360;
-//		transform.Rotate ( Vector3.up * -zAngle * Time.deltaTime, Space.World );
-
-		Vector3 velo = Vector3.ClampMagnitude ( rb.velocity, moveSpeed );
+		Vector3 velo = rb.velocity;
+		float y = Mathf.Clamp ( velo.y, velo.y, moveSpeed );
+		velo.y = 0;
+		velo = Vector3.ClampMagnitude ( velo, moveSpeed );
+		velo.y = y;
+//		Vector3 velo = Vector3.ClampMagnitude ( rb.velocity, moveSpeed );
 		rb.velocity = velo;
 	}
 

@@ -115,6 +115,8 @@ namespace Ros_CSharp
 		{
 		}
 
+		public string getNamespace () { return Namespace; }
+
 		/// <summary>
 		///     gets/sets this nodehandle's callbackqueue
 		///     get : if the private _callback is null, a new one is created and enabled

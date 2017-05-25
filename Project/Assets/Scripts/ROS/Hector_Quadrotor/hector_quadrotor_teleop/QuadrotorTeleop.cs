@@ -92,9 +92,8 @@ public class QuadrotorTeleop : MonoBehaviour
 	SAxes sAxes;
 
 
-	public void joyAttitudeCallback(Joy joy)
+	public void joyAttitudeCallback (Joy joy)
 	{
-
 		AttitudeCommand attitude = new AttitudeCommand ();
 		ThrustCommand thrust = new ThrustCommand ();
 		YawRateCommand yawrate = new YawRateCommand ();
@@ -197,7 +196,6 @@ public class QuadrotorTeleop : MonoBehaviour
 		if (getButton(joy, sButtons.stop))
 		{
 			landingClient.sendGoalAndWait ( new LandingGoal (), new Messages.std_msgs.Duration ( new TimeData ( 10, 0 ) ), new Messages.std_msgs.Duration ( new TimeData ( 10, 0 ) ) );
-//			landingClient.sendGoalAndWait(LandingGoal(), Duration(10.0), Duration(10.0));
 		}
 	}
 
@@ -345,13 +343,9 @@ public class QuadrotorTeleop : MonoBehaviour
 			ROS.Error("Unsupported control mode: " + control_mode);
 		}
 
-		motorEnableService = robot_nh.serviceClient<EnableMotors>(
-			"enable_motors");
+		motorEnableService = robot_nh.serviceClient<EnableMotors> ( "enable_motors" );
 		takeoffClient = new TakeoffClient ( robot_nh, "action/takeoff" );
 		landingClient = new LandingClient ( robot_nh, "action/landing" );
 		poseClient = new PoseClient ( robot_nh, "action/pose" );
-//		takeoffClient = boost::shared_ptr<TakeoffClient>(new TakeoffClient(robot_nh, "action/takeoff"));
-//		landingClient = boost::shared_ptr<LandingClient>(new LandingClient(robot_nh, "action/landing"));
-//		poseClient = boost::shared_ptr<PoseClient>(new PoseClient(robot_nh, "action/pose"));
 	}
 }
