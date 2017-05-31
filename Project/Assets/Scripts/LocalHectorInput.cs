@@ -5,7 +5,7 @@ using UnityEngine;
 /*
  * LocalHectorInput: queries keyboard and either applies force/torque directly to a HectorQuadController, or to a QRKeyboardTeleop.
  * If using the Teleop, check 'useTeleop' in the inspector, and there must be a QRKeyboardTeleop component assigned.
- * If controlling a local controller otherwise, uncheck 'useTeleop' and there must be a HectorquadController component assigned.
+ * If controlling a local controller otherwise, uncheck 'useTeleop' and there must be a HectorQuadController component assigned.
  */
 
 public class LocalHectorInput : MonoBehaviour
@@ -33,11 +33,12 @@ public class LocalHectorInput : MonoBehaviour
 
 		if ( useTeleop )
 		{
-			if ( Input.GetKeyDown ( KeyCode.Return ) )
-				teleop.enableMotors ( !motorEnabled );
-			motorEnabled = !motorEnabled;
+//			if ( Input.GetKeyDown ( KeyCode.Return ) )
+//				teleop.enableMotors ( !motorEnabled );
+			motorEnabled = droneController.MotorsEnabled;
 
-			teleop.SendTwist ( force, torque );
+			teleop.SendWrench ( force, torque );
+//			teleop.SendTwist ( force, torque );
 
 		} else
 		{
@@ -63,5 +64,12 @@ public class LocalHectorInput : MonoBehaviour
 		GUI.Label ( r, "Force: " + droneController.Force.ToString () );
 		r.y += r.height;
 		GUI.Label ( r, "Torque: " + droneController.Torque.ToString () );
+		if ( useTeleop )
+		{
+			r.y += r.height;
+			GUI.Label ( r, "Position: " + teleop.Position.ToString () );
+			r.y += r.height;
+			GUI.Label ( r, "Rotation: " + teleop.Rotation.ToString () );
+		}
 	}
 }

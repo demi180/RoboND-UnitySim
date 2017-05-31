@@ -46,6 +46,13 @@ float64 z"; }
             
         }
 
+		public Vector3 (UnityEngine.Vector3 source, bool swapAxes = false)
+		{
+			x = source.x;
+			y = swapAxes ? source.z : source.y;
+			z = swapAxes ? source.y : source.z;
+		}
+
         [System.Diagnostics.DebuggerStepThrough]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public Vector3(byte[] SERIALIZEDSTUFF)
@@ -186,6 +193,11 @@ float64 z"; }
 			v.y = lhs.y + rhs.y;
 			v.z = lhs.z + rhs.z;
 			return v;
+		}
+
+		public UnityEngine.Vector3 ToUnityVector ()
+		{
+			return new UnityEngine.Vector3 ( (float) x, (float) y, (float) z );
 		}
     }
 }

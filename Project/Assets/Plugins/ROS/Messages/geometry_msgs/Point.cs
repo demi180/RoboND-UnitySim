@@ -46,6 +46,18 @@ float64 z"; }
             
         }
 
+		public Point (UnityEngine.Vector3 source, bool swapAxes = false)
+		{
+			x = source.x;
+			y = swapAxes ? source.z : source.y;
+			z = swapAxes ? source.y : source.z;
+		}
+
+		public UnityEngine.Vector3 ToUnity ()
+		{
+			return new UnityEngine.Vector3 ( (float) x, (float) y, (float) z );
+		}
+
         [System.Diagnostics.DebuggerStepThrough]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public Point(byte[] SERIALIZEDSTUFF)

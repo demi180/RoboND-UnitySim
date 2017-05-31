@@ -48,6 +48,19 @@ float64 w"; }
             
         }
 
+		public Quaternion (UnityEngine.Quaternion source)
+		{
+			x = source.x;
+			y = source.y;
+			z = source.z;
+			w = source.w;
+		}
+
+		public UnityEngine.Quaternion ToUnity ()
+		{
+			return new UnityEngine.Quaternion ( (float) x, (float) y, (float) z, (float) w );
+		}
+
         [System.Diagnostics.DebuggerStepThrough]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public Quaternion(byte[] SERIALIZEDSTUFF)

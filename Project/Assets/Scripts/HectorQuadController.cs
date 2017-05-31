@@ -7,6 +7,8 @@ public class HectorQuadController : MonoBehaviour
 	public bool MotorsEnabled { get; set; }
 	public Vector3 Force { get { return force; } }
 	public Vector3 Torque { get { return torque; } }
+	public Vector3 Position { get; protected set; }
+	public Quaternion Rotation { get; protected set; }
 
 	public Transform frontLeftRotor;
 	public Transform frontRightRotor;
@@ -58,7 +60,8 @@ public class HectorQuadController : MonoBehaviour
 		while ( zAngle < -360 )
 			zAngle += 360;
 		transform.Rotate ( Vector3.up * -zAngle * Time.deltaTime, Space.World );
-//		cameraOrientationTarget.Rotate ( Vector3.up * -zAngle * Time.deltaTime, Space.World );
+		Position = transform.position;
+		Rotation = transform.rotation;
 	}
 
 	void FixedUpdate ()

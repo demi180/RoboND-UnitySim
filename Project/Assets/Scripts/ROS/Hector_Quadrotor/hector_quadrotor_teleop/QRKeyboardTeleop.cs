@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using Ros_CSharp;
 using Messages;
@@ -19,9 +20,12 @@ using PoseClient = actionlib.SimpleActionClient<hector_uav_msgs.PoseAction>;
 public class QRKeyboardTeleop : MonoBehaviour
 {
 	public bool active;
+	public UnityEngine.Vector3 Position { get; protected set; }
+	public UnityEngine.Quaternion Rotation { get; protected set; }
 
 	NodeHandle nh;
 	Subscriber<Joy> joySubscriber;
+	Publisher<Wrench> wrenchPub;
 	Publisher<TwistStamped> velocityPublisher;
 	Publisher<AttitudeCommand> attitudePublisher;
 	Publisher<YawRateCommand> yawRatePublisher;
@@ -30,6 +34,8 @@ public class QRKeyboardTeleop : MonoBehaviour
 	LandingClient landingClient;
 	TakeoffClient takeoffClient;
 	PoseClient poseClient;
+	Thread pubThread;
+	Subscriber<PoseStamped> poseSub;
 
 	PoseStamped pose;
 	double yaw;
@@ -64,20 +70,24 @@ public class QRKeyboardTeleop : MonoBehaviour
 	void OnRosInit ()
 	{
 		NodeHandle privateNH = new NodeHandle("~");
-
-
 		// TODO dynamic reconfig
 		string control_mode = "";
-		privateNH.param<string>("control_mode", ref control_mode, "twist");
+		privateNH.param<string>("control_mode", ref control_mode, "wrench");
 
-		NodeHandle robot_nh = new NodeHandle ();
+		NodeHandle robot_nh = new NodeHandle ("~");
 
 		// TODO factor out
-		robot_nh.param<string>("base_link_frame", ref baseLinkFrame, "base_link");
-		robot_nh.param<string>("world_frame", ref worldFrame, "world");
-		robot_nh.param<string>("base_stabilized_frame", ref baseStabilizedFrame, "base_stabilized");
+//		robot_nh.param<string>("base_link_frame", ref baseLinkFrame, "base_link");
+//		robot_nh.param<string>("world_frame", ref worldFrame, "world");
+//		robot_nh.param<string>("base_stabilized_frame", ref baseStabilizedFrame, "base_stabilized");
 
-		if (control_mode == "attitude")
+		if ( control_mode == "wrench" )
+		{
+			wrenchPub = robot_nh.advertise<Wrench> ( "quad_rotor/cmd_force", 10 );
+			poseSub = robot_nh.subscribe<PoseStamped> ( "quad_rotor/pose", 10, PoseCallback );
+//			pubThread = new Thread ()
+		}
+		else if (control_mode == "attitude")
 		{
 //			privateNH.param<double>("pitch_max", ref sAxes.x.factor, 30.0);
 //			privateNH.param<double>("roll_max", ref sAxes.y.factor, 30.0);
@@ -117,16 +127,16 @@ public class QRKeyboardTeleop : MonoBehaviour
 		}
 
 		motorEnableService = robot_nh.serviceClient<EnableMotors> ( "enable_motors" );
-		takeoffClient = new TakeoffClient ( robot_nh, "action/takeoff" );
-		landingClient = new LandingClient ( robot_nh, "action/landing" );
-		poseClient = new PoseClient ( robot_nh, "action/pose" );
+//		takeoffClient = new TakeoffClient ( robot_nh, "action/takeoff" );
+//		landingClient = new LandingClient ( robot_nh, "action/landing" );
+//		poseClient = new PoseClient ( robot_nh, "action/pose" );
 	}
 
 	public bool enableMotors (bool enable)
 	{
 		EnableMotors srv = new EnableMotors ();
 		srv.req.enable = enable;
-		return motorEnableService.call(srv);
+		return motorEnableService.call ( srv );
 	}
 
 	public void stop ()
@@ -168,5 +178,20 @@ public class QRKeyboardTeleop : MonoBehaviour
 		twist.header.frame_id = baseLinkFrame;
 		twist.header.stamp = ROS.GetTime ();
 		velocityPublisher.publish ( twist );
+	}
+
+	public void SendWrench (UnityEngine.Vector3 force, UnityEngine.Vector3 torque)
+	{
+		Wrench wrench = new Wrench ();
+		wrench.force = new Messages.geometry_msgs.Vector3 ( force );
+		wrench.torque = new Messages.geometry_msgs.Vector3 ( torque );
+
+		wrenchPub.publish ( wrench );
+	}
+
+	void PoseCallback (PoseStamped poseInfo)
+	{
+		Position = poseInfo.pose.position.ToUnity ();
+		Rotation = poseInfo.pose.orientation.ToUnity ();
 	}
 }

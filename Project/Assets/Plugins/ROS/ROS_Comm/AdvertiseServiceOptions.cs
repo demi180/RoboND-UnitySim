@@ -48,7 +48,8 @@ namespace Ros_CSharp
             res_datatype = new MRes().msgtype().ToString().Replace("__", "/").Replace("/Response", "__Response");
             srvtype = (SrvTypes) Enum.Parse(typeof (SrvTypes), req_datatype.Replace("__Request", "").Replace("/", "__"));
             datatype = srvtype.ToString().Replace("__", "/");
-            md5sum = IRosService.generate(srvtype).MD5Sum();
+			md5sum = IRosService.generate<MReq> ( srvtype ).MD5Sum ();
+//            md5sum = IRosService.generate(srvtype).MD5Sum();
         }
     }
 }
