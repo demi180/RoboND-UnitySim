@@ -82,8 +82,8 @@ public class HectorDrone : MonoBehaviour
 		{
 			if ( !droneController.MotorsEnabled )
 				droneController.MotorsEnabled = true;
-			droneController.ApplyMotorForce ( force.x, force.y, force.z );
-			droneController.ApplyMotorTorque ( torque.x, torque.y, torque.z );
+			droneController.ApplyMotorForce ( force.x, force.y, force.z, true );
+			droneController.ApplyMotorTorque ( torque.x, torque.z, torque.y, true );
 		}
 	}
 

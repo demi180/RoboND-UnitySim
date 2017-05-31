@@ -61,15 +61,19 @@ public class LocalHectorInput : MonoBehaviour
 		r.height = 20;
 		GUI.Label ( r, "Motors enabled: <color=yellow>" + motorEnabled + "</color>" );
 		r.y += r.height;
-		GUI.Label ( r, "Force: " + droneController.Force.ToString () );
+		Vector3 force = droneController.Force;
+		force = new Vector3 ( force.x, force.z, force.y );
+		GUI.Label ( r, "Force: " + force.ToString () );
 		r.y += r.height;
-		GUI.Label ( r, "Torque: " + droneController.Torque.ToString () );
+		force = droneController.Torque;
+		force = new Vector3 ( force.x, force.z, force.y );
+		GUI.Label ( r, "Torque: " + force.ToString () );
 		if ( useTeleop )
 		{
 			r.y += r.height;
 			GUI.Label ( r, "Position: " + teleop.Position.ToString () );
 			r.y += r.height;
-			GUI.Label ( r, "Rotation: " + teleop.Rotation.ToString () );
+			GUI.Label ( r, "PRY: " + teleop.Rotation.eulerAngles.ToString () );
 		}
 	}
 }

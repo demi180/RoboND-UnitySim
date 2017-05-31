@@ -183,7 +183,7 @@ public class QRKeyboardTeleop : MonoBehaviour
 	public void SendWrench (UnityEngine.Vector3 force, UnityEngine.Vector3 torque)
 	{
 		Wrench wrench = new Wrench ();
-		wrench.force = new Messages.geometry_msgs.Vector3 ( force );
+		wrench.force = new Messages.geometry_msgs.Vector3 ( force, true );
 		wrench.torque = new Messages.geometry_msgs.Vector3 ( torque );
 
 		wrenchPub.publish ( wrench );
