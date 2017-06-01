@@ -15,6 +15,9 @@ public class ROSController : MonoBehaviour
 	static Queue<NodeHandle> nodes = new Queue<NodeHandle> ();
 	public static bool delayedStart;
 
+	public string rosMasterURI = "http://localhost:11311";
+	public string nodePrefix = "";
+
 	bool starting;
 	bool stopping;
 	bool delete;
@@ -30,8 +33,9 @@ public class ROSController : MonoBehaviour
 
 //		Debug.Log ( "ros master is " + ROS.ROS_MASTER_URI );
 		if ( string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.User ) ) &&
-			string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.Machine ) ) )
-			delayedStart = true;
+		     string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.Machine ) ) )
+			ROS.ROS_MASTER_URI = rosMasterURI;
+//			delayedStart = true;
 		instance = this;
 		StartROS ();
 	}
@@ -107,12 +111,12 @@ public class ROSController : MonoBehaviour
 		if ( delayedStart )
 			return;
 
-		string timeString = DateTime.UtcNow.ToString ( "MM_dd_yy_HH_MM_ss" );
+//		string timeString = DateTime.UtcNow.ToString ( "MM_dd_yy_HH_MM_ss" );
 //		Debug.Log ( timeString );
 		instance.starting = true;
 		instance.stopping = false;
 		Debug.Log ( "ROS is starting" );
-		ROS.Init ( new string[0], "ROS_Unity_" + timeString );
+		ROS.Init ( new string[0], instance.nodePrefix );
 		instance.StartCoroutine ( instance.WaitForInit () );
 		XmlRpcUtil.SetLogLevel(XmlRpcUtil.XMLRPC_LOG_LEVEL.ERROR);
 	}

@@ -10,46 +10,37 @@ public class FollowCamera : MonoBehaviour
 	public float height = 4;
 
 	Vector3 toTarget;
-	Vector3 toCamera;
-	Vector3 targetForward;
-	Quaternion initialRot;
+	Vector3 targetToTarget;
+//	Vector3 targetForward;
+	float initialDistance;
 
 	void Awake ()
 	{
-		toTarget = target.InverseTransformDirection ( target.position - transform.position ).normalized;
-		toCamera = target.InverseTransformDirection ( transform.position - target.position ).normalized;
-		targetForward = transform.InverseTransformDirection ( target.forward ).normalized;
-		initialRot = Quaternion.Inverse ( transform.rotation );
+		toTarget = target.position - transform.position;
+		initialDistance = toTarget.magnitude;
+		toTarget = toTarget.normalized;
+//		targetToTarget = target.InverseTransformDirection (  )
+//		targetForward = transform.InverseTransformDirection ( target.forward ).normalized;
+//		initialDistance = ( target.position - transform.position ).magnitude;
 	}
 
 	void LateUpdate ()
 	{
-		Vector3 followPoint = target.position + Vector3.up * height;
-		Vector3 forward = target.position - transform.position;
-		forward.y = 0;
-		forward = forward.normalized * followDistance;
-//		Vector3 forward = target.up.y >= 0 ? target.forward : Vector3.Reflect ( target.forward, Vector3.up );
-//		forward *= followDistance;
-//		Vector3 forward = orientTarget.forward * followDistance;
-//		Vector3 forward = target.up.y > 0 ? transform.TransformDirection ( targetForward ) : Vector3.ProjectOnPlane ( target.up, Vector3.up );
-//		forward *= followDistance;
-//		forward = new Vector3 ( forward.x, 0, forward.z ).normalized * followDistance;
-//		Vector3 forward = transform.TransformDirection (
-//			transform.up.y > 0 ? targetForward :
-//			transform.up.y < 0 ? target.up :
-//			target.up
-//		) * followDistance;
-//		Vector3 forward = target.TransformDirection ( toTarget ) * followDistance;
-		transform.position = target.position - forward + Vector3.up * height;
-//		transform.position = followPoint - forward;
-//		transform.rotation = Quaternion.LookRotation ( forward.normalized );
-//		transform.LookAt ( target, Vector3.up );
-		transform.LookAt ( followPoint, Vector3.up );
-//		transform.rotation = orientTarget.rotation;
-//		Vector3 euler = transform.eulerAngles;
-//		euler.y = target.eulerAngles.y;
-//		transform.eulerAngles = euler;
-		Debug.DrawRay ( target.position, forward, Color.red );
-		Debug.DrawRay ( followPoint, Vector3.up, Color.green );
+//		Vector3 forward = target.forward;
+//		if ( forward.y < 0 )
+//			forward.y = -forward.y;
+		Vector3 forward = Vector3.ProjectOnPlane ( target.forward, Vector3.up ).normalized;
+		Vector3 localForward = Vector3.ProjectOnPlane ( transform.forward, Vector3.up ).normalized;
+		if ( Vector3.Angle ( forward, localForward ) > 90 )
+		{
+//			forward = -forward;
+//			forward = transform.InverseTransformDirection ( forward );
+//			forward.z = -forward.z;
+//			forward = transform.TransformDirection ( forward );
+		}
+
+		transform.position = target.position - forward * followDistance + Vector3.up * height;
+		Quaternion q = Quaternion.FromToRotation ( localForward, forward );
+		transform.rotation =  Quaternion.RotateTowards ( transform.rotation, q * transform.rotation, 90 * Time.deltaTime );
 	}
 }

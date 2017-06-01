@@ -36,6 +36,7 @@ public class HectorQuadController : MonoBehaviour
 			rearLeftRotor,
 			rearRightRotor
 		};
+		MotorsEnabled = true;
 	}
 
 	void LateUpdate ()
