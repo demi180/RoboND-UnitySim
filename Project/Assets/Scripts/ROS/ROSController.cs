@@ -116,6 +116,8 @@ public class ROSController : MonoBehaviour
 		instance.starting = true;
 		instance.stopping = false;
 		Debug.Log ( "ROS is starting" );
+		if ( instance.nodePrefix == null )
+			instance.nodePrefix = "";
 		ROS.Init ( new string[0], instance.nodePrefix );
 		instance.StartCoroutine ( instance.WaitForInit () );
 		XmlRpcUtil.SetLogLevel(XmlRpcUtil.XMLRPC_LOG_LEVEL.ERROR);

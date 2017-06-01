@@ -41,6 +41,6 @@ public class FollowCamera : MonoBehaviour
 
 		transform.position = target.position - forward * followDistance + Vector3.up * height;
 		Quaternion q = Quaternion.FromToRotation ( localForward, forward );
-		transform.rotation =  Quaternion.RotateTowards ( transform.rotation, q * transform.rotation, 90 * Time.deltaTime );
+		transform.rotation =  Quaternion.RotateTowards ( transform.rotation, q * transform.rotation, 360 * Time.deltaTime );
 	}
 }

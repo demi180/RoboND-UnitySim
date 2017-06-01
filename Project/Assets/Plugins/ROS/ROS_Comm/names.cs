@@ -100,6 +100,7 @@ namespace Ros_CSharp
 
         public static string resolve(string ns, string name, bool doremap)
         {
+//			UnityEngine.Debug.Log ( "ns " + ns );
             string error = "";
             if (!validate(name, ref error))
             {
@@ -113,7 +114,13 @@ namespace Ros_CSharp
                     return ns;
                 return append("/", ns);
             }
+//			UnityEngine.Debug.Log ( "thisnodename " + this_node.Name );
+//			UnityEngine.Debug.Log ( "name " + name );
+
             string copy = name;
+			if ( copy == "~" )
+				copy = this_node.Name;
+			else
             if (copy[0] == '~')
                 copy = append(this_node.Name, copy.Substring(1));
             if (copy[0] != '/')
