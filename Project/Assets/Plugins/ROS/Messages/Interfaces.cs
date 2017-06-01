@@ -61,7 +61,7 @@ namespace Messages
 				Type thistype = typeof (IRosMessage);
 				foreach ( Type othertype in Assembly.GetAssembly ( typeof (MessageType) ).GetTypes() )
 				{
-					if ( thistype == othertype || !othertype.IsSubclassOf ( thistype ) || othertype.IsAbstract )
+					if ( thistype == othertype || !othertype.IsSubclassOf ( thistype ) || othertype.IsAbstract || othertype.Name.Contains ( "Decorator" ) )
 					{
 						continue;
 					}
@@ -270,7 +270,7 @@ namespace Messages
 				Type thistype = typeof (IRosService);
 				foreach ( Type othertype in Assembly.GetAssembly (typeof (RequestType)).GetTypes() )
 				{
-					if ( thistype == othertype || !othertype.IsSubclassOf ( thistype ) || othertype.IsAbstract )
+					if ( thistype == othertype || !othertype.IsSubclassOf ( thistype ) || othertype.IsAbstract || othertype.Name.Contains ( "Decorator" ) )
 					{
 						continue;
 					}
