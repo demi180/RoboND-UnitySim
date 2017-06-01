@@ -1,0 +1,17 @@
+{
+    "version": "0.1.0",
+    "command": "dotnet ",
+    "isShellCommand": true,
+    "args": [],
+    "options":  {
+        "cwd": "${workspaceRoot}/"
+    },
+    "suppressTaskName": true,
+    "tasks": [
+        {
+            "taskName": "debugMain",
+            "args": ["build ${workspaceRoot}/Uml.Robotics.Ros/Uml.Robotics.Ros.csproj"],
+            "isBuildCommand": true,
+            "problemMatcher": "$msCompile"
+        } ]
+}

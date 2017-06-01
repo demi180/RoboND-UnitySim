@@ -1,0 +1,47 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "YAML Parser .NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceRoot}/YAMLParser/bin/Debug/netcoreapp1.1/YAMLParser.dll",
+            "args": ["Debug", "${workspaceRoot}"],
+            "cwd": "${workspaceRoot}/YAMLParser",
+            "externalConsole": false,
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": "Talker .NET Core (console), debug main",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "debugMain",
+            "program": "${workspaceRoot}/Samples/Talker/bin/Debug/netcoreapp1.1/Talker.dll",
+            "args": ["__master:=http://rosetta:11311/"],
+            "cwd": "${workspaceRoot}",
+            "externalConsole": false,
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": "Service Test (console), debug main",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "debugMain",
+            "program": "${workspaceRoot}/Samples/ServiceServerSample/bin/Debug/netcoreapp1.1/ServiceServerSample.dll",
+            "args": ["__master:=http://rosetta:11311/"],
+            "cwd": "${workspaceRoot}",
+            "externalConsole": false,
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        }
+    ]
+}

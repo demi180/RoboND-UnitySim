@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "YAMLParser": {
+      "commandName": "Project",
+      "commandLineArgs": "Debug ../"
+    }
+  }
+}
