@@ -1,11 +1,13 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
-
+//using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging.Console;
+//using DummyLogging;
+using UnityEngine;
 
 namespace Uml.Robotics.Ros
 {
     public static class ApplicationLogging
     {
+		UnityEngine.Debug debug;
         private static ILoggerFactory _loggerFactory;
 
         public static ILoggerFactory LoggerFactory
@@ -29,10 +31,21 @@ namespace Uml.Robotics.Ros
 
         }
 
-        public static ILogger CreateLogger<T>() =>
-            LoggerFactory.CreateLogger<T>();
+		public static ILogger CreateLogger<T> ()
+		{
+			return new Logger ( Debug.logger );
+//			return LoggerFactory.CreateLogger<T> ();
+		}
 
-        public static ILogger CreateLogger(string category) =>
-            LoggerFactory.CreateLogger(category);
+		public static ILogger CreateLogger (string category)
+		{
+			return new Logger ( Debug.logger );
+//			return LoggerFactory.CreateLogger ( category );
+		}
+//        public static ILogger CreateLogger<T>() =>
+//            LoggerFactory.CreateLogger<T>();
+
+//        public static ILogger CreateLogger(string category) =>
+//            LoggerFactory.CreateLogger(category);
     }
 }
