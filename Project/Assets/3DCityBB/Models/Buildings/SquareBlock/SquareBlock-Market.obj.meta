@@ -20,6 +20,7 @@ ModelImporter:
     100024: Plane003
     100026: Plane004
     100028: //RootNode
+    100030: SquareBlock-Market_root
     400000: Box008
     400002: Box009
     400004: Box010
@@ -35,6 +36,7 @@ ModelImporter:
     400024: Plane003
     400026: Plane004
     400028: //RootNode
+    400030: SquareBlock-Market_root
     2300000: Box008
     2300002: Box009
     2300004: Box010
@@ -120,7 +122,7 @@ ModelImporter:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
-  importAnimation: 1
+  importAnimation: 0
   copyAvatar: 0
   humanDescription:
     serializedVersion: 2
@@ -136,7 +138,7 @@ ModelImporter:
     rootMotionBoneName: 
     rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
     hasTranslationDoF: 0
-    hasExtraRoot: 0
+    hasExtraRoot: 1
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 0

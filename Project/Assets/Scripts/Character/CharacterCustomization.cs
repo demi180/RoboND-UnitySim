@@ -27,9 +27,10 @@ public class CharacterCustomization : MonoBehaviour
 		if ( overs == null )
 			overs = new GameObject[0];
 
-		bool useFullBody = Random.value >= 0.5f;
-		if ( fullBody == null || fullBody.Length == 0 )
-			useFullBody = false;
+		bool useFullBody = false;
+
+		if ( fullBody != null && fullBody.Length > 0 )
+			useFullBody = Random.value >= 0.75f;
 
 		// start by turning EVERYTHING off
 		fullBody.ForEach ( x => x.SetActive ( false ) );
@@ -51,6 +52,11 @@ public class CharacterCustomization : MonoBehaviour
 			tops [ index ].SetActive ( true );
 			index = Random.Range ( 0, bottoms.Length );
 			bottoms [ index ].SetActive ( true );
+			if ( overs != null && overs.Length > 0 && Random.value > 0.75f )
+			{
+				index = Random.Range ( 0, overs.Length );
+				overs [ index ].SetActive ( true );
+			}
 		}
 
 		index = Random.Range ( 0, shoes.Length );
