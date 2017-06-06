@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
-using Hjg.Pngcs;
 
 public class OrbitCamera : MonoBehaviour
 {
@@ -38,12 +37,6 @@ public class OrbitCamera : MonoBehaviour
 	bool recording;
 	float nextRecordTime;
 	int imageCount;
-	string path1;
-	string path2;
-	Texture2D tex1;
-	Texture2D tex2;
-	object lock1 = new object ();
-	object lock2 = new object ();
 
 	void Awake ()
 	{
@@ -97,7 +90,9 @@ public class OrbitCamera : MonoBehaviour
 		{
 //			Debug.Log ( "hitting " + hit.collider.name );
 			lp.z = hit.distance - 0.1f;
-			Debug.DrawRay ( ray.origin, ray.direction * hit.distance );
+			if ( lp.z < 1 )
+				lp.z = 1;
+			Debug.DrawRay ( ray.origin, ray.direction * hit.distance, Color.red );
 
 		} else
 			lp.z = desiredZ;
@@ -173,68 +168,24 @@ public class OrbitCamera : MonoBehaviour
 		RenderTexture targetTexture = cam1.targetTexture;
 		RenderTexture.active = targetTexture;
 		byte[] bytes;
-		lock ( lock1 )
-		{
-			tex1 = new Texture2D ( targetTexture.width, targetTexture.height, TextureFormat.RGB24, false );
-			tex1.ReadPixels ( new Rect ( 0, 0, targetTexture.width, targetTexture.height ), 0, 0 );
-			tex1.Apply ();
-			bytes = tex1.EncodeToPNG ();
-		}
+		Texture2D tex = new Texture2D ( targetTexture.width, targetTexture.height, TextureFormat.RGB24, false );
+		tex.ReadPixels ( new Rect ( 0, 0, targetTexture.width, targetTexture.height ), 0, 0 );
+		tex.Apply ();
+		bytes = tex.EncodeToPNG ();
 		string directory = RecordingController.SaveLocation;
-		path1 = Path.Combine ( directory, "cam1_" + prefix + ".png" );
-		Thread t1 = new Thread ( SaveImage1 );
-		t1.Start ();
+		string path = Path.Combine ( directory, "cam1_" + prefix + ".png" );
+		File.WriteAllBytes ( path, bytes );
 
 		targetTexture = cam2.targetTexture;
-		lock ( lock2 )
-		{
-			tex2 = new Texture2D ( targetTexture.width, targetTexture.height, TextureFormat.RGB24, false );
-			tex2.ReadPixels ( new Rect ( 0, 0, targetTexture.width, targetTexture.height ), 0, 0 );
-			tex2.Apply ();
-			bytes = tex2.EncodeToPNG ();
-		}
-		path2 = Path.Combine ( directory, "cam2_" + prefix + ".png" );
-		Thread t2 = new Thread ( SaveImage2 );
-		t2.Start ();
-
-//		image = null;
-		RenderTexture.active = null;
-//		Destroy ( tex1 );
-//		Destroy ( tex2 );
-//		Destroy ( texture2D );
-	}
-
-	void SaveImage1 ()
-	{
-		lock ( lock1 )
-		{
-			byte[] bytes = tex1.EncodeToPNG ();
-			File.WriteAllBytes ( path1, bytes );
-			Destroy ( tex1 );
-		}
-		tex1.GetRawTextureData ();
-	}
-
-	void SaveImage2 ()
-	{
-		lock ( lock2 )
-		{
-			byte[] bytes = tex2.EncodeToPNG ();
-			File.WriteAllBytes ( path2, bytes );
-			Destroy ( tex2 );
-		}
-
-	}
-
-	void Test ()
-	{
-		Texture2D tex = new Texture2D ( 1280, 720, TextureFormat.RGB24, false );
+		RenderTexture.active = targetTexture;
+		tex.ReadPixels ( new Rect ( 0, 0, targetTexture.width, targetTexture.height ), 0, 0 );
 		tex.Apply ();
-		ImageInfo info = new ImageInfo ( 1280, 720, 24, false );
+		bytes = tex.EncodeToPNG ();
+		path = Path.Combine ( directory, "cam2_" + prefix + ".png" );
+		File.WriteAllBytes ( path, bytes );
 
-		MemoryStream stream = new MemoryStream ( tex.GetRawTextureData () );
-		Hjg.Pngcs.PngWriter writer = new PngWriter ( stream, info, Application.dataPath + "test123.png" );
-//		writer.
+		bytes = null;
+		RenderTexture.active = null;
 		Destroy ( tex );
 	}
 }

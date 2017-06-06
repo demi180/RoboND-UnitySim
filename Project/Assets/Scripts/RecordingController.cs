@@ -28,9 +28,8 @@ public class RecordingController : MonoBehaviour
 
 	void LateUpdate ()
 	{
-		// temporarily disabling recording until i can figure out the png saving
-//		if ( Input.GetButtonDown ( "Record" ) )
-//			ToggleRecording ();
+		if ( Input.GetButtonDown ( "Record" ) )
+			ToggleRecording ();
 		
 	}
 
