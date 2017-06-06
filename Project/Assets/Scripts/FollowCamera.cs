@@ -5,23 +5,12 @@ using UnityEngine;
 public class FollowCamera : MonoBehaviour
 {
 	public Transform target;
-	public Transform orientTarget;
 	public float followDistance = 5;
 	public float height = 4;
 
-	Vector3 toTarget;
-	Vector3 targetToTarget;
-//	Vector3 targetForward;
-	float initialDistance;
 
 	void Awake ()
 	{
-		toTarget = target.position - transform.position;
-		initialDistance = toTarget.magnitude;
-		toTarget = toTarget.normalized;
-//		targetToTarget = target.InverseTransformDirection (  )
-//		targetForward = transform.InverseTransformDirection ( target.forward ).normalized;
-//		initialDistance = ( target.position - transform.position ).magnitude;
 	}
 
 	void LateUpdate ()

@@ -25,7 +25,8 @@ public class WanderMovement : MonoBehaviour
 	void LateUpdate ()
 	{
 		Vector3 euler = transform.eulerAngles;
-		euler.y += 0.25f - Mathf.PerlinNoise ( start + Time.time, start + Time.time ) / 2;
+		if ( Time.timeScale != 0 )
+			euler.y += 0.25f - Mathf.PerlinNoise ( start + Time.time, start + Time.time ) / 2;
 
 		NavMeshHit navHit;
 		float rayDist = 2f;

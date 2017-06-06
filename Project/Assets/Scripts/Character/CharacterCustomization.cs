@@ -63,6 +63,6 @@ public class CharacterCustomization : MonoBehaviour
 		shoes [ index ].SetActive ( true );
 
 		hair.material.color = Random.ColorHSV ();
-//		hair.material.SetColor ( "_SpecColor", Random.ColorHSV ( 0, 1, 0, 1, 0.01f, 0.4f ) );
+		body.material.color = Color.white * Random.Range ( 0.15f, 1f );
 	}
 }
