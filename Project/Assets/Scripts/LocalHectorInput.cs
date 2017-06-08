@@ -54,7 +54,7 @@ public class LocalHectorInput : MonoBehaviour
 
 	void OnGUI ()
 	{
-		Rect r = new Rect ( 10, 10, 180, 100 );
+		Rect r = new Rect ( 10, 10, 180, 200 );
 		GUI.Box ( r, "" );
 		GUI.Box ( r, "" );
 		r.x = 15;
@@ -75,5 +75,13 @@ public class LocalHectorInput : MonoBehaviour
 			r.y += r.height;
 			GUI.Label ( r, "PRY: " + teleop.Rotation.eulerAngles.ToString () );
 		}
+		r.y += r.height;
+		force = droneController.AngularVelocity;
+		force = new Vector3 ( force.x, force.z, force.y );
+		GUI.Label ( r, "Angular Vel.: " + force.ToString () );
+		r.y += r.height;
+		force = droneController.LinearAcceleration;
+		force = new Vector3 ( force.x, force.z, force.y );
+		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
 	}
 }

@@ -9,6 +9,8 @@ public class HectorQuadController : MonoBehaviour
 	public Vector3 Torque { get { return torque; } }
 	public Vector3 Position { get; protected set; }
 	public Quaternion Rotation { get; protected set; }
+	public Vector3 AngularVelocity { get; protected set; }
+	public Vector3 LinearAcceleration { get; protected set; }
 
 	public Transform frontLeftRotor;
 	public Transform frontRightRotor;
@@ -26,6 +28,7 @@ public class HectorQuadController : MonoBehaviour
 	Transform[] rotors;
 	Vector3 force;
 	Vector3 torque;
+	Vector3 lastVelocity;
 
 	void Awake ()
 	{
@@ -48,6 +51,10 @@ public class HectorQuadController : MonoBehaviour
 		{
 			ResetOrientation ();
 		}
+
+		// update acceleration
+//		LinearAcceleration = ( rb.velocity - lastVelocity ) / Time.deltaTime;
+//		lastVelocity = rb.velocity;
 
 
 		float zAngle = 0;
@@ -75,6 +82,11 @@ public class HectorQuadController : MonoBehaviour
 			// add torque
 			rb.AddRelativeTorque ( torque * Time.deltaTime, torqueMode );
 //			rb.AddTorque ( torque * Time.deltaTime, torqueMode );
+
+			// update acceleration
+			LinearAcceleration = ( rb.velocity - lastVelocity ) / Time.deltaTime;
+			lastVelocity = rb.velocity;
+			AngularVelocity = rb.angularVelocity;
 		}
 	}
 
@@ -101,5 +113,6 @@ public class HectorQuadController : MonoBehaviour
 		torque = Vector3.zero;
 		rb.velocity = Vector3.zero;
 		rb.angularVelocity = Vector3.zero;
+		LinearAcceleration = Vector3.zero;
 	}
 }

@@ -59,7 +59,12 @@ string frame_id"; }
             Deserialize(SERIALIZEDSTUFF, ref currentIndex);
         }
 
-
+		public Header (Header other)
+		{
+			this.frame_id = other.frame_id;
+			this.seq = other.seq;
+			this.stamp = other.stamp;
+		}
 
         [System.Diagnostics.DebuggerStepThrough]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
