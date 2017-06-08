@@ -121,6 +121,7 @@ public class HectorDrone : MonoBehaviour
 			imu.angular_velocity = new GVector3 ( droneController.AngularVelocity, true );
 			imu.linear_acceleration = new GVector3 ( droneController.LinearAcceleration, true );
 			imu.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation );
+			imuPub.publish ( imu );
 			
 			Thread.Sleep ( sleep );
 		}
