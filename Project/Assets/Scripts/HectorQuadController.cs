@@ -23,6 +23,7 @@ public class HectorQuadController : MonoBehaviour
 	public ForceMode torqueMode = ForceMode.Force;
 
 	public Transform cameraOrientationTarget;
+	public bool rotateWithTorque;
 
 	Rigidbody rb;
 	Transform[] rotors;
@@ -57,17 +58,21 @@ public class HectorQuadController : MonoBehaviour
 //		lastVelocity = rb.velocity;
 
 
-		float zAngle = 0;
-		Vector3 up = transform.up;
-		if ( up.y >= 0 )
-			zAngle = transform.localEulerAngles.z;
-		else
-			zAngle = -transform.localEulerAngles.z;
-		while ( zAngle > 180 )
-			zAngle -= 360;
-		while ( zAngle < -360 )
-			zAngle += 360;
-		transform.Rotate ( Vector3.up * -zAngle * Time.deltaTime, Space.World );
+		// use this to have a follow camera rotate with the quad. not proper torque!
+		if ( rotateWithTorque )
+		{
+			float zAngle = 0;
+			Vector3 up = transform.up;
+			if ( up.y >= 0 )
+				zAngle = transform.localEulerAngles.z;
+			else
+				zAngle = -transform.localEulerAngles.z;
+			while ( zAngle > 180 )
+				zAngle -= 360;
+			while ( zAngle < -360 )
+				zAngle += 360;
+			transform.Rotate ( Vector3.up * -zAngle * Time.deltaTime, Space.World );
+		}
 		Position = transform.position;
 		Rotation = transform.rotation;
 	}
