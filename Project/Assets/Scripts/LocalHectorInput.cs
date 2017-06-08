@@ -52,7 +52,7 @@ public class LocalHectorInput : MonoBehaviour
 	}
 
 
-	void OnGUI ()
+/*	void OnGUI ()
 	{
 		Rect r = new Rect ( 10, 10, 180, 200 );
 		GUI.Box ( r, "" );
@@ -83,5 +83,5 @@ public class LocalHectorInput : MonoBehaviour
 		force = droneController.LinearAcceleration;
 		force = new Vector3 ( force.x, force.z, force.y );
 		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
-	}
+	}*/
 }

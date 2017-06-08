@@ -90,6 +90,39 @@ public class HectorQuadController : MonoBehaviour
 		}
 	}
 
+	void OnGUI ()
+	{
+		Rect r = new Rect ( 10, 10, 180, 200 );
+		GUI.Box ( r, "" );
+		GUI.Box ( r, "" );
+		r.x = 15;
+		r.height = 20;
+		GUI.Label ( r, "Motors enabled: <color=yellow>" + MotorsEnabled + "</color>" );
+		r.y += r.height;
+		Vector3 force = Force;
+		force = new Vector3 ( force.x, force.z, force.y );
+		GUI.Label ( r, "Force: " + force.ToString () );
+		r.y += r.height;
+		force = Torque;
+		force = new Vector3 ( force.x, force.z, force.y );
+		GUI.Label ( r, "Torque: " + force.ToString () );
+//		if ( useTeleop )
+//		{
+			r.y += r.height;
+			GUI.Label ( r, "Position: " + Position.ToString () );
+			r.y += r.height;
+			GUI.Label ( r, "PRY: " + Rotation.eulerAngles.ToString () );
+//		}
+		r.y += r.height;
+		force = AngularVelocity;
+		force = new Vector3 ( force.x, force.z, force.y );
+		GUI.Label ( r, "Angular Vel.: " + force.ToString () );
+		r.y += r.height;
+		force = LinearAcceleration;
+		force = new Vector3 ( force.x, force.z, force.y );
+		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
+	}
+
 	public void ApplyMotorForce (float x, float y, float z, bool swapAxes = false)
 	{
 		force.x = x;
