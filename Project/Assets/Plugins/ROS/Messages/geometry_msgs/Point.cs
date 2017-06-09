@@ -46,9 +46,9 @@ float64 z"; }
             
         }
 
-		public Point (UnityEngine.Vector3 source, bool swapAxes = false)
+		public Point (UnityEngine.Vector3 source, bool swapAxes = false, bool invertX = false)
 		{
-			x = source.x;
+			x = invertX ? -source.x : source.x;
 			y = swapAxes ? source.z : source.y;
 			z = swapAxes ? source.y : source.z;
 		}

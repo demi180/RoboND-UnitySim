@@ -73,8 +73,8 @@ public class HectorDrone : MonoBehaviour
 		GVector3 angular = msg.twist.angular;
 		if ( droneController != null )
 		{
-			droneController.ApplyMotorForce ( (float) linear.x, (float) linear.y, (float) linear.z );
-			droneController.ApplyMotorTorque ( (float) angular.x, (float) angular.y, (float) angular.z );
+			droneController.ApplyMotorForce ( (float) linear.x, (float) linear.y, (float) linear.z, true, true );
+			droneController.ApplyMotorTorque ( (float) angular.x, (float) angular.y, (float) angular.z, true, true );
 		}
 	}
 
@@ -86,8 +86,8 @@ public class HectorDrone : MonoBehaviour
 		{
 			if ( !droneController.MotorsEnabled )
 				droneController.MotorsEnabled = true;
-			droneController.ApplyMotorForce ( force.x, force.y, force.z, true );
-			droneController.ApplyMotorTorque ( torque.x, torque.y, torque.z, true );
+			droneController.ApplyMotorForce ( force.x, force.y, force.z, true, true );
+			droneController.ApplyMotorTorque ( torque.x, torque.y, torque.z, true, true );
 		}
 	}
 
@@ -111,7 +111,7 @@ public class HectorDrone : MonoBehaviour
 			ps.header.frame_id = "";
 			ps.header.seq = frameSeq++;
 			ps.header.stamp = ROS.GetTime ();
-			ps.pose.position = new Messages.geometry_msgs.Point ( droneController.Position, true );
+			ps.pose.position = new Messages.geometry_msgs.Point ( droneController.Position, true, true );
 			ps.pose.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation );
 			posePub.publish ( ps );
 
@@ -119,8 +119,8 @@ public class HectorDrone : MonoBehaviour
 			imu.header.frame_id = "";
 			imu.header.seq = frameSeq;
 			imu.header.stamp = ps.header.stamp;
-			imu.angular_velocity = new GVector3 ( droneController.AngularVelocity, true );
-			imu.linear_acceleration = new GVector3 ( droneController.LinearAcceleration, true );
+			imu.angular_velocity = new GVector3 ( droneController.AngularVelocity, true, true );
+			imu.linear_acceleration = new GVector3 ( droneController.LinearAcceleration, true, true );
 			imu.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation );
 			imuPub.publish ( imu );
 			

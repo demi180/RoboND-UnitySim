@@ -107,11 +107,11 @@ public class HectorQuadController : MonoBehaviour
 		GUI.Label ( r, "Motors enabled: <color=yellow>" + MotorsEnabled + "</color>" );
 		r.y += r.height;
 		Vector3 force = Force;
-		force = new Vector3 ( force.x, force.z, force.y );
+		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Force: " + force.ToString () );
 		r.y += r.height;
 		force = Torque;
-		force = new Vector3 ( force.x, force.z, force.y );
+		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Torque: " + force.ToString () );
 //		if ( useTeleop )
 //		{
@@ -122,25 +122,25 @@ public class HectorQuadController : MonoBehaviour
 //		}
 		r.y += r.height;
 		force = AngularVelocity;
-		force = new Vector3 ( force.x, force.z, force.y );
+		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Angular Vel.: " + force.ToString () );
 		r.y += r.height;
 		force = LinearAcceleration;
-		force = new Vector3 ( force.x, force.z, force.y );
+		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
 	}
 
-	public void ApplyMotorForce (float x, float y, float z, bool swapAxes = false)
+	public void ApplyMotorForce (float x, float y, float z, bool swapAxes = false, bool invertX = false)
 	{
-		force.x = x;
+		force.x = invertX ? -x : x;
 		force.y = swapAxes ? z : y;
 		force.z = swapAxes ? y : z;
 		force *= thrustForce;
 	}
 
-	public void ApplyMotorTorque (float x, float y, float z, bool swapAxes = false)
+	public void ApplyMotorTorque (float x, float y, float z, bool swapAxes = false, bool invertX = false)
 	{
-		torque.x = x;
+		torque.x = invertX ? -x : x;
 		torque.y = swapAxes ? z : y;
 		torque.z = swapAxes ? y : z;
 		torque *= torqueForce;
