@@ -280,7 +280,8 @@ namespace Uml.Robotics.Ros.ActionLib
                     goalStatus, goalAction.Goal
                 );
                 goalHandles[goalId.id] = newGoalHandle;
-                goalCallback?.Invoke(newGoalHandle);
+				if ( goalCallback != null )
+					goalCallback.Invoke ( newGoalHandle );
             }
         }
 
@@ -295,12 +296,13 @@ namespace Uml.Robotics.Ros.ActionLib
         }
 
 
-        private (int seconds, int milliseconds) SplitSeconds(double exactSeconds)
+		private Tuple<int, int> SplitSeconds (double exactSeconds)
+//        private (int seconds, int milliseconds) SplitSeconds(double exactSeconds)
         {
-            int seconds = (int)exactSeconds;
+			int seconds = (int) exactSeconds;
             int milliseconds = (int)((exactSeconds - seconds) * 1000);
 
-            return (seconds, milliseconds);
+			return Tuple.Create ( seconds, milliseconds );
         }
 
 

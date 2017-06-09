@@ -223,7 +223,8 @@ namespace Uml.Robotics.Ros
         {
             lock (idInfoMutex)
             {
-                if (idInfo.TryGetValue(id, out IDInfo value))
+				IDInfo value;
+                if (idInfo.TryGetValue(id, out value))
                     return value;
             }
             return null;

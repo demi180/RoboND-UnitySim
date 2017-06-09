@@ -31,7 +31,7 @@ namespace Uml.Robotics.Ros
         /// </summary>
         public virtual string MessageType { get { return "xamla/unkown"; } }
 
-        public byte[] Serialized { get => serialized; set => serialized = value; }
+		public byte[] Serialized { get { return serialized; } set { serialized = value; } }
 
         public RosMessage()
         {

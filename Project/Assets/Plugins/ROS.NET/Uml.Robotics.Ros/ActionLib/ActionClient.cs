@@ -211,7 +211,8 @@ namespace Uml.Robotics.Ros.ActionLib
         {
             ROS.Debug()($"Transitioning CommState from {goalHandle.State} to {nextState}");
             goalHandle.State = nextState;
-            goalHandle.OnTransitionCallback?.Invoke(goalHandle);
+			if ( goalHandle.OnTransitionCallback != null )
+				goalHandle.OnTransitionCallback.Invoke(goalHandle);
         }
 
 

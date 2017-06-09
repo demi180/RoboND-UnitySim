@@ -28,7 +28,8 @@ namespace Uml.Robotics.Ros
         protected T Create<T>(string rosType) where T : class, new()
         {
             T result = null;
-            bool typeExist = TypeRegistry.TryGetValue(rosType, out Type type);
+			Type type;
+            bool typeExist = TypeRegistry.TryGetValue(rosType, out type);
             if (typeExist)
             {
                 result = Activator.CreateInstance(type) as T;

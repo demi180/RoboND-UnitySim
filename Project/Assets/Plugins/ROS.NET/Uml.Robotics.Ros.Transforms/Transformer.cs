@@ -100,7 +100,8 @@ namespace Uml.Robotics.Ros.Transforms
 
         public bool lookupTransform(string target_frame, string source_frame, Time time, out Transform transform)
         {
-            bool result = lookupTransform(target_frame, source_frame, time, out transform, out string error_string);
+			string error_string;
+            bool result = lookupTransform(target_frame, source_frame, time, out transform, out error_string);
             if (!result && error_string != null)
                 ROS.Error()(error_string);
             return result;
