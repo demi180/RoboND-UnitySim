@@ -11,6 +11,9 @@ public class HectorQuadController : MonoBehaviour
 	public Quaternion Rotation { get; protected set; }
 	public Vector3 AngularVelocity { get; protected set; }
 	public Vector3 LinearAcceleration { get; protected set; }
+	// not threadsafe
+	public Vector3 Forward { get { return ( transform.forward - transform.right ).normalized; } }
+	public Vector3 Right { get { return ( transform.forward + transform.right ).normalized; } }
 
 	public Transform frontLeftRotor;
 	public Transform frontRightRotor;
@@ -22,7 +25,6 @@ public class HectorQuadController : MonoBehaviour
 	public ForceMode forceMode = ForceMode.Force;
 	public ForceMode torqueMode = ForceMode.Force;
 
-	public Transform cameraOrientationTarget;
 	public bool rotateWithTorque;
 
 	Rigidbody rb;

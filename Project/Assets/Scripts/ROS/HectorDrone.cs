@@ -11,6 +11,7 @@ using PoseStamped = Messages.geometry_msgs.PoseStamped;
 using Wrench = Messages.geometry_msgs.Wrench;
 using Imu = Messages.sensor_msgs.Imu;
 
+
 /*
  * HectorDrone: receives messages from a QRKeyboardTeleop, and applies force/torque to a HectorQuadController
  */
@@ -86,7 +87,7 @@ public class HectorDrone : MonoBehaviour
 			if ( !droneController.MotorsEnabled )
 				droneController.MotorsEnabled = true;
 			droneController.ApplyMotorForce ( force.x, force.y, force.z, true );
-			droneController.ApplyMotorTorque ( torque.x, torque.z, torque.y, true );
+			droneController.ApplyMotorTorque ( torque.x, torque.y, torque.z, true );
 		}
 	}
 
