@@ -13,12 +13,12 @@ using Imu = Messages.sensor_msgs.Imu;
 
 
 /*
- * HectorDrone: receives messages from a QRKeyboardTeleop, and applies force/torque to a HectorQuadController
+ * QuadDrone: receives messages from a QRKeyboardTeleop, and applies force/torque to a QuadController
  */
 
-public class HectorDrone : MonoBehaviour
+public class QuadDrone : MonoBehaviour
 {
-	public HectorQuadController droneController;
+	public QuadController droneController;
 	public bool active;
 
 	NodeHandle nh;

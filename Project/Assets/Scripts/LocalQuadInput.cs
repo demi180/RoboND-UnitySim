@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /*
- * LocalHectorInput: queries keyboard and either applies force/torque directly to a HectorQuadController, or to a QRKeyboardTeleop.
+ * LocalQuadInput: queries keyboard and either applies force/torque directly to a QuadController, or to a QRKeyboardTeleop.
  * If using the Teleop, check 'useTeleop' in the inspector, and there must be a QRKeyboardTeleop component assigned.
- * If controlling a local controller otherwise, uncheck 'useTeleop' and there must be a HectorQuadController component assigned.
+ * If controlling a local controller otherwise, uncheck 'useTeleop' and there must be a QuadController component assigned.
  */
 
-public class LocalHectorInput : MonoBehaviour
+public class LocalQuadInput : MonoBehaviour
 {
-	public HectorQuadController droneController;
+	public QuadController droneController;
 	public QRKeyboardTeleop teleop;
 	public bool useTeleop;
 
@@ -29,7 +29,10 @@ public class LocalHectorInput : MonoBehaviour
 
 		Vector3 input = new Vector3 ( Input.GetAxis ( "Horizontal" ), thrust, Input.GetAxis ( "Vertical" ) );
 		Vector3 force = new Vector3 ( 0, input.y, 0 );
-		Vector3 torque = new Vector3 ( input.z, 0, -input.x );
+		float x = input.z / 2 + input.x / 2;
+		float z = input.z / 2 - input.x / 2;
+		Vector3 torque = new Vector3 ( x, 0, z );
+//		Vector3 torque = new Vector3 ( input.z, 0, -input.x );
 
 		if ( useTeleop )
 		{

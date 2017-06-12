@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HectorQuadController : MonoBehaviour
+public class QuadController : MonoBehaviour
 {
 	public bool MotorsEnabled { get; set; }
 	public Vector3 Force { get { return force; } }
