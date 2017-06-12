@@ -29,10 +29,13 @@ public class LocalQuadInput : MonoBehaviour
 
 		Vector3 input = new Vector3 ( Input.GetAxis ( "Horizontal" ), thrust, Input.GetAxis ( "Vertical" ) );
 		Vector3 force = new Vector3 ( 0, input.y, 0 );
-		float x = input.z / 2 + input.x / 2;
-		float z = input.z / 2 - input.x / 2;
-		Vector3 torque = new Vector3 ( x, 0, z );
-//		Vector3 torque = new Vector3 ( input.z, 0, -input.x );
+		float x = input.x / 2 - input.z / 2;
+		float z = input.x / 2 + input.z / 2;
+//		float x = input.z / 2 - input.x / 2;
+//		float z = input.z / 2 + input.x / 2;
+		Vector3 torque = new Vector3 ( x, Input.GetAxis ( "Yaw" ), z );
+
+		torque = new Vector3 ( Input.GetAxis ( "Roll" ), Input.GetAxis ( "Yaw" ), Input.GetAxis ( "Pitch" ) );
 
 		if ( useTeleop )
 		{

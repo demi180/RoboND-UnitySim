@@ -22,6 +22,7 @@ public class QuadDrone : MonoBehaviour
 	public bool active;
 
 	NodeHandle nh;
+	ServiceServer setOrientSrv;
 	ServiceServer enableMotorSrv;
 	Publisher<PoseStamped> posePub;
 	Publisher<Imu> imuPub;
@@ -44,6 +45,7 @@ public class QuadDrone : MonoBehaviour
 	void OnRosInit ()
 	{
 		nh = new NodeHandle ( "~" );
+//		setOrientSrv = nh.advertiseService<Messages.std_srvs.Empty.Request>
 //		enableMotorSrv = nh.advertiseService<EnableMotors.Request, EnableMotors.Response> ( "enable_motors", OnEnableMotors );
 		nh.setParam ( "control_mode", "wrench" ); // for now force twist mode
 //		twistSub = nh.subscribe<TwistStamped> ( "command/twist", 10, TwistCallback );

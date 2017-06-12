@@ -12,13 +12,17 @@ public class QuadController : MonoBehaviour
 	public Vector3 AngularVelocity { get; protected set; }
 	public Vector3 LinearAcceleration { get; protected set; }
 	// not threadsafe
-	public Vector3 Forward { get { return ( transform.forward - transform.right ).normalized; } }
-	public Vector3 Right { get { return ( transform.forward + transform.right ).normalized; } }
+	public Vector3 Forward { get { return yAxis.forward; } }
+	public Vector3 Right { get { return -xAxis.forward; } }
+	public Vector3 YAxis { get { return yAxis.forward; } }
+	public Vector3 XAxis { get { return xAxis.forward; } }
 
 	public Transform frontLeftRotor;
 	public Transform frontRightRotor;
 	public Transform rearLeftRotor;
 	public Transform rearRightRotor;
+	public Transform yAxis;
+	public Transform xAxis;
 
 	public float thrustForce = 2000;
 	public float torqueForce = 500;
@@ -140,7 +144,17 @@ public class QuadController : MonoBehaviour
 
 	public void ApplyMotorTorque (float x, float y, float z, bool swapAxes = false, bool invertX = false)
 	{
-		torque.x = invertX ? -x : x;
+		torque = XAxis * x;
+		torque += YAxis * ( swapAxes ? y : z );
+		torque += transform.up * ( swapAxes ? z : y );
+
+		Debug.DrawRay ( transform.position, torque * 5, Color.red );
+		torque = transform.InverseTransformDirection ( torque ) * torqueForce;
+//		Debug.DrawRay ( transform.position, torque, Color.magenta );
+		return;
+
+		torque.x = x; // don't invert because, the rotation will already get inversed as the intended axis is inversed
+//		torque.x = invertX ? -x : x;
 		torque.y = swapAxes ? z : y;
 		torque.z = swapAxes ? y : z;
 		torque *= torqueForce;
