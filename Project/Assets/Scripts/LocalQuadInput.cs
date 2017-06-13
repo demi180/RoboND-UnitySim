@@ -35,8 +35,6 @@ public class LocalQuadInput : MonoBehaviour
 //		float z = input.z / 2 + input.x / 2;
 		Vector3 torque = new Vector3 ( x, Input.GetAxis ( "Yaw" ), z );
 
-		torque = new Vector3 ( Input.GetAxis ( "Roll" ), Input.GetAxis ( "Yaw" ), Input.GetAxis ( "Pitch" ) );
-
 		if ( useTeleop )
 		{
 //			if ( Input.GetKeyDown ( KeyCode.Return ) )
@@ -48,6 +46,7 @@ public class LocalQuadInput : MonoBehaviour
 
 		} else
 		{
+			torque = new Vector3 ( Input.GetAxis ( "Roll" ), Input.GetAxis ( "Yaw" ), Input.GetAxis ( "Pitch" ) );
 			if ( Input.GetKeyDown ( KeyCode.Return ) )
 				droneController.MotorsEnabled = !motorEnabled;
 			

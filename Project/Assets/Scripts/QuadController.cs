@@ -11,11 +11,11 @@ public class QuadController : MonoBehaviour
 	public Quaternion Rotation { get; protected set; }
 	public Vector3 AngularVelocity { get; protected set; }
 	public Vector3 LinearAcceleration { get; protected set; }
-	// not threadsafe
-	public Vector3 Forward { get { return yAxis.forward; } }
-	public Vector3 Right { get { return -xAxis.forward; } }
-	public Vector3 YAxis { get { return yAxis.forward; } }
-	public Vector3 XAxis { get { return xAxis.forward; } }
+	public Vector3 Forward { get; protected set; }
+	public Vector3 Right { get; protected set; }
+	public Vector3 Up { get; protected set; }
+	public Vector3 YAxis { get; protected set; }
+	public Vector3 XAxis { get; protected set; }
 
 	public Transform frontLeftRotor;
 	public Transform frontRightRotor;
@@ -36,6 +36,7 @@ public class QuadController : MonoBehaviour
 	Vector3 force;
 	Vector3 torque;
 	Vector3 lastVelocity;
+	bool inverseFlag;
 
 	void Awake ()
 	{
@@ -81,6 +82,12 @@ public class QuadController : MonoBehaviour
 		}
 		Position = transform.position;
 		Rotation = transform.rotation;
+
+		Forward = yAxis.forward;
+		Right = -xAxis.forward;
+		Up = transform.up;
+		XAxis = xAxis.forward;
+		YAxis = yAxis.forward;
 	}
 
 	void FixedUpdate ()
@@ -91,6 +98,11 @@ public class QuadController : MonoBehaviour
 			rb.AddRelativeForce ( force * Time.deltaTime, forceMode );
 
 			// add torque
+			if ( inverseFlag )
+			{
+				inverseFlag = false;
+				torque = transform.InverseTransformDirection ( torque ) * torqueForce;
+			}
 			rb.AddRelativeTorque ( torque * Time.deltaTime, torqueMode );
 //			rb.AddTorque ( torque * Time.deltaTime, torqueMode );
 
@@ -146,11 +158,10 @@ public class QuadController : MonoBehaviour
 	{
 		torque = XAxis * x;
 		torque += YAxis * ( swapAxes ? y : z );
-		torque += transform.up * ( swapAxes ? z : y );
+		torque += Up * ( swapAxes ? z : y );
 
-		Debug.DrawRay ( transform.position, torque * 5, Color.red );
-		torque = transform.InverseTransformDirection ( torque ) * torqueForce;
-//		Debug.DrawRay ( transform.position, torque, Color.magenta );
+		inverseFlag = true;
+//		torque = transform.InverseTransformDirection ( torque ) * torqueForce;
 		return;
 
 		torque.x = x; // don't invert because, the rotation will already get inversed as the intended axis is inversed
