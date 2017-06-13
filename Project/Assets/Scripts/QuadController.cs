@@ -146,26 +146,29 @@ public class QuadController : MonoBehaviour
 		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
 	}
 
-	public void ApplyMotorForce (float x, float y, float z, bool swapAxes = false, bool invertX = false)
+	public void ApplyMotorForce (float x, float y, float z, bool swapAxes = false, bool invertAxes = false)
 	{
-		force.x = invertX ? -x : x;
+		force.x = x;
 		force.y = swapAxes ? z : y;
 		force.z = swapAxes ? y : z;
 		force *= thrustForce;
+		if ( invertAxes )
+			force *= -1;
 	}
 
-	public void ApplyMotorTorque (float x, float y, float z, bool swapAxes = false, bool invertX = false)
+	public void ApplyMotorTorque (float x, float y, float z, bool swapAxes = false, bool invertAxes = false)
 	{
 		torque = XAxis * x;
 		torque += YAxis * ( swapAxes ? y : z );
 		torque += Up * ( swapAxes ? z : y );
+		if ( invertAxes )
+			torque *= -1;
 
 		inverseFlag = true;
 //		torque = transform.InverseTransformDirection ( torque ) * torqueForce;
 		return;
 
 		torque.x = x; // don't invert because, the rotation will already get inversed as the intended axis is inversed
-//		torque.x = invertX ? -x : x;
 		torque.y = swapAxes ? z : y;
 		torque.z = swapAxes ? y : z;
 		torque *= torqueForce;

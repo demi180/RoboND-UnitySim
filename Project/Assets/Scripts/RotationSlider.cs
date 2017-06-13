@@ -12,7 +12,7 @@ public class RotationSlider : MonoBehaviour
 
 	public void OnValueChanged (float value)
 	{
-		float adjustedValue = ( 0.5f - value ) * 2;
+		float adjustedValue = ( value - 0.5f ) * 2;
 		Vector3 rotAxis = Vector3.zero;
 		if ( axis == RotationAxis.X )
 			rotAxis.x = adjustedValue;
@@ -20,7 +20,7 @@ public class RotationSlider : MonoBehaviour
 			rotAxis.y = adjustedValue;
 		if ( axis == RotationAxis.Z )
 			rotAxis.z = adjustedValue;
-		quad.ApplyMotorTorque ( rotAxis.x, rotAxis.y, rotAxis.z, true );
+		quad.ApplyMotorTorque ( rotAxis.x, rotAxis.y, rotAxis.z, true, true );
 	}
 
 	public void OnText ()
