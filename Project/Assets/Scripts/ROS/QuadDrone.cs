@@ -71,12 +71,14 @@ public class QuadDrone : MonoBehaviour
 
 	void TwistCallback (TwistStamped msg)
 	{
-		GVector3 linear = msg.twist.linear;
-		GVector3 angular = msg.twist.angular;
+		Vector3 linear = msg.twist.linear.ToUnityVector ();
+		Vector3 angular = msg.twist.angular.ToUnityVector ();
 		if ( droneController != null )
 		{
-			droneController.ApplyMotorForce ( (float) linear.x, (float) linear.y, (float) linear.z, true, true );
-			droneController.ApplyMotorTorque ( (float) angular.x, (float) angular.y, (float) angular.z, true, true );
+			droneController.ApplyMotorForce ( linear.x, linear.y, linear.z, true );
+			droneController.ApplyMotorTorque ( angular.x, angular.y, angular.z, true );
+//			droneController.ApplyMotorForce ( (float) linear.x, (float) linear.y, (float) linear.z, true, true );
+//			droneController.ApplyMotorTorque ( (float) angular.x, (float) angular.y, (float) angular.z, true, true );
 		}
 	}
 
@@ -88,8 +90,10 @@ public class QuadDrone : MonoBehaviour
 		{
 			if ( !droneController.MotorsEnabled )
 				droneController.MotorsEnabled = true;
-			droneController.ApplyMotorForce ( force.x, force.y, force.z, true, true );
-			droneController.ApplyMotorTorque ( torque.x, torque.y, torque.z, true, true );
+			droneController.ApplyMotorForce ( force.x, force.y, force.z, true );
+			droneController.ApplyMotorTorque ( torque.x, torque.y, torque.z, true );
+//			droneController.ApplyMotorForce ( force.x, force.y, force.z, true, true );
+//			droneController.ApplyMotorTorque ( torque.x, torque.y, torque.z, true, true );
 		}
 	}
 
@@ -113,17 +117,20 @@ public class QuadDrone : MonoBehaviour
 			ps.header.frame_id = "";
 			ps.header.seq = frameSeq++;
 			ps.header.stamp = ROS.GetTime ();
-			ps.pose.position = new Messages.geometry_msgs.Point ( droneController.Position, true, true );
-			ps.pose.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation );
+			ps.pose.position = new Messages.geometry_msgs.Point ( droneController.Position.ToRos () );
+//			ps.pose.position = new Messages.geometry_msgs.Point ( droneController.Position, true, true );
+			ps.pose.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation.ToRos () );
 			posePub.publish ( ps );
 
 			// publish imu
 			imu.header.frame_id = "";
 			imu.header.seq = frameSeq;
 			imu.header.stamp = ps.header.stamp;
-			imu.angular_velocity = new GVector3 ( droneController.AngularVelocity, true, true );
-			imu.linear_acceleration = new GVector3 ( droneController.LinearAcceleration, true, true );
-			imu.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation );
+			imu.angular_velocity = new GVector3 ( droneController.AngularVelocity.ToRos () );
+//			imu.angular_velocity = new GVector3 ( droneController.AngularVelocity, true, true );
+			imu.linear_acceleration = new GVector3 ( droneController.LinearAcceleration.ToRos () );
+//			imu.linear_acceleration = new GVector3 ( droneController.LinearAcceleration, true, true );
+			imu.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation.ToRos () );
 			imuPub.publish ( imu );
 			
 			Thread.Sleep ( sleep );

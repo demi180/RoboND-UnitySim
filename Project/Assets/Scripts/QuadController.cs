@@ -23,6 +23,8 @@ public class QuadController : MonoBehaviour
 	public Transform rearRightRotor;
 	public Transform yAxis;
 	public Transform xAxis;
+	public Transform forward;
+	public Transform right;
 
 	public float thrustForce = 2000;
 	public float torqueForce = 500;
@@ -48,6 +50,9 @@ public class QuadController : MonoBehaviour
 			rearRightRotor
 		};
 		MotorsEnabled = true;
+		Forward = forward.forward;
+		Right = right.forward;
+		Up = transform.up;
 	}
 
 	void LateUpdate ()
@@ -83,8 +88,10 @@ public class QuadController : MonoBehaviour
 		Position = transform.position;
 		Rotation = transform.rotation;
 
-		Forward = yAxis.forward;
-		Right = -xAxis.forward;
+		Forward = forward.forward;
+		Right = right.forward;
+//		Forward = yAxis.forward;
+//		Right = -xAxis.forward;
 		Up = transform.up;
 		XAxis = xAxis.forward;
 		YAxis = yAxis.forward;
@@ -146,7 +153,23 @@ public class QuadController : MonoBehaviour
 		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
 	}
 
-	public void ApplyMotorForce (float x, float y, float z, bool swapAxes = false, bool invertAxes = false)
+	public void ApplyMotorForce (float x, float y, float z, bool convertFromRos = false)
+	{
+		force = new Vector3 ( x, y, z );
+		if ( convertFromRos )
+			force = force.ToUnity ();
+		force *= thrustForce;
+	}
+
+	public void ApplyMotorTorque (float x, float y, float z, bool convertFromRos = false)
+	{
+		torque = new Vector3 ( x, y, z );
+		if ( convertFromRos )
+			torque = torque.ToUnity ();
+		torque *= convertFromRos ? -torqueForce : torqueForce;
+	}
+
+/*	public void ApplyMotorForce (float x, float y, float z, bool swapAxes = false, bool invertAxes = false)
 	{
 		force.x = x;
 		force.y = swapAxes ? z : y;
@@ -172,7 +195,7 @@ public class QuadController : MonoBehaviour
 		torque.y = swapAxes ? z : y;
 		torque.z = swapAxes ? y : z;
 		torque *= torqueForce;
-	}
+	}*/
 
 	public void ResetOrientation ()
 	{
