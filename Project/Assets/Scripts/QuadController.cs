@@ -129,27 +129,27 @@ public class QuadController : MonoBehaviour
 		r.height = 20;
 		GUI.Label ( r, "Motors enabled: <color=yellow>" + MotorsEnabled + "</color>" );
 		r.y += r.height;
-		Vector3 force = Force;
-		force = new Vector3 ( -force.x, force.z, force.y );
+		Vector3 force = Force.ToRos ();
+//		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Force: " + force.ToString () );
 		r.y += r.height;
-		force = Torque;
+		force = Torque.ToRos ();
 		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Torque: " + force.ToString () );
 //		if ( useTeleop )
 //		{
 			r.y += r.height;
-			GUI.Label ( r, "Position: " + Position.ToString () );
+		GUI.Label ( r, "Position: " + Position.ToRos ().ToString () );
 			r.y += r.height;
-			GUI.Label ( r, "PRY: " + Rotation.eulerAngles.ToString () );
+		GUI.Label ( r, "PRY: " + Rotation.eulerAngles.ToRos ().ToString () );
 //		}
 		r.y += r.height;
-		force = AngularVelocity;
-		force = new Vector3 ( -force.x, force.z, force.y );
+		force = AngularVelocity.ToRos ();
+//		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Angular Vel.: " + force.ToString () );
 		r.y += r.height;
-		force = LinearAcceleration;
-		force = new Vector3 ( -force.x, force.z, force.y );
+		force = LinearAcceleration.ToRos ();
+//		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
 	}
 
