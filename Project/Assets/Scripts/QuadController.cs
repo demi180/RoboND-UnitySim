@@ -1,9 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 public class QuadController : MonoBehaviour
 {
+	public static QuadController ActiveController;
+	public static int ImageWidth = 640;
+	public static int ImageHeight = 480;
+
 	public bool MotorsEnabled { get; set; }
 	public Vector3 Force { get { return force; } }
 	public Vector3 Torque { get { return torque; } }
@@ -26,6 +31,8 @@ public class QuadController : MonoBehaviour
 	public Transform forward;
 	public Transform right;
 
+	public Camera droneCam1;
+
 	public float thrustForce = 2000;
 	public float torqueForce = 500;
 	public ForceMode forceMode = ForceMode.Force;
@@ -33,15 +40,24 @@ public class QuadController : MonoBehaviour
 
 	public bool rotateWithTorque;
 
-	Rigidbody rb;
+	[System.NonSerialized]
+	public Rigidbody rb;
 	Transform[] rotors;
 	Vector3 force;
 	Vector3 torque;
 	Vector3 lastVelocity;
 	bool inverseFlag;
+	Ray ray;
+	RaycastHit rayHit;
+	BinarySerializer b = new BinarySerializer ( 1000 );
+
+	byte[] cameraData;
+//	RenderTexture cameraTex;
 
 	void Awake ()
 	{
+		if ( ActiveController == null )
+			ActiveController = this;
 		rb = GetComponent<Rigidbody> ();
 		rotors = new Transform[4] {
 			frontLeftRotor,
@@ -53,6 +69,18 @@ public class QuadController : MonoBehaviour
 		Forward = forward.forward;
 		Right = right.forward;
 		Up = transform.up;
+		CreateCameraTex ();
+	}
+
+	void Update ()
+	{
+		Position = transform.position;
+		Rotation = transform.rotation;
+		Forward = forward.forward;
+		Right = right.forward;
+		Up = transform.up;
+		XAxis = xAxis.forward;
+		YAxis = yAxis.forward;
 	}
 
 	void LateUpdate ()
@@ -85,16 +113,38 @@ public class QuadController : MonoBehaviour
 				zAngle += 360;
 			transform.Rotate ( Vector3.up * -zAngle * Time.deltaTime, Space.World );
 		}
-		Position = transform.position;
-		Rotation = transform.rotation;
 
-		Forward = forward.forward;
-		Right = right.forward;
-//		Forward = yAxis.forward;
-//		Right = -xAxis.forward;
-		Up = transform.up;
-		XAxis = xAxis.forward;
-		YAxis = yAxis.forward;
+//		Position = transform.position;
+//		Rotation = transform.rotation;
+//		Forward = forward.forward;
+//		Right = right.forward;
+//		Up = transform.up;
+//		XAxis = xAxis.forward;
+//		YAxis = yAxis.forward;
+
+		Profiler.BeginSample ( "Raycast" );
+		ray = droneCam1.ViewportPointToRay ( new Vector3 ( 0.5f, 0.5f, droneCam1.nearClipPlane ) );
+		bool didHit;
+		int count = 1000;
+		b.Clear ();
+//		Profiler.EndSample ();
+		short value;
+		for ( int i = 0; i < count; i++ )
+		{
+			didHit = Physics.Raycast ( ray, out rayHit, 400 );
+			if ( didHit )
+				value = (short) rayHit.distance;
+			else
+				value = short.MaxValue;
+			byte b1 = (byte) ( value >> 8 );
+			byte b2 = (byte) ( value & 255 );
+			b.WriteByte ( b1 );
+			b.WriteByte ( b2 );
+//			Debug.Log ( "dist " + rayHit.distance );
+//			Debug.Log ( "short is " + ( (short) ( b1 << 8 ) + b2 ) );
+		}
+		cameraData = b.GetBytes ();
+		Profiler.EndSample ();
 	}
 
 	void FixedUpdate ()
@@ -153,17 +203,17 @@ public class QuadController : MonoBehaviour
 		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
 	}
 
-	public void ApplyMotorForce (float x, float y, float z, bool convertFromRos = false)
+	public void ApplyMotorForce (Vector3 v, bool convertFromRos = false)
 	{
-		force = new Vector3 ( x, y, z );
+		force = v;
 		if ( convertFromRos )
 			force = force.ToUnity ();
 		force *= thrustForce;
 	}
 
-	public void ApplyMotorTorque (float x, float y, float z, bool convertFromRos = false)
+	public void ApplyMotorTorque (Vector3 v, bool convertFromRos = false)
 	{
-		torque = new Vector3 ( x, y, z );
+		torque = v;
 		if ( convertFromRos )
 			torque = torque.ToUnity ();
 		torque *= convertFromRos ? -torqueForce : torqueForce;
@@ -205,5 +255,20 @@ public class QuadController : MonoBehaviour
 		rb.velocity = Vector3.zero;
 		rb.angularVelocity = Vector3.zero;
 		LinearAcceleration = Vector3.zero;
+	}
+
+	void CreateCameraTex ()
+	{
+		// for now, just prep a byte[] that we can put raycast data into
+
+
+//		cameraTex = new RenderTexture ( ImageWidth, ImageHeight, 0, RenderTextureFormat.RHalf );
+//		cameraTex.enableRandomWrite = true;
+//		cameraTex.Create ();
+	}
+
+	public byte[] GetImageData ()
+	{
+		return cameraData;
 	}
 }

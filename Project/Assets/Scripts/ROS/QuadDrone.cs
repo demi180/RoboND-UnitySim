@@ -10,6 +10,7 @@ using GVector3 = Messages.geometry_msgs.Vector3;
 using PoseStamped = Messages.geometry_msgs.PoseStamped;
 using Wrench = Messages.geometry_msgs.Wrench;
 using Imu = Messages.sensor_msgs.Imu;
+using Image = Messages.sensor_msgs.Image;
 
 
 /*
@@ -26,6 +27,7 @@ public class QuadDrone : MonoBehaviour
 	ServiceServer enableMotorSrv;
 	Publisher<PoseStamped> posePub;
 	Publisher<Imu> imuPub;
+	Publisher<Image> imgPub;
 	Subscriber<TwistStamped> twistSub;
 	Subscriber<Wrench> wrenchSub;
 	Thread pubThread;
@@ -52,6 +54,7 @@ public class QuadDrone : MonoBehaviour
 		wrenchSub = nh.subscribe<Wrench> ( "quad_rotor/cmd_force", 10, WrenchCallback );
 		posePub = nh.advertise<PoseStamped> ( "quad_rotor/pose", 10, false );
 		imuPub = nh.advertise<Imu> ( "quad_rotor/imu", 10, false );
+		imgPub = nh.advertise<Image> ( "quad_rotor/image", 10, false );
 		pubThread = new Thread ( PublishAll );
 		pubThread.Start ();
 	}
@@ -75,8 +78,8 @@ public class QuadDrone : MonoBehaviour
 		Vector3 angular = msg.twist.angular.ToUnityVector ();
 		if ( droneController != null )
 		{
-			droneController.ApplyMotorForce ( linear.x, linear.y, linear.z, true );
-			droneController.ApplyMotorTorque ( angular.x, angular.y, angular.z, true );
+			droneController.ApplyMotorForce ( linear, true );
+			droneController.ApplyMotorTorque ( angular, true );
 //			droneController.ApplyMotorForce ( (float) linear.x, (float) linear.y, (float) linear.z, true, true );
 //			droneController.ApplyMotorTorque ( (float) angular.x, (float) angular.y, (float) angular.z, true, true );
 		}
@@ -90,8 +93,8 @@ public class QuadDrone : MonoBehaviour
 		{
 			if ( !droneController.MotorsEnabled )
 				droneController.MotorsEnabled = true;
-			droneController.ApplyMotorForce ( force.x, force.y, force.z, true );
-			droneController.ApplyMotorTorque ( torque.x, torque.y, torque.z, true );
+			droneController.ApplyMotorForce ( force, true );
+			droneController.ApplyMotorTorque ( torque, true );
 //			droneController.ApplyMotorForce ( force.x, force.y, force.z, true, true );
 //			droneController.ApplyMotorTorque ( torque.x, torque.y, torque.z, true, true );
 		}
@@ -99,14 +102,24 @@ public class QuadDrone : MonoBehaviour
 
 	void PublishAll ()
 	{
+		// pose info
 		PoseStamped ps = new PoseStamped ();
 		ps.header = new Messages.std_msgs.Header ();
 		ps.pose = new Messages.geometry_msgs.Pose ();
 		Imu imu = new Imu ();
+		// imu info
 		imu.header = new Messages.std_msgs.Header ( ps.header );
 		imu.angular_velocity_covariance = new double[9] { -1, 0, 0, 0, 0, 0, 0, 0, 0 };
 		imu.linear_acceleration_covariance = new double[9] { -1, 0, 0, 0, 0, 0, 0, 0, 0 };
 		imu.orientation_covariance = new double[9] { -1, 0, 0, 0, 0, 0, 0, 0, 0 };
+		// image info
+		Image img = new Image ();
+		img.header = new Messages.std_msgs.Header ( ps.header );
+		img.width = (uint) QuadController.ImageWidth;
+		img.height = (uint) QuadController.ImageHeight;
+		img.encoding = "mono16"; // "rgba8";
+		img.step = img.width * 2; // * 4
+		img.is_bigendian = 1;
 
 
 		int sleep = 1000 / 60;
@@ -132,6 +145,10 @@ public class QuadDrone : MonoBehaviour
 //			imu.linear_acceleration = new GVector3 ( droneController.LinearAcceleration, true, true );
 			imu.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation.ToRos () );
 			imuPub.publish ( imu );
+
+			// publish image
+			img.data = droneController.GetImageData ();
+			imgPub.publish ( img );
 			
 			Thread.Sleep ( sleep );
 		}

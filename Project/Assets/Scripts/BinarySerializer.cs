@@ -14,9 +14,9 @@ public class BinarySerializer
 	int count;
 	bool isWriting;
 
-	public BinarySerializer ()
+	public BinarySerializer (int capacity = 200)
 	{
-		byteList = new List<byte> ( 200 );
+		byteList = new List<byte> ( capacity );
 		isWriting = true;
 	}
 
@@ -32,6 +32,12 @@ public class BinarySerializer
 			byteList.Clear ();
 		byteList = null;
 		byteArray = null;
+	}
+
+	public void Clear ()
+	{
+		byteList.Clear ();
+		currentPosition = 0;
 	}
 
 	public byte[] GetBytes ()

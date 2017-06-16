@@ -20,7 +20,7 @@ public class RotationSlider : MonoBehaviour
 			rotAxis.y = adjustedValue;
 		if ( axis == RotationAxis.Z )
 			rotAxis.z = adjustedValue;
-		quad.ApplyMotorTorque ( rotAxis.x, rotAxis.y, rotAxis.z, true );
+		quad.ApplyMotorTorque ( rotAxis, true );
 //		quad.ApplyMotorTorque ( rotAxis.x, rotAxis.y, rotAxis.z, true, true );
 	}
 
