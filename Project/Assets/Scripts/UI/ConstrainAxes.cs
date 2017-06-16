@@ -1,37 +1,29 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ConstrainAxes : MonoBehaviour
 {
 	/// <summary>
 	/// Normal of the plane to constrain movement to. Use Rox axes and the appropriate Unity axes will be constrained
 	/// </summary>
-	public Vector3 planeNormal = Vector3.forward;
+	public RigidbodyConstraints constraint;
+	public string tooltip = "Constrain...";
+	[System.NonSerialized]
+	public Color color;
+	[System.NonSerialized]
+	public bool active;
 
-	RigidbodyConstraints constraints;
+	Outline outline;
 
 
 	void Awake ()
 	{
-		if ( planeNormal != Vector3.forward && planeNormal != Vector3.right && planeNormal != Vector3.up )
-		{
-			Debug.LogError ( "Please use only one normalized axis for plane normal. (0,0,1), (0,1,0) or (1,0,0)." );
-			constraints = RigidbodyConstraints.None;
-			return;
-		}
-
-		if ( planeNormal == Vector3.forward )
-			constraints = RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezeRotationY;
-		if ( planeNormal == Vector3.right )
-			constraints = RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationZ;
-		if ( planeNormal == Vector3.up )
-			constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezeRotationX;
-	}
-
-	void Update ()
-	{
-		
+		color = GetComponent<Image> ().color;
+		outline = GetComponent<Outline> ();
+		outline.enabled = false;
+		active = false;
 	}
 
 	public void OnClick ()
@@ -40,14 +32,36 @@ public class ConstrainAxes : MonoBehaviour
 		{
 			Rigidbody rb = QuadController.ActiveController.rb;
 			RigidbodyConstraints rbc = rb.constraints;
-			if ( rbc == constraints )
-				rbc = RigidbodyConstraints.None;
-			else
-				rbc = constraints;
+
+			if ( active )
+			{
+				rbc ^= constraint;
+				outline.enabled = false;
+				active = false;
+
+			} else
+			{
+				rbc |= constraint;
+				outline.enabled = true;
+				active = true;
+			}
 			rb.constraints = rbc;
+
 			QuadController.ActiveController.ResetOrientation ();
 			QuadController.ActiveController.ApplyMotorForce ( Vector3.zero );
 			QuadController.ActiveController.ApplyMotorTorque ( Vector3.zero );
 		}
+	}
+
+	public void OnMouseEnter ()
+	{
+		if ( ConstrainTooltip.instance != null )
+			ConstrainTooltip.instance.Show ( this );
+	}
+
+	public void OnMouseExit ()
+	{
+		if ( ConstrainTooltip.instance != null )
+			ConstrainTooltip.instance.Hide ();
 	}
 }
