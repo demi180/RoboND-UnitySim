@@ -40,6 +40,12 @@ public class QuadController : MonoBehaviour
 
 	public bool rotateWithTorque;
 
+	// recording vars
+	public float pathRecordFrequency = 3;
+	[System.NonSerialized]
+	public bool isRecordingPath;
+	float nextNodeTime;
+
 	[System.NonSerialized]
 	public Rigidbody rb;
 	Transform[] rotors;
@@ -70,6 +76,7 @@ public class QuadController : MonoBehaviour
 		Right = right.forward;
 		Up = transform.up;
 		CreateCameraTex ();
+		transform.position = Vector3.up * 10;
 	}
 
 	void Update ()
@@ -81,6 +88,12 @@ public class QuadController : MonoBehaviour
 		Up = transform.up;
 		XAxis = xAxis.forward;
 		YAxis = yAxis.forward;
+
+		if ( isRecordingPath && Time.time > nextNodeTime )
+		{
+			PathPlanner.AddNode ( Position, Rotation );
+			nextNodeTime = Time.time + pathRecordFrequency;
+		}
 	}
 
 	void LateUpdate ()
@@ -91,6 +104,11 @@ public class QuadController : MonoBehaviour
 		if ( Input.GetKeyDown ( KeyCode.R ) )
 		{
 			ResetOrientation ();
+		}
+
+		if ( Input.GetKeyDown ( KeyCode.P ) )
+		{
+			PathPlanner.AddNode ( Position, Rotation );
 		}
 
 		// update acceleration
@@ -219,34 +237,6 @@ public class QuadController : MonoBehaviour
 		torque *= convertFromRos ? -torqueForce : torqueForce;
 	}
 
-/*	public void ApplyMotorForce (float x, float y, float z, bool swapAxes = false, bool invertAxes = false)
-	{
-		force.x = x;
-		force.y = swapAxes ? z : y;
-		force.z = swapAxes ? y : z;
-		force *= thrustForce;
-		if ( invertAxes )
-			force *= -1;
-	}
-
-	public void ApplyMotorTorque (float x, float y, float z, bool swapAxes = false, bool invertAxes = false)
-	{
-		torque = XAxis * x;
-		torque += YAxis * ( swapAxes ? y : z );
-		torque += Up * ( swapAxes ? z : y );
-		if ( invertAxes )
-			torque *= -1;
-
-		inverseFlag = true;
-//		torque = transform.InverseTransformDirection ( torque ) * torqueForce;
-		return;
-
-		torque.x = x; // don't invert because, the rotation will already get inversed as the intended axis is inversed
-		torque.y = swapAxes ? z : y;
-		torque.z = swapAxes ? y : z;
-		torque *= torqueForce;
-	}*/
-
 	public void ResetOrientation ()
 	{
 		transform.rotation = Quaternion.identity;
@@ -270,5 +260,18 @@ public class QuadController : MonoBehaviour
 	public byte[] GetImageData ()
 	{
 		return cameraData;
+	}
+
+	public void BeginRecordPath ()
+	{
+		isRecordingPath = true;
+		PathPlanner.AddNode ( Position, Rotation );
+		nextNodeTime = Time.time + pathRecordFrequency;
+	}
+
+	public void EndRecordPath ()
+	{
+		PathPlanner.AddNode ( Position, Rotation );
+		isRecordingPath = false;
 	}
 }

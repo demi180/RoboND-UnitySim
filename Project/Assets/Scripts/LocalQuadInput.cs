@@ -29,11 +29,8 @@ public class LocalQuadInput : MonoBehaviour
 
 		Vector3 input = new Vector3 ( Input.GetAxis ( "Horizontal" ), thrust, Input.GetAxis ( "Vertical" ) );
 		Vector3 force = new Vector3 ( 0, input.y, 0 );
-//		Vector3 torque = new Vector3 ( input.x, Input.GetAxis ( "Yaw" ), input.z );
-		float x = input.z - input.x;
-		float z = input.z - input.x;
-//		float x = input.z / 2 - input.x / 2;
-//		float z = input.z / 2 - input.x / 2;
+		float x = input.z / 2 + input.x / 2;
+		float z = input.z / 2 - input.x / 2;
 		Vector3 torque = new Vector3 ( x, Input.GetAxis ( "Yaw" ), z );
 
 		if ( useTeleop )
@@ -48,8 +45,6 @@ public class LocalQuadInput : MonoBehaviour
 		} else
 		{
 //			torque = new Vector3 ( Input.GetAxis ( "Roll" ), Input.GetAxis ( "Yaw" ), Input.GetAxis ( "Pitch" ) );
-			if ( Input.GetKeyDown ( KeyCode.Return ) )
-				droneController.MotorsEnabled = !motorEnabled;
 			
 			droneController.ApplyMotorForce ( force );
 			droneController.ApplyMotorTorque ( torque );

@@ -42,6 +42,11 @@ namespace Messages.std_msgs
             
         }
 
+		public Time (Time other)
+		{
+			data = new TimeData ( other.data.sec, other.data.nsec );
+		}
+
         [System.Diagnostics.DebuggerStepThrough]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public Time(byte[] SERIALIZEDSTUFF)

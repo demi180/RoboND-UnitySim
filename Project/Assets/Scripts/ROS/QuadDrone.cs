@@ -11,6 +11,8 @@ using PoseStamped = Messages.geometry_msgs.PoseStamped;
 using Wrench = Messages.geometry_msgs.Wrench;
 using Imu = Messages.sensor_msgs.Imu;
 using Image = Messages.sensor_msgs.Image;
+using Path = Messages.nav_msgs.Path;
+using GetPlan = Messages.nav_msgs.GetPlan;
 
 
 /*
@@ -28,6 +30,7 @@ public class QuadDrone : MonoBehaviour
 	Publisher<PoseStamped> posePub;
 	Publisher<Imu> imuPub;
 	Publisher<Image> imgPub;
+	ServiceServer pathSrv;
 	Subscriber<TwistStamped> twistSub;
 	Subscriber<Wrench> wrenchSub;
 	Thread pubThread;
@@ -47,6 +50,7 @@ public class QuadDrone : MonoBehaviour
 	void OnRosInit ()
 	{
 		nh = new NodeHandle ( "~" );
+		pathSrv = nh.advertiseService<GetPlan.Request, GetPlan.Response> ( "quad_rotor/path", PathService );
 //		setOrientSrv = nh.advertiseService<Messages.std_srvs.Empty.Request>
 //		enableMotorSrv = nh.advertiseService<EnableMotors.Request, EnableMotors.Response> ( "enable_motors", OnEnableMotors );
 		nh.setParam ( "control_mode", "wrench" ); // for now force twist mode
@@ -128,7 +132,7 @@ public class QuadDrone : MonoBehaviour
 		{
 			// publish pose
 			ps.header.frame_id = "";
-			ps.header.seq = frameSeq++;
+			ps.header.seq = frameSeq;
 			ps.header.stamp = ROS.GetTime ();
 			ps.pose.position = new Messages.geometry_msgs.Point ( droneController.Position.ToRos () );
 //			ps.pose.position = new Messages.geometry_msgs.Point ( droneController.Position, true, true );
@@ -137,7 +141,7 @@ public class QuadDrone : MonoBehaviour
 
 			// publish imu
 			imu.header.frame_id = "";
-			imu.header.seq = frameSeq;
+			imu.header.seq = frameSeq++;
 			imu.header.stamp = ps.header.stamp;
 			imu.angular_velocity = new GVector3 ( droneController.AngularVelocity.ToRos () );
 //			imu.angular_velocity = new GVector3 ( droneController.AngularVelocity, true, true );
@@ -152,5 +156,33 @@ public class QuadDrone : MonoBehaviour
 			
 			Thread.Sleep ( sleep );
 		}
+	}
+
+	bool PathService (GetPlan.Request req, ref GetPlan.Response resp)
+	{
+		Debug.Log ( "path service called!" );
+		Path path = new Path ();
+		path.header = new Messages.std_msgs.Header ();
+		path.header.frame_id = "";
+		path.header.stamp = ROS.GetTime ();
+		path.header.seq = 0;
+		PathSample[] samples = PathPlanner.GetPath ();
+		int count = samples.Length;
+		path.poses = new PoseStamped[ count ];
+		Debug.Log ( "sending " + count + " samples" );
+		for ( int i = 0; i < count; i++ )
+		{
+			PoseStamped pst = new PoseStamped ();
+			pst.header = new Messages.std_msgs.Header ();
+			pst.header.frame_id = "";
+			pst.header.stamp = ROS.GetTime ();
+			pst.header.seq = (uint) i;
+			pst.pose = new Messages.geometry_msgs.Pose ();
+			pst.pose.position = new Messages.geometry_msgs.Point ( samples [ i ].position.ToRos () );
+			pst.pose.orientation = new Messages.geometry_msgs.Quaternion ( samples [ i ].orientation.ToRos () );
+			path.poses [ i ] = pst;
+		}
+		resp.plan = path;
+		return true;
 	}
 }

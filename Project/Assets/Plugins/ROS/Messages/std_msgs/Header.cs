@@ -63,7 +63,7 @@ string frame_id"; }
 		{
 			this.frame_id = other.frame_id;
 			this.seq = other.seq;
-			this.stamp = other.stamp;
+			this.stamp = new Time ( other.stamp );
 		}
 
         [System.Diagnostics.DebuggerStepThrough]
