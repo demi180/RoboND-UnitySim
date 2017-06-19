@@ -233,6 +233,12 @@ int32 b"; }
                 //sum
                 piecesize = Marshal.SizeOf(typeof(int));
                 h = IntPtr.Zero;
+				if ( SERIALIZEDSTUFF == null )
+				{
+					throw new NullReferenceException ( "SERIALIZEDSTUFF is null?" );
+					sum = 0;
+					return;
+				}
                 if (SERIALIZEDSTUFF.Length - currentIndex != 0)
                 {
                     h = Marshal.AllocHGlobal(piecesize);

@@ -18,7 +18,7 @@ namespace Messages
         private static Dictionary<MsgTypes, Type> _typeregistry = new Dictionary<MsgTypes, Type>();
 
 #if !TRACE
-    [DebuggerStepThrough]
+//    [DebuggerStepThrough]
 #endif
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static IRosMessage generate(MsgTypes t)
@@ -102,20 +102,20 @@ namespace Messages
         public IDictionary connection_header;
 
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        [System.Diagnostics.DebuggerStepThrough]
+//        [System.Diagnostics.DebuggerStepThrough]
         public IRosMessage()
         {
         }
 
 
-        [System.Diagnostics.DebuggerStepThrough]
+//        [System.Diagnostics.DebuggerStepThrough]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public IRosMessage(byte[] SERIALIZEDSTUFF)
         {
             Deserialize(SERIALIZEDSTUFF);
         }
 
-        [System.Diagnostics.DebuggerStepThrough]
+//        [System.Diagnostics.DebuggerStepThrough]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public IRosMessage(byte[] SERIALIZEDSTUFF, ref int currentIndex)
         {
@@ -125,7 +125,7 @@ namespace Messages
 
 
 #if !TRACE
-        [DebuggerStepThrough]
+//        [DebuggerStepThrough]
 #endif
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public void Deserialize(byte[] SERIALIZEDSTUFF)
@@ -135,7 +135,7 @@ namespace Messages
         }
 
 #if !TRACE
-        [DebuggerStepThrough]
+//        [DebuggerStepThrough]
 #endif
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public virtual void Deserialize(byte[] SERIALIZEDSTUFF, ref int currentIndex)
@@ -143,14 +143,14 @@ namespace Messages
             throw new NotImplementedException();
         }
 
-        [System.Diagnostics.DebuggerStepThrough]
+//        [System.Diagnostics.DebuggerStepThrough]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public byte[] Serialize()
         {
             return Serialize(false);
         }
 
-        [System.Diagnostics.DebuggerStepThrough]
+//        [System.Diagnostics.DebuggerStepThrough]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public virtual byte[] Serialize(bool partofsomethingelse)
         {
@@ -172,7 +172,7 @@ namespace Messages
             return Equals(obj as IRosMessage);
         }
 
-        [System.Diagnostics.DebuggerStepThrough]
+//        [System.Diagnostics.DebuggerStepThrough]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public override int GetHashCode()
         {
@@ -182,7 +182,7 @@ namespace Messages
 
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
     public delegate IRosMessage RosServiceDelegate(IRosMessage request);
-    [System.Diagnostics.DebuggerStepThrough]
+//    [System.Diagnostics.DebuggerStepThrough]
     public class IRosService
     {
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -224,7 +224,7 @@ namespace Messages
         private static Dictionary<SrvTypes, Type> _typeregistry = new Dictionary<SrvTypes, Type>();
 
 #if !TRACE
-    [DebuggerStepThrough]
+//    [DebuggerStepThrough]
 #endif
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static IRosService generate(SrvTypes t)
@@ -337,7 +337,7 @@ namespace Messages
         Request,
         Response
     }
-    [System.Diagnostics.DebuggerStepThrough]
+//    [System.Diagnostics.DebuggerStepThrough]
     public struct TimeData
     {
         public uint sec;

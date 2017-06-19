@@ -26,6 +26,17 @@ public class ConstrainAxes : MonoBehaviour
 		active = false;
 	}
 
+	void Update ()
+	{
+		if ( QuadController.ActiveController != null )
+		{
+			Rigidbody rb = QuadController.ActiveController.rb;
+			RigidbodyConstraints rbc = rb.constraints;
+
+			active = outline.enabled = ( rbc & constraint ) != 0;
+		}
+	}
+
 	public void OnClick ()
 	{
 		if ( QuadController.ActiveController != null )
@@ -36,18 +47,19 @@ public class ConstrainAxes : MonoBehaviour
 			if ( active )
 			{
 				rbc ^= constraint;
-				outline.enabled = false;
-				active = false;
+//				outline.enabled = false;
+//				active = false;
 
 			} else
 			{
 				rbc |= constraint;
-				outline.enabled = true;
-				active = true;
+//				outline.enabled = true;
+//				active = true;
 			}
 			rb.constraints = rbc;
+			QuadController.ActiveController.UpdateConstraints ();
 
-			QuadController.ActiveController.ResetOrientation ();
+			QuadController.ActiveController.TriggerReset ();
 			QuadController.ActiveController.ApplyMotorForce ( Vector3.zero );
 			QuadController.ActiveController.ApplyMotorTorque ( Vector3.zero );
 		}

@@ -11,7 +11,9 @@ public class ATIClient : MonoBehaviour
 	ServiceClient<AddTwoInts.Request, AddTwoInts.Response> cli;
 	Thread thread;
 
-	int a, b;
+	int a, b, sum;
+	public bool callFinished = false;
+	public bool callResponse;
 
 	IEnumerator Start ()
 	{
@@ -27,19 +29,46 @@ public class ATIClient : MonoBehaviour
 		cli = nh.serviceClient<AddTwoInts.Request, AddTwoInts.Response> ( "/add_two_ints" );
 
 		Debug.Log ( "calling client" );
+		callFinished = false;
 		thread = new Thread ( Add );
 		thread.Start ();
 	}
 
+	void Update ()
+	{
+		if ( thread != null )
+			Debug.Log ( thread.ThreadState );
+		if ( callFinished )
+		{
+//			OnCallFinished ();
+		}
+	}
+
 	void Add ()
 	{
-		AddTwoInts.Request req = new AddTwoInts.Request() { a = this.a, b = this.b };
-		AddTwoInts.Response resp = new AddTwoInts.Response();
-		bool res = cli.call ( req, ref resp );
-//		bool res = nh.serviceClient<AddTwoInts.Request, AddTwoInts.Response> ( "/add_two_ints" ).call ( req, ref resp );
-		if ( res )
+		AddTwoInts.Request req = new AddTwoInts.Request () { a = this.a, b = this.b };
+		AddTwoInts.Response resp = new AddTwoInts.Response ();
+		a = req.a;
+		b = req.b;
+		sum = 0;
+		callResponse = cli.call ( req, ref resp );
+		sum = resp.sum;
+		if ( callResponse )
+			Debug.Log ( "response added " + sum );
+		else
+			Debug.Log ( "response failed" );
+		callFinished = true;
+//		Thread.CurrentThread.Join ( 200 );
+	}
+
+	void OnCallFinished ()
+	{
+		Debug.Log ( "thread state is " + thread.ThreadState );
+//		thread.Join ();
+		callFinished = false;
+		if ( callResponse )
 		{
-			Debug.Log ( "Addition called (client)! " + req.a + " + " + req.b + " = " + resp.sum );
+			Debug.Log ( "Addition called (client)! " + a + " + " + b + " = " + sum );
 		} else
 		{
 			Debug.Log ( "Call failed :(" );

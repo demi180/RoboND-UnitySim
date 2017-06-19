@@ -22,8 +22,8 @@ public class ATIServer : MonoBehaviour
 
 	bool Addition (AddTwoInts.Request req, ref AddTwoInts.Response resp)
 	{
-		Debug.Log ( "Addition called (server)! " + req.a + " + " + req.b + " = " + ( req.a + req.b ) );
 		resp.sum = req.a + req.b;
+		Debug.Log ( "Addition called (server)! " + req.a + " + " + req.b + " = " + ( req.a + req.b ) );
 		return true;
 	}
 }

@@ -21,6 +21,13 @@ public class QuadController : MonoBehaviour
 	public Vector3 Up { get; protected set; }
 	public Vector3 YAxis { get; protected set; }
 	public Vector3 XAxis { get; protected set; }
+	public bool UseGravity { get; set; }
+	public bool ConstrainForceX { get; set; }
+	public bool ConstrainForceY { get; set; }
+	public bool ConstrainForceZ { get; set; }
+	public bool ConstrainTorqueX { get; set; }
+	public bool ConstrainTorqueY { get; set; }
+	public bool ConstrainTorqueZ { get; set; }
 
 	public Transform frontLeftRotor;
 	public Transform frontRightRotor;
@@ -58,6 +65,7 @@ public class QuadController : MonoBehaviour
 	BinarySerializer b = new BinarySerializer ( 1000 );
 
 	byte[] cameraData;
+	bool resetFlag;
 //	RenderTexture cameraTex;
 
 	void Awake ()
@@ -77,10 +85,18 @@ public class QuadController : MonoBehaviour
 		Up = transform.up;
 		CreateCameraTex ();
 		transform.position = Vector3.up * 10;
+		UseGravity = rb.useGravity;
+		UpdateConstraints ();
 	}
 
 	void Update ()
 	{
+		if ( resetFlag )
+		{
+			ResetOrientation ();
+			resetFlag = false;
+		}
+
 		Position = transform.position;
 		Rotation = transform.rotation;
 		Forward = forward.forward;
@@ -98,6 +114,12 @@ public class QuadController : MonoBehaviour
 
 	void LateUpdate ()
 	{
+		if ( resetFlag )
+		{
+			ResetOrientation ();
+			resetFlag = false;
+		}
+
 		if ( Input.GetKeyDown ( KeyCode.Escape ) )
 			Application.Quit ();
 
@@ -167,6 +189,14 @@ public class QuadController : MonoBehaviour
 
 	void FixedUpdate ()
 	{
+		if ( resetFlag )
+		{
+			ResetOrientation ();
+			resetFlag = false;
+		}
+
+		rb.useGravity = UseGravity;
+		CheckConstraints ();
 		if ( MotorsEnabled )
 		{
 			// add force
@@ -237,6 +267,11 @@ public class QuadController : MonoBehaviour
 		torque *= convertFromRos ? -torqueForce : torqueForce;
 	}
 
+	public void TriggerReset ()
+	{
+		resetFlag = true;
+	}
+
 	public void ResetOrientation ()
 	{
 		transform.rotation = Quaternion.identity;
@@ -273,5 +308,33 @@ public class QuadController : MonoBehaviour
 	{
 		PathPlanner.AddNode ( Position, Rotation );
 		isRecordingPath = false;
+	}
+
+	void CheckConstraints ()
+	{
+		RigidbodyConstraints c = RigidbodyConstraints.None;
+		if ( ConstrainForceX )
+			c |= RigidbodyConstraints.FreezePositionZ;
+		if ( ConstrainForceY )
+			c |= RigidbodyConstraints.FreezePositionX;
+		if ( ConstrainForceZ )
+			c |= RigidbodyConstraints.FreezePositionY;
+		if ( ConstrainTorqueX )
+			c |= RigidbodyConstraints.FreezeRotationZ;
+		if ( ConstrainTorqueY )
+			c |= RigidbodyConstraints.FreezeRotationX;
+		if ( ConstrainTorqueZ )
+			c |= RigidbodyConstraints.FreezeRotationY;
+		rb.constraints = c;
+	}
+
+	public void UpdateConstraints ()
+	{
+		ConstrainForceX = ( rb.constraints & RigidbodyConstraints.FreezePositionZ ) != 0;
+		ConstrainForceY = ( rb.constraints & RigidbodyConstraints.FreezePositionX ) != 0;
+		ConstrainForceZ = ( rb.constraints & RigidbodyConstraints.FreezePositionY ) != 0;
+		ConstrainTorqueX = ( rb.constraints & RigidbodyConstraints.FreezeRotationZ ) != 0;
+		ConstrainTorqueY = ( rb.constraints & RigidbodyConstraints.FreezeRotationX ) != 0;
+		ConstrainTorqueZ = ( rb.constraints & RigidbodyConstraints.FreezeRotationY ) != 0;
 	}
 }
