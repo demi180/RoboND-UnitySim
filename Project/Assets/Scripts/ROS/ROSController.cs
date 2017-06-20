@@ -31,6 +31,11 @@ public class ROSController : MonoBehaviour
 			return;
 		}
 
+		if ( QualitySettings.vSyncCount == 2 )
+			Application.targetFrameRate = 30;
+		else
+			Application.targetFrameRate = 60;
+
 //		Debug.Log ( "ros master is " + ROS.ROS_MASTER_URI );
 		if ( string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.User ) ) &&
 		     string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.Machine ) ) )
