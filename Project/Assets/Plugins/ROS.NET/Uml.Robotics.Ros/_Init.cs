@@ -38,7 +38,7 @@ namespace Uml.Robotics.Ros
 
         public static ICallbackQueue GlobalCallbackQueue
         {
-            get => globalCallbackQueue;
+			get { return globalCallbackQueue; }
         }
 
         /// <summary>
@@ -268,7 +268,8 @@ namespace Uml.Robotics.Ros
             // 2. passed in as remap argument
             // 3. environment variable
 
-            if (RemappingHelper.GetRemappings(ref args, out IDictionary<string, string> remapping))
+			IDictionary<string, string> remapping;
+            if (RemappingHelper.GetRemappings(ref args, out remapping))
                 Init(remapping, name, options);
             else
                 throw new InvalidOperationException("Could not initialize ROS");
@@ -343,20 +344,23 @@ namespace Uml.Robotics.Ros
 
                     lock (shuttingDownMutex)
                     {
-                        switch(shutdownTask?.Status)
-                        {
-                            case null:
-                            case TaskStatus.RanToCompletion:
-                                break;
-                            default:
-                                throw new InvalidOperationException("ROS was not shut down correctly");
-                        }
+						if ( shutdownTask != null )
+						{
+							switch ( shutdownTask.Status )
+							{
+							case null:
+							case TaskStatus.RanToCompletion:
+								break;
+							default:
+								throw new InvalidOperationException ( "ROS was not shut down correctly" );
+							}
+						}
                         shutdownTask = new Task(_shutdown);
                     }
                     initialized = true;
 
-                    GlobalNodeHandle = new NodeHandle(ThisNode.Namespace, remappingArgs);
-                    RosOutAppender.Instance.Start();
+					GlobalNodeHandle = new NodeHandle ( ThisNode.Namespace, remappingArgs );
+					RosOutAppender.Instance.Start ();
                 }
             }
         }

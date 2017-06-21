@@ -27,7 +27,9 @@ namespace Uml.Robotics.Ros
                     };
 
                     var h = new Header();
-                    h.Write(m, out byte[] headerbuf, out int size);
+					byte[] headerbuf;
+					int size;
+                    h.Write(m, out headerbuf, out size);
 
                     byte[] sizebuf = BitConverter.GetBytes(size);
 

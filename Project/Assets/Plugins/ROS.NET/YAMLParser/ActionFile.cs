@@ -8,6 +8,21 @@ using YAMLParser;
 
 namespace FauxMessages
 {
+	internal class ParsedAction
+	{
+		public List<string> GoalParameters, ResultParameters, FeedbackParameters, GoalActionParameters, ResultActionParameters, FeedbackActionParameters;
+
+		public ParsedAction (List<string> gp, List<string> rp, List<string> fp, List<string> gap, List<string> rap, List<string> fap)
+		{
+			GoalParameters = gp;
+			ResultParameters = rp;
+			FeedbackParameters = fp;
+			GoalActionParameters = gap;
+			ResultActionParameters = rap;
+			FeedbackActionParameters = fap;
+		}
+	}
+
     public class ActionFile
     {
         public string Name { get; private set; }
@@ -192,9 +207,10 @@ namespace FauxMessages
         /// </summary>
         /// <param name="lines">The content of the .action file</param>
         /// <returns>A ValueTuple with the parameters in a different field</returns>
-        private (List<string> GoalParameters, List<string> ResultParameters, List<string> FeedbackParameters,
-            List<string> GoalActionParameters, List<string> ResultActionParameters, List<string> FeedbackActionParameters)
-            ParseActionFile (string[] lines)
+		private ParsedAction ParseActionFile (string[] lines)
+//        private (List<string> GoalParameters, List<string> ResultParameters, List<string> FeedbackParameters,
+//            List<string> GoalActionParameters, List<string> ResultActionParameters, List<string> FeedbackActionParameters)
+//            ParseActionFile (string[] lines)
         {
             var goalParameters = new List<string>();
             var resultParameters = new List<string>();
@@ -269,7 +285,7 @@ namespace FauxMessages
                 }
             }
 
-            return (goalParameters, resultParameters, feedbackParameters, goalActionParameters, resultActionParameters,
+			return new ParsedAction (goalParameters, resultParameters, feedbackParameters, goalActionParameters, resultActionParameters,
                 feedbackActionParameters);
         }
 

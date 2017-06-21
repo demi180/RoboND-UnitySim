@@ -476,7 +476,8 @@ namespace Uml.Robotics.Ros
 
         private string resolveName(string name, bool remap)
         {
-            if (!Names.Validate(name, out string error))
+			string error;
+            if (!Names.Validate(name, out error))
                 throw new InvalidNameException(error);
             return resolveName(name, remap, no_validate);
         }

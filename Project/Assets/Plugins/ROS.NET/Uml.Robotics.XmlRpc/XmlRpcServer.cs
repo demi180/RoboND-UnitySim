@@ -83,17 +83,17 @@ namespace Uml.Robotics.XmlRpc
             _disp.Work(timeSlice);
         }
 
-        public XmlRpcServerMethod FindMethod(string name)
-        {
-            if (_methods.ContainsKey(name))
-                return _methods[name];
-            return null;
-        }
+        public XmlRpcServerMethod FindMethod (string name)
+		{
+			if ( _methods.ContainsKey ( name ) )
+				return _methods [ name ];
+			return null;
+		}
 
-        public override Socket getSocket()
-        {
-            return listener?.Server;
-        }
+        public override Socket getSocket ()
+		{
+			return listener != null ? listener.Server : null;
+		}
 
         public bool BindAndListen(int port, int backlog = 5)
         {

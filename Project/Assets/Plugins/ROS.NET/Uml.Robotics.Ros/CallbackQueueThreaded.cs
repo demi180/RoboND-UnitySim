@@ -66,17 +66,18 @@ namespace Uml.Robotics.Ros
         {
             lock (idInfoMutex)
             {
-                if (idInfo.TryGetValue(id, out IDInfo value))
-                    return value;
+				IDInfo value;
+				if ( idInfo.TryGetValue ( id, out value ) )
+					return value;
             }
             return null;
         }
 
 
-        public void AddCallback(CallbackInterface callback)
-        {
-            AddCallback(callback, callback.Uid);
-        }
+		public void AddCallback(CallbackInterface callback)
+		{
+			AddCallback ( callback, callback.Uid );
+		}
 
 
         public void AddCallback(CallbackInterface cb, long owner_id)

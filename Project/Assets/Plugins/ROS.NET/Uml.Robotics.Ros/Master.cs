@@ -108,7 +108,9 @@ namespace Uml.Robotics.Ros
                 return null;
 
             string nodeUri = payl.GetString();
-            if (!Network.SplitUri(nodeUri, out string nodeHost, out int nodePort) || nodeHost == null || nodePort <= 0)
+			string nodeHost;
+			int nodePort;
+            if (!Network.SplitUri(nodeUri, out nodeHost, out nodePort) || nodeHost == null || nodePort <= 0)
                 return null;
 
             return new XmlRpcClient(nodeHost, nodePort);

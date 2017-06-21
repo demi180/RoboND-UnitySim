@@ -80,7 +80,8 @@ namespace Uml.Robotics.Ros
 
         public static string Resolve(string ns, string name, bool doremap)
         {
-            if (!Validate(name, out string error))
+			string error;
+            if (!Validate(name, out error))
                 throw new InvalidNameException(error);
 
             if (string.IsNullOrEmpty(name))
@@ -119,7 +120,8 @@ namespace Uml.Robotics.Ros
 
         public static string ParentNamespace(string name)
         {
-            if (!Validate(name, out string error))
+			string error;
+            if (!Validate(name, out error))
                 throw new InvalidNameException(error);
 
             if (string.IsNullOrEmpty(name))

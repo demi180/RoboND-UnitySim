@@ -328,19 +328,22 @@ namespace Uml.Robotics.Ros
                 if (name[0] == '_' && name[1] != '_')
                 {
                     string localName = "~" + name.Substring(1);
-                    bool success = int.TryParse(param, out int i);
+					int i;
+					double d;
+					bool b;
+                    bool success = int.TryParse(param, out i);
                     if (success)
                     {
                         Set(Names.Resolve(localName), i);
                         continue;
                     }
-                    success = double.TryParse(param, out double d);
+                    success = double.TryParse(param, out d);
                     if (success)
                     {
                         Set(Names.Resolve(localName), d);
                         continue;
                     }
-                    success = bool.TryParse(param.ToLower(), out bool b);
+                    success = bool.TryParse(param.ToLower(), out b);
                     if (success)
                     {
                         Set(Names.Resolve(localName), b);

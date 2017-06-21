@@ -58,7 +58,8 @@ namespace Uml.Robotics.Ros
                 }
             }
 
-            ms.TryGetBuffer(out ArraySegment<byte> result);
+			ArraySegment<byte> result = new ArraySegment<byte> ( ms.GetBuffer () );
+//			ms.TryGetBuffer ( out result );
             buffer = new byte[result.Count];
             Array.Copy(result.Array, result.Offset, buffer, 0, result.Count);
             totallength = result.Count;

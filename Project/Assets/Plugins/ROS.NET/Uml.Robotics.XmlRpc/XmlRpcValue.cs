@@ -408,37 +408,121 @@ namespace Uml.Robotics.XmlRpc
             EnsureArraySize(elementCount);
         }
 
-        public void Set(string name, string value) => Get(name, true).Set(value);
-        public void Set(string name, int value) => Get(name, true).Set(value);
-        public void Set(string name, bool value) => Get(name, true).Set(value);
-        public void Set(string name, double value) => Get(name, true).Set(value);
-        public void Set(string name, byte[] value) => Get(name, true).Set(value);
-        public void Set(string name, DateTime value) => Get(name, true).Set(value);
-        public void Set(string name, XmlRpcValue value) => Get(name, true).Set(value);
+		public void Set ( string name, string value )
+		{
+			Get ( name, true ).Set ( value );
+		}
+		public void Set ( string name, int value )
+		{
+			Get ( name, true ).Set ( value );
+		}
+		public void Set ( string name, bool value )
+		{
+			Get ( name, true ).Set ( value );
+		}
+		public void Set ( string name, double value )
+		{
+			Get ( name, true ).Set ( value );
+		}
+		public void Set ( string name, byte[] value )
+		{
+			Get ( name, true ).Set ( value );
+		}
+		public void Set ( string name, DateTime value )
+		{
+			Get ( name, true ).Set ( value );
+		}
+		public void Set ( string name, XmlRpcValue value )
+		{
+			Get ( name, true ).Set ( value );
+		}
 
-        public void Set(int index, string value) => this[index].Set(value);
-        public void Set(int index, int value) => this[index].Set(value);
-        public void Set(int index, bool value) => this[index].Set(value);
-        public void Set(int index, double value) => this[index].Set(value);
-        public void Set(int index, byte[] value) => this[index].Set(value);
-        public void Set(int index, DateTime value) => this[index].Set(value);
-        public void Set(int index, XmlRpcValue value) => this[index].Set(value);
+		public void Set ( int index, string value )
+		{
+			this [ index ].Set ( value );
+		}
+		public void Set ( int index, int value )
+		{
+			this [ index ].Set ( value );
+		}
+		public void Set ( int index, bool value )
+		{
+			this [ index ].Set ( value );
+		}
+		public void Set ( int index, double value )
+		{
+			this [ index ].Set ( value );
+		}
+		public void Set ( int index, byte[] value )
+		{
+			this [ index ].Set ( value );
+		}
+		public void Set ( int index, DateTime value )
+		{
+			this [ index ].Set ( value );
+		}
+		public void Set ( int index, XmlRpcValue value )
+		{
+			this [ index ].Set ( value );
+		}
 
-        public static explicit operator bool(XmlRpcValue value) => value.GetBool();
-        public static explicit operator int(XmlRpcValue value) => value.GetInt();
-        public static explicit operator double(XmlRpcValue value) => value.GetDouble();
-        public static explicit operator byte[](XmlRpcValue value) => value.GetBinary();
-        public static explicit operator DateTime (XmlRpcValue value) => value.GetDateTime();
-        public static explicit operator string(XmlRpcValue value) => value.GetString();
+		public static explicit operator bool ( XmlRpcValue value )
+		{
+			return value.GetBool ();
+		}
+		public static explicit operator int ( XmlRpcValue value )
+		{
+			return value.GetInt ();
+		}
+		public static explicit operator double ( XmlRpcValue value )
+		{
+			return value.GetDouble ();
+		}
+		public static explicit operator byte[] ( XmlRpcValue value )
+		{
+			return value.GetBinary ();
+		}
+		public static explicit operator DateTime ( XmlRpcValue value )
+		{
+			return value.GetDateTime ();
+		}
+		public static explicit operator string ( XmlRpcValue value )
+		{
+			return value.GetString ();
+		}
 
-        public IDictionary<string, XmlRpcValue> GetStruct() => (IDictionary<string, XmlRpcValue>)value;
-        public XmlRpcValue[] GetArray() => (XmlRpcValue[])value;
-        public int GetInt() => (int)value;
-        public string GetString() => (string)value;
-        public bool GetBool() => (bool)value;
-        public double GetDouble() => (double)value;
-        public DateTime GetDateTime() => (DateTime)value;
-        public byte[] GetBinary() => (byte[])value;
+		public IDictionary<string, XmlRpcValue> GetStruct ()
+		{
+			return (IDictionary<string, XmlRpcValue>) value;
+		}
+		public XmlRpcValue[] GetArray ()
+		{
+			return (XmlRpcValue[]) value;
+		}
+		public int GetInt ()
+		{
+			return (int) value;
+		}
+		public string GetString ()
+		{
+			return (string) value;
+		}
+		public bool GetBool ()
+		{
+			return (bool) value;
+		}
+		public double GetDouble ()
+		{
+			return (double) value;
+		}
+		public DateTime GetDateTime ()
+		{
+			return (DateTime) value;
+		}
+		public byte[] GetBinary ()
+		{
+			return (byte[]) value;
+		}
 
         public override string ToString()
         {
@@ -475,7 +559,10 @@ namespace Uml.Robotics.XmlRpc
             return array;
         }
 
-        private XmlRpcValue Get(int index) => this.GetArray()[index];
+		private XmlRpcValue Get ( int index )
+		{
+			return this.GetArray () [ index ];
+		}
 
         private XmlRpcValue Get(string key, bool createMissing = false)
         {

@@ -255,7 +255,9 @@ namespace Uml.Robotics.Ros
             Params.Set(0, ThisNode.Name);
             Params.Set(1, name);
             Params.Set(2, protos_array);
-            if (!Network.SplitUri(xmlRpcUri, out string peerHost, out int peerPort))
+			string peerHost;
+			int peerPort;
+            if (!Network.SplitUri(xmlRpcUri, out peerHost, out peerPort))
             {
                 Logger.LogError("Bad xml-rpc URI: [" + xmlRpcUri + "]");
                 return false;

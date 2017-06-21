@@ -67,10 +67,12 @@ namespace Uml.Robotics.Ros
 
 
         public void Shutdown()
-        {
-            simTimeSubscriber?.shutdown();
-            nodeHandle?.shutdown();
-        }
+		{
+			if ( simTimeSubscriber != null )
+				simTimeSubscriber.shutdown ();
+			if ( nodeHandle != null )
+				nodeHandle.shutdown ();
+		}
 
 
         private void SimTimeCallback(Clock time)

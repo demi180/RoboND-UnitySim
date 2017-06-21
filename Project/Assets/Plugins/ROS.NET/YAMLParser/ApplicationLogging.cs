@@ -28,11 +28,15 @@ namespace YAMLParser
             }
         }
 
-        public static ILogger CreateLogger<T>() =>
-            LoggerFactory.CreateLogger<T>();
+        public static ILogger CreateLogger<T>()
+		{
+			return LoggerFactory.CreateLogger<T> ();
+		}
 
-        public static ILogger CreateLogger(string category) =>
-            LoggerFactory.CreateLogger(category);
+        public static ILogger CreateLogger(string category)
+		{
+			return LoggerFactory.CreateLogger ( category );
+		}
     }
 
 }
