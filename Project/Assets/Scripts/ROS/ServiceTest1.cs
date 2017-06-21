@@ -8,6 +8,7 @@ using PoseStamped = Messages.geometry_msgs.PoseStamped;
 using Pose = Messages.geometry_msgs.Pose;
 using SetBool = Messages.std_srvs.SetBool;
 using System.Threading;
+using SetPose = Messages.geometry_msgs.SetPose;
 
 public class ServiceTest1 : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class ServiceTest1 : MonoBehaviour
 	ServiceClient<SetBool.Request, SetBool.Response> ctx;
 	ServiceClient<SetBool.Request, SetBool.Response> cty;
 	ServiceClient<SetBool.Request, SetBool.Response> ctz;
+	ServiceClient<SetPose.Request, SetPose.Response> poseClient;
 //	ServiceClient<Plan> pathClient;
 	NodeHandle nh;
 //	Plan path;
@@ -68,6 +70,9 @@ public class ServiceTest1 : MonoBehaviour
 				CallConstrain ( 4 );
 			if ( Input.GetKeyDown ( KeyCode.F6 ) )
 				CallConstrain ( 5 );
+
+			if ( Input.GetKeyDown ( KeyCode.F10 ) )
+				CallSetPose ();
 		}
 	}
 	
@@ -81,8 +86,7 @@ public class ServiceTest1 : MonoBehaviour
 		ctx = nh.serviceClient<SetBool.Request, SetBool.Response> ( "/quad_rotor/x_torque_constrained" );
 		cty = nh.serviceClient<SetBool.Request, SetBool.Response> ( "/quad_rotor/y_torque_constrained" );
 		ctz = nh.serviceClient<SetBool.Request, SetBool.Response> ( "/quad_rotor/z_torque_constrained" );
-//		pathClient = nh.serviceClient<Plan> ( "/quad_rotor/path" );
-//		path = new Plan ();
+		poseClient = nh.serviceClient<SetPose.Request, SetPose.Response> ( "/quad_rotor/set_pose" );
 	}
 
 	void CallService ()
@@ -248,5 +252,30 @@ public class ServiceTest1 : MonoBehaviour
 //			Debug.Log ( "call failed?" );
 
 		isCalling = false;
+	}
+
+	void CallSetPose ()
+	{
+		Debug.Log ( "Calling pose" );
+		isCalling = true;
+		lastCallTime = Time.time;
+		Vector3 camForward = Camera.main.transform.forward;
+
+		srvThread = new Thread (new ThreadStart (() => {
+			SetPose.Request req = new SetPose.Request ();
+			req.pose = new Pose ();
+			req.pose.position = new Messages.geometry_msgs.Point ( new Vector3 ( 70, 70, 70 ).ToRos () );
+			req.pose.orientation = new Messages.geometry_msgs.Quaternion ( Quaternion.identity.ToRos () );
+
+			SetPose.Response resp = new SetPose.Response ();
+
+			if (poseClient.call ( req, ref resp ))
+				Debug.Log ("called!");
+			else
+				Debug.Log ("not called or failed or something!");
+
+			isCalling = false;
+		}));
+		srvThread.Start ();
 	}
 }

@@ -15,6 +15,7 @@ using Path = Messages.nav_msgs.Path;
 using GetPlan = Messages.nav_msgs.GetPlan;
 using SetBool = Messages.std_srvs.SetBool;
 using Empty = Messages.std_srvs.Empty;
+using SetPose = Messages.geometry_msgs.SetPose;
 
 
 /*
@@ -53,6 +54,7 @@ public class QuadDrone : MonoBehaviour
 	ServiceServer constrainTorqueYSrv;
 	ServiceServer constrainTorqueZSrv;
 	ServiceServer TriggerResetSrv;
+	ServiceServer setPoseSrv;
 
 	uint frameSeq = 0;
 
@@ -89,6 +91,7 @@ public class QuadDrone : MonoBehaviour
 		constrainTorqueYSrv = nh.advertiseService<SetBool.Request, SetBool.Response> ( "quad_rotor/y_torque_constrained", ConstrainTorqueY );
 		constrainTorqueZSrv = nh.advertiseService<SetBool.Request, SetBool.Response> ( "quad_rotor/z_torque_constrained", ConstrainTorqueZ );
 		TriggerResetSrv = nh.advertiseService<Empty.Request, Empty.Response> ( "quad_rotor/reset_orientation", TriggerReset );
+		setPoseSrv = nh.advertiseService<SetPose.Request, SetPose.Response> ( "quad_rotor/set_pose", SetPoseService );
 	}
 
 	bool OnEnableMotors (EnableMotors.Request req, ref EnableMotors.Response resp)
@@ -315,6 +318,16 @@ public class QuadDrone : MonoBehaviour
 //		droneController.TriggerReset ();
 		droneController.ApplyMotorForce ( Vector3.zero );
 		droneController.ApplyMotorTorque ( Vector3.zero );
+		return true;
+	}
+
+	bool SetPoseService (SetPose.Request req, ref SetPose.Response resp)
+	{
+		Debug.Log ( "setpose service!" );
+		// first ToUnity goes from PointQuaternion to Vector3/Quaternion, and 2nd goes from Ros' coord system to Unity's
+		droneController.SetPositionAndOrientation ( req.pose.position.ToUnity ().ToUnity (), req.pose.orientation.ToUnity ().ToUnity () );
+		resp.message = "";
+		resp.success = true;
 		return true;
 	}
 }

@@ -66,7 +66,10 @@ public class QuadController : MonoBehaviour
 
 	byte[] cameraData;
 	bool resetFlag;
-//	RenderTexture cameraTex;
+	bool setPoseFlag;
+
+	Vector3 posePosition;
+	Quaternion poseOrientation;
 
 	void Awake ()
 	{
@@ -96,6 +99,7 @@ public class QuadController : MonoBehaviour
 			ResetOrientation ();
 			resetFlag = false;
 		}
+		CheckSetPose ();
 
 		Position = transform.position;
 		Rotation = transform.rotation;
@@ -119,6 +123,7 @@ public class QuadController : MonoBehaviour
 			ResetOrientation ();
 			resetFlag = false;
 		}
+		CheckSetPose ();
 
 		if ( Input.GetKeyDown ( KeyCode.Escape ) )
 			Application.Quit ();
@@ -194,6 +199,7 @@ public class QuadController : MonoBehaviour
 			ResetOrientation ();
 			resetFlag = false;
 		}
+		CheckSetPose ();
 
 		rb.useGravity = UseGravity;
 		CheckConstraints ();
@@ -280,6 +286,35 @@ public class QuadController : MonoBehaviour
 		rb.velocity = Vector3.zero;
 		rb.angularVelocity = Vector3.zero;
 		LinearAcceleration = Vector3.zero;
+	}
+
+	void CheckSetPose ()
+	{
+		if ( setPoseFlag )
+		{
+			transform.position = posePosition;
+			transform.rotation = poseOrientation;
+			force = Vector3.zero;
+			torque = Vector3.zero;
+			rb.velocity = Vector3.zero;
+			rb.angularVelocity = Vector3.zero;
+			LinearAcceleration = Vector3.zero;
+			setPoseFlag = false;
+		}
+	}
+
+	public void SetPositionAndOrientation (Vector3 pos, Quaternion orientation, bool convertFromRos = false)
+	{
+		setPoseFlag = true;
+		if ( convertFromRos )
+		{
+			posePosition = posePosition.ToUnity ();
+			poseOrientation = poseOrientation.ToUnity ();
+		} else
+		{
+			posePosition = pos;
+			poseOrientation = orientation;
+		}
 	}
 
 	void CreateCameraTex ()
