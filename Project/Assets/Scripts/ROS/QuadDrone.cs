@@ -71,7 +71,7 @@ public class QuadDrone : MonoBehaviour
 	void OnRosInit ()
 	{
 		nh = new NodeHandle ( "~" );
-		pathSrv = nh.advertiseService<GetPlan.Request, GetPlan.Response> ( "quad_rotor/path", PathService );
+		pathSrv = nh.advertiseService<GetPlan.Request, GetPlan.Response> ( "quad_rotor/get_plan", PathService );
 //		setOrientSrv = nh.advertiseService<Messages.std_srvs.Empty.Request>
 //		enableMotorSrv = nh.advertiseService<EnableMotors.Request, EnableMotors.Response> ( "enable_motors", OnEnableMotors );
 		nh.setParam ( "control_mode", "wrench" ); // for now force twist mode
