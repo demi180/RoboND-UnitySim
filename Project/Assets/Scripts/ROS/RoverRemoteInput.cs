@@ -63,7 +63,8 @@ public class RoverRemoteInput : MonoBehaviour
 		Debug.Log ( "Ros init (input)" );
 		if ( nh == null )
 		{
-			nh = new NodeHandle ();
+			nh = ROS.GlobalNodeHandle;
+//			nh = new NodeHandle ();
 			ROSController.AddNode ( nh );
 		}
 		Subscribe ();

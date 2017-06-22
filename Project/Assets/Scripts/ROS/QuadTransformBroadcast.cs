@@ -31,7 +31,8 @@ public class QuadTransformBroadcast : MonoBehaviour
 
 	void OnROSInit ()
 	{
-		nh = new NodeHandle ();
+		nh = ROS.GlobalNodeHandle;
+//		nh = new NodeHandle ();
 		pub = nh.advertise<tfmsg> ( "/quad", 10, false );
 		pubthread = new Thread ( Publish );
 		pubthread.Start ();

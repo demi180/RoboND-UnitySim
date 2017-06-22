@@ -53,7 +53,8 @@ namespace Ros_CSharp
         {
             if (callbackInterface == null)
                 callbackInterface = ROS.GlobalCallbackQueue;
-            NodeHandle spinnerhandle = new NodeHandle();
+			NodeHandle spinnerhandle = ROS.GlobalNodeHandle;
+//            NodeHandle spinnerhandle = new NodeHandle();
             while (spinnerhandle.ok)
             {
                 callbackInterface.callAvailable(ROS.WallDuration);

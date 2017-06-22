@@ -29,7 +29,8 @@ public class QuadROSListener : MonoBehaviour
 
 	void OnROSInit ()
 	{
-		nh = new NodeHandle ();
+		nh = ROS.GlobalNodeHandle;
+//		nh = new NodeHandle ();
 		nh.subscribe<rquat> ( "/quad", 10, OnInputReceived );
 	}
 

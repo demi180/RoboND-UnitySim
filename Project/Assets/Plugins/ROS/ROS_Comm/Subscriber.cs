@@ -31,7 +31,8 @@ namespace Ros_CSharp
         {
             // TODO: Complete member initialization
             this.topic = topic;
-            nodehandle = new NodeHandle(nodeHandle);
+			nodehandle = ROS.GlobalNodeHandle;
+//            nodehandle = new NodeHandle(nodeHandle);
             helper = cb;
         }
 
@@ -42,7 +43,8 @@ namespace Ros_CSharp
         public Subscriber(Subscriber<M> s) : base(s.topic)
         {
             topic = s.topic;
-            nodehandle = new NodeHandle(s.nodehandle);
+			nodehandle = ROS.GlobalNodeHandle;
+//            nodehandle = new NodeHandle(s.nodehandle);
             helper = s.helper;
         }
 

@@ -41,7 +41,8 @@ namespace MeshLib
                 }
                 if (!ROS.shutting_down)
                 {
-                    nh = new NodeHandle();
+					nh = ROS.GlobalNodeHandle;
+//                    nh = new NodeHandle();
                     Load();
                 }
             }) { IsBackground = true }.Start();

@@ -55,14 +55,16 @@ public class TestRoverInput : MonoBehaviour
 		Debug.Log ( "Ros init (test). Input is: " + ( roverInput != null ) );
 		if ( roverInput != null )
 		{
-			roverInput.nh = new NodeHandle ();
+			roverInput.nh = ROS.GlobalNodeHandle;
+//			roverInput.nh = new NodeHandle ();
 			ROSController.AddNode ( roverInput.nh );
 			nh = roverInput.nh;
 
 		} else
 		{
-			nh = new NodeHandle ();
-			ROSController.AddNode ( nh );
+			nh = ROS.GlobalNodeHandle;
+//			nh = new NodeHandle ();
+//			ROSController.AddNode ( nh );
 		}
 		pub = nh.advertise<rbyte> ( "/RoverInput", 0, false );
 		pubthread = new Thread ( Publish );

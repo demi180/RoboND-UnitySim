@@ -51,7 +51,8 @@ public class QuadROSInput : MonoBehaviour
 
 	void OnROSInit ()
 	{
-		nh = new NodeHandle ();
+		nh = ROS.GlobalNodeHandle;
+//		nh = new NodeHandle ();
 		pub = nh.advertise<rquat> ( "/quad", 10, false );
 		pubthread = new Thread ( Publish );
 		pubthread.Start ();

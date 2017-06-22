@@ -69,49 +69,50 @@ public class QRKeyboardTeleop : MonoBehaviour
 
 	void OnRosInit ()
 	{
-		NodeHandle privateNH = new NodeHandle("~");
+		nh = ROS.GlobalNodeHandle;
+//		NodeHandle privateNH = new NodeHandle("~");
 		// TODO dynamic reconfig
 		string control_mode = "";
-		privateNH.param<string>("control_mode", ref control_mode, "wrench");
+		nh.param<string>("control_mode", ref control_mode, "wrench");
 
-		NodeHandle robot_nh = new NodeHandle ("~");
+//		NodeHandle robot_nh = new NodeHandle ("~");
 
 		// TODO factor out
-//		robot_nh.param<string>("base_link_frame", ref baseLinkFrame, "base_link");
-//		robot_nh.param<string>("world_frame", ref worldFrame, "world");
-//		robot_nh.param<string>("base_stabilized_frame", ref baseStabilizedFrame, "base_stabilized");
+//		nh.param<string>("base_link_frame", ref baseLinkFrame, "base_link");
+//		nh.param<string>("world_frame", ref worldFrame, "world");
+//		nh.param<string>("base_stabilized_frame", ref baseStabilizedFrame, "base_stabilized");
 
 		if ( control_mode == "wrench" )
 		{
-			wrenchPub = robot_nh.advertise<Wrench> ( "quad_rotor/cmd_force", 10 );
-			poseSub = robot_nh.subscribe<PoseStamped> ( "quad_rotor/pose", 10, PoseCallback );
+			wrenchPub = nh.advertise<Wrench> ( "quad_rotor/cmd_force", 10 );
+			poseSub = nh.subscribe<PoseStamped> ( "quad_rotor/pose", 10, PoseCallback );
 //			pubThread = new Thread ()
 		}
 		else if (control_mode == "attitude")
 		{
-//			privateNH.param<double>("pitch_max", ref sAxes.x.factor, 30.0);
-//			privateNH.param<double>("roll_max", ref sAxes.y.factor, 30.0);
-//			privateNH.param<double>("thrust_max", ref sAxes.thrust.factor, 10.0);
-//			privateNH.param<double>("thrust_offset", ref sAxes.thrust.offset, 10.0);
-			attitudePublisher = robot_nh.advertise<AttitudeCommand> ( "command/attitude", 10 );
-			yawRatePublisher = robot_nh.advertise<YawRateCommand> ( "command/yawrate", 10 );
-			thrustPublisher = robot_nh.advertise<ThrustCommand> ( "command/thrust", 10 );
+//			nh.param<double>("pitch_max", ref sAxes.x.factor, 30.0);
+//			nh.param<double>("roll_max", ref sAxes.y.factor, 30.0);
+//			nh.param<double>("thrust_max", ref sAxes.thrust.factor, 10.0);
+//			nh.param<double>("thrust_offset", ref sAxes.thrust.offset, 10.0);
+			attitudePublisher = nh.advertise<AttitudeCommand> ( "command/attitude", 10 );
+			yawRatePublisher = nh.advertise<YawRateCommand> ( "command/yawrate", 10 );
+			thrustPublisher = nh.advertise<ThrustCommand> ( "command/thrust", 10 );
 		}
 		else if (control_mode == "velocity" || control_mode == "twist")
 		{
 			// Gazebo uses Y=forward and Z=up
-			privateNH.param<double>("x_velocity_max", ref xVelocityMax, 2.0);
-			privateNH.param<double>("y_velocity_max", ref zVelocityMax, 2.0);
-			privateNH.param<double>("z_velocity_max", ref yVelocityMax, 2.0);
+			nh.param<double>("x_velocity_max", ref xVelocityMax, 2.0);
+			nh.param<double>("y_velocity_max", ref zVelocityMax, 2.0);
+			nh.param<double>("z_velocity_max", ref yVelocityMax, 2.0);
 
-			velocityPublisher = robot_nh.advertise<TwistStamped> ( "command/twist", 10 );
+			velocityPublisher = nh.advertise<TwistStamped> ( "command/twist", 10 );
 		}
 		else if (control_mode == "position")
 		{
 			// Gazebo uses Y=forward and Z=up
-			privateNH.param<double>("x_velocity_max", ref xVelocityMax, 2.0);
-			privateNH.param<double>("y_velocity_max", ref zVelocityMax, 2.0);
-			privateNH.param<double>("z_velocity_max", ref yVelocityMax, 2.0);
+			nh.param<double>("x_velocity_max", ref xVelocityMax, 2.0);
+			nh.param<double>("y_velocity_max", ref zVelocityMax, 2.0);
+			nh.param<double>("z_velocity_max", ref yVelocityMax, 2.0);
 
 			pose.pose.position.x = 0;
 			pose.pose.position.y = 0;
@@ -126,10 +127,10 @@ public class QRKeyboardTeleop : MonoBehaviour
 			ROS.Error("Unsupported control mode: " + control_mode);
 		}
 
-		motorEnableService = robot_nh.serviceClient<EnableMotors> ( "enable_motors" );
-//		takeoffClient = new TakeoffClient ( robot_nh, "action/takeoff" );
-//		landingClient = new LandingClient ( robot_nh, "action/landing" );
-//		poseClient = new PoseClient ( robot_nh, "action/pose" );
+		motorEnableService = nh.serviceClient<EnableMotors> ( "enable_motors" );
+//		takeoffClient = new TakeoffClient ( nh, "action/takeoff" );
+//		landingClient = new LandingClient ( nh, "action/landing" );
+//		poseClient = new PoseClient ( nh, "action/pose" );
 	}
 
 	public bool enableMotors (bool enable)

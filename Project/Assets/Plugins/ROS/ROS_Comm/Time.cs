@@ -41,7 +41,8 @@ namespace Ros_CSharp
                                {
                                    Thread.Sleep(100);
                                }
-                               nh = new NodeHandle();
+				nh = ROS.GlobalNodeHandle;
+//                               nh = new NodeHandle();
                                if (!ROS.shutting_down)
                                {
                                    simTimeSubscriber = nh.subscribe<Clock>("/clock", 1, SimTimeCallback);

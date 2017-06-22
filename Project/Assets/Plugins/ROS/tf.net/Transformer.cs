@@ -46,7 +46,8 @@ namespace tf.net
 
         private void InitNH()
         {
-            nh = new NodeHandle();
+			nh = ROS.GlobalNodeHandle;
+//            nh = new NodeHandle();
             nh.subscribe<tfMessage>("/tf", 0, Update);
         }
 

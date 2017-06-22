@@ -66,7 +66,8 @@ public class RoverRosInput : MonoBehaviour
 
 	void OnRosInit ()
 	{
-		nh = new NodeHandle ();
+		nh = ROS.GlobalNodeHandle;
+//		nh = new NodeHandle ();
 		ROSController.AddNode ( nh );
 		pub = nh.advertise<rbyte> ( "/RoverInput", 0, false );
 		pubthread = new Thread ( Publish );

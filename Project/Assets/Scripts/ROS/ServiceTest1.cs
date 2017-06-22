@@ -28,6 +28,7 @@ public class ServiceTest1 : MonoBehaviour
 
 	public float lastCallTime;
 	public bool isCalling;
+	public bool shutdown;
 
 	void Start ()
 	{
@@ -74,11 +75,17 @@ public class ServiceTest1 : MonoBehaviour
 			if ( Input.GetKeyDown ( KeyCode.F10 ) )
 				CallSetPose ();
 		}
+		if ( shutdown )
+		{
+			shutdown = false;
+			ROSController.StopROS ();
+		}
 	}
 	
 	void OnRosInit ()
 	{
-		nh = new NodeHandle ( "~" );
+		nh = ROS.GlobalNodeHandle;
+//		nh = new NodeHandle ( "~" );
 		pathClient = nh.serviceClient<Plan.Request, Plan.Response> ( "/quad_rotor/path" );
 		cfx = nh.serviceClient<SetBool.Request, SetBool.Response> ( "/quad_rotor/x_force_constrained" );
 		cfy = nh.serviceClient<SetBool.Request, SetBool.Response> ( "/quad_rotor/y_force_constrained" );

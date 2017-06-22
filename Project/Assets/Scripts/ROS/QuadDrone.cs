@@ -70,7 +70,8 @@ public class QuadDrone : MonoBehaviour
 
 	void OnRosInit ()
 	{
-		nh = new NodeHandle ( "~" );
+		nh = ROS.GlobalNodeHandle;
+//		nh = new NodeHandle ( "~" );
 		pathSrv = nh.advertiseService<GetPlan.Request, GetPlan.Response> ( "quad_rotor/get_plan", PathService );
 //		setOrientSrv = nh.advertiseService<Messages.std_srvs.Empty.Request>
 //		enableMotorSrv = nh.advertiseService<EnableMotors.Request, EnableMotors.Response> ( "enable_motors", OnEnableMotors );

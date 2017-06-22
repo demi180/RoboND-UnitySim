@@ -16,7 +16,8 @@ public class ATIServer : MonoBehaviour
 
 	void OnRosInit ()
 	{
-		nh = new NodeHandle ( "" );
+		nh = ROS.GlobalNodeHandle;
+//		nh = new NodeHandle ( "" );
 		srv = nh.advertiseService<AddTwoInts.Request, AddTwoInts.Response> ( "/add_two_ints", Addition );
 	}
 

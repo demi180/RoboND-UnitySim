@@ -25,7 +25,8 @@ public class ATIClient : MonoBehaviour
 
 	void OnRosInit ()
 	{
-		nh = new NodeHandle ( "" );
+		nh = ROS.GlobalNodeHandle;
+//		nh = new NodeHandle ( "" );
 		cli = nh.serviceClient<AddTwoInts.Request, AddTwoInts.Response> ( "/add_two_ints" );
 
 		Debug.Log ( "calling client" );

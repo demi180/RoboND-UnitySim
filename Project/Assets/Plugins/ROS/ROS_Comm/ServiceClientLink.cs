@@ -93,21 +93,56 @@ namespace Ros_CSharp
 
         public virtual void processResponse(string error, bool success)
         {
-            String msg = new String(error);
-            msg.Serialized = msg.Serialize();
-            byte[] buf = new byte[msg.Serialized.Length + 1];
-            buf[0] = (byte) (success ? 0x01 : 0x00);
-            msg.Serialized.CopyTo(buf, 1);
-            connection.write(buf, buf.Length, onResponseWritten, true);
+			// copied over from Xamla
+			var msg = new Messages.std_msgs.String(error);
+			msg.Serialized = msg.Serialize();
+			byte[] buf;
+			if (success)
+			{
+				buf = new byte[msg.Serialized.Length + 1 + 4];
+				buf[0] = (byte) (success ? 0x01 : 0x00);
+				msg.Serialized.CopyTo(buf, 5);
+				Array.Copy(BitConverter.GetBytes(msg.Serialized.Length),0, buf, 1,4);
+			}
+			else
+			{
+				buf = new byte[1 + 4];
+				buf[0] = (byte) (success ? 0x01 : 0x00);
+				Array.Copy(BitConverter.GetBytes(0),0, buf, 1,4);
+			}
+			connection.write(buf, buf.Length, onResponseWritten, true); // Eric has immediate as true, Xamla doesn't, but this seems to work for now
+//            String msg = new String(error);
+//            msg.Serialized = msg.Serialize();
+//            byte[] buf = new byte[msg.Serialized.Length + 1];
+//            buf[0] = (byte) (success ? 0x01 : 0x00);
+//            msg.Serialized.CopyTo(buf, 1);
+//            connection.write(buf, buf.Length, onResponseWritten, true);
         }
 
         public virtual void processResponse(IRosMessage msg, bool success)
         {
-            msg.Serialized = msg.Serialize();
-            byte[] buf = new byte[msg.Serialized.Length + 1];
-            buf[0] = (byte) (success ? 0x01 : 0x00);
-            msg.Serialized.CopyTo(buf, 1);
-            connection.write(buf, buf.Length, onResponseWritten, true);
+			// copied over from Xamla
+			byte[] buf;
+			if (success)
+			{
+				msg.Serialized = msg.Serialize();
+				buf = new byte[msg.Serialized.Length + 1 + 4];
+				buf[0] = (byte) (success ? 0x01 : 0x00);
+				msg.Serialized.CopyTo(buf, 5);
+				Array.Copy(BitConverter.GetBytes(msg.Serialized.Length),0, buf, 1,4);
+			}
+			else
+			{
+				buf = new byte[1 + 4];
+				buf[0] = (byte) (success ? 0x01 : 0x00);
+				Array.Copy(BitConverter.GetBytes(0),0, buf, 1,4);
+			}
+			connection.write(buf, buf.Length, onResponseWritten, true); // Eric has immediate as true, Xamla doesn't, but this seems to work for now
+//            msg.Serialized = msg.Serialize();
+//            byte[] buf = new byte[msg.Serialized.Length + 1];
+//            buf[0] = (byte) (success ? 0x01 : 0x00);
+//            msg.Serialized.CopyTo(buf, 1);
+//            connection.write(buf, buf.Length, onResponseWritten, true);
         }
 
         public virtual void drop()
@@ -173,9 +208,9 @@ namespace Ros_CSharp
                 throw new Exception("WRONG CONNECTION!");
 
             if (persistent)
-                connection.read(4, onRequestLength);
+				connection.read(4, onRequestLength);
             else
-                connection.drop(Connection.DropReason.Destructing);
+				connection.drop(Connection.DropReason.Destructing);
             return true;
         }
     }

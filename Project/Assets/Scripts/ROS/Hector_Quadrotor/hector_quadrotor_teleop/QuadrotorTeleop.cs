@@ -275,27 +275,29 @@ public class QuadrotorTeleop : MonoBehaviour
 
 	void OnRosInit ()
 	{
-		NodeHandle privateNH = new NodeHandle("~");
+		nh = ROS.GlobalNodeHandle;
+//		NodeHandle privateNH = new NodeHandle("~");
 
-		privateNH.param<int>("x_axis", ref sAxes.x.axis, 5);
-		privateNH.param<int>("y_axis", ref sAxes.y.axis, 4);
-		privateNH.param<int>("z_axis", ref sAxes.z.axis, 2);
-		privateNH.param<int>("thrust_axis", ref sAxes.thrust.axis, -3);
-		privateNH.param<int>("yaw_axis", ref sAxes.yaw.axis, 1);
+		nh.param<int>("x_axis", ref sAxes.x.axis, 5);
+		nh.param<int>("y_axis", ref sAxes.y.axis, 4);
+		nh.param<int>("z_axis", ref sAxes.z.axis, 2);
+		nh.param<int>("thrust_axis", ref sAxes.thrust.axis, -3);
+		nh.param<int>("yaw_axis", ref sAxes.yaw.axis, 1);
 
-		privateNH.param<double>("yaw_velocity_max", ref sAxes.yaw.factor, 90.0);
+		nh.param<double>("yaw_velocity_max", ref sAxes.yaw.factor, 90.0);
 
-		privateNH.param<int>("slow_button", ref sButtons.slow.button, 4);
-		privateNH.param<int>("go_button", ref sButtons.go.button, 1);
-		privateNH.param<int>("stop_button", ref sButtons.stop.button, 2);
-		privateNH.param<int>("interrupt_button", ref sButtons.interrupt.button, 3);
-		privateNH.param<double>("slow_factor", ref slowFactor, 0.2);
+		nh.param<int>("slow_button", ref sButtons.slow.button, 4);
+		nh.param<int>("go_button", ref sButtons.go.button, 1);
+		nh.param<int>("stop_button", ref sButtons.stop.button, 2);
+		nh.param<int>("interrupt_button", ref sButtons.interrupt.button, 3);
+		nh.param<double>("slow_factor", ref slowFactor, 0.2);
 
 		// TODO dynamic reconfig
 		string control_mode = "";
-		privateNH.param<string>("control_mode", ref control_mode, "twist");
+		nh.param<string>("control_mode", ref control_mode, "twist");
 
-		NodeHandle robot_nh = new NodeHandle ();
+		NodeHandle robot_nh = ROS.GlobalNodeHandle;
+//		NodeHandle robot_nh = new NodeHandle ();
 
 		// TODO factor out
 		robot_nh.param<string>("base_link_frame", ref baseLinkFrame, "base_link");
@@ -304,10 +306,10 @@ public class QuadrotorTeleop : MonoBehaviour
 
 		if (control_mode == "attitude")
 		{
-			privateNH.param<double>("pitch_max", ref sAxes.x.factor, 30.0);
-			privateNH.param<double>("roll_max", ref sAxes.y.factor, 30.0);
-			privateNH.param<double>("thrust_max", ref sAxes.thrust.factor, 10.0);
-			privateNH.param<double>("thrust_offset", ref sAxes.thrust.offset, 10.0);
+			nh.param<double>("pitch_max", ref sAxes.x.factor, 30.0);
+			nh.param<double>("roll_max", ref sAxes.y.factor, 30.0);
+			nh.param<double>("thrust_max", ref sAxes.thrust.factor, 10.0);
+			nh.param<double>("thrust_offset", ref sAxes.thrust.offset, 10.0);
 			joySubscriber = nh.subscribe<Joy> ( "joy", 1, joyAttitudeCallback );
 			attitudePublisher = robot_nh.advertise<AttitudeCommand> ( "command/attitude", 10 );
 			yawRatePublisher = robot_nh.advertise<YawRateCommand> ( "command/yawrate", 10 );
@@ -315,18 +317,18 @@ public class QuadrotorTeleop : MonoBehaviour
 		}
 		else if (control_mode == "velocity")
 		{
-			privateNH.param<double>("x_velocity_max", ref sAxes.x.factor, 2.0);
-			privateNH.param<double>("y_velocity_max", ref sAxes.y.factor, 2.0);
-			privateNH.param<double>("z_velocity_max", ref sAxes.z.factor, 2.0);
+			nh.param<double>("x_velocity_max", ref sAxes.x.factor, 2.0);
+			nh.param<double>("y_velocity_max", ref sAxes.y.factor, 2.0);
+			nh.param<double>("z_velocity_max", ref sAxes.z.factor, 2.0);
 
 			joySubscriber = nh.subscribe<Joy> ( "joy", 1, joyTwistCallback );
 			velocityPublisher = robot_nh.advertise<TwistStamped> ( "command/twist", 10 );
 		}
 		else if (control_mode == "position")
 		{
-			privateNH.param<double>("x_velocity_max", ref sAxes.x.factor, 2.0);
-			privateNH.param<double>("y_velocity_max", ref sAxes.y.factor, 2.0);
-			privateNH.param<double>("z_velocity_max", ref sAxes.z.factor, 2.0);
+			nh.param<double>("x_velocity_max", ref sAxes.x.factor, 2.0);
+			nh.param<double>("y_velocity_max", ref sAxes.y.factor, 2.0);
+			nh.param<double>("z_velocity_max", ref sAxes.z.factor, 2.0);
 
 			joySubscriber = nh.subscribe<Joy> ( "joy", 1, joyPoseCallback );
 
