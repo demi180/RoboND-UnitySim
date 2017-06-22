@@ -11,7 +11,7 @@ using Messages.std_msgs;
 using String=System.String;
 using Messages.geometry_msgs;
 
-namespace Messages.geometry_msgs
+namespace Messages.quad_controller
 {
 #if !TRACE
     [System.Diagnostics.DebuggerStepThrough]
@@ -19,7 +19,7 @@ namespace Messages.geometry_msgs
     public class SetPose : IRosService
     {
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public override SrvTypes srvtype() { return SrvTypes.geometry_msgs__SetPose; }
+        public override SrvTypes srvtype() { return SrvTypes.quad_controller__SetPose; }
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public override string ServiceDefinition() { return @"geometry_msgs/Pose pose
 ---
@@ -62,7 +62,7 @@ string message"; }
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
             public override string MessageDefinition() { return @"geometry_msgs/Pose pose"; }
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-            public override MsgTypes msgtype() { return MsgTypes.geometry_msgs__SetPose__Request; }
+            public override MsgTypes msgtype() { return MsgTypes.quad_controller__SetPose__Request; }
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
             public override bool IsServiceComponent() { return true; }
 
@@ -140,7 +140,7 @@ string message"; }
             {
                 if (____other == null) return false;
                 bool ret = true;
-                geometry_msgs.SetPose.Request other = (Messages.geometry_msgs.SetPose.Request)____other;
+                quad_controller.SetPose.Request other = (Messages.quad_controller.SetPose.Request)____other;
 
                 ret &= pose.Equals(other.pose);
                 return ret;
@@ -164,7 +164,7 @@ string message"; }
             public override string MessageDefinition() { return @"bool success
 string message"; }
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-            public override MsgTypes msgtype() { return MsgTypes.geometry_msgs__SetPose__Response; }
+            public override MsgTypes msgtype() { return MsgTypes.quad_controller__SetPose__Response; }
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
             public override bool IsServiceComponent() { return true; }
 
@@ -266,7 +266,7 @@ string message"; }
             {
                 if (____other == null) return false;
                 bool ret = true;
-                geometry_msgs.SetPose.Response other = (Messages.geometry_msgs.SetPose.Response)____other;
+                quad_controller.SetPose.Response other = (Messages.quad_controller.SetPose.Response)____other;
 
                 ret &= success == other.success;
                 ret &= message == other.message;

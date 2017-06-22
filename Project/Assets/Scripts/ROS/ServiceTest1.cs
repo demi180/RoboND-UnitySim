@@ -8,7 +8,7 @@ using PoseStamped = Messages.geometry_msgs.PoseStamped;
 using Pose = Messages.geometry_msgs.Pose;
 using SetBool = Messages.std_srvs.SetBool;
 using System.Threading;
-using SetPose = Messages.geometry_msgs.SetPose;
+using SetPose = Messages.quad_controller.SetPose;
 
 public class ServiceTest1 : MonoBehaviour
 {

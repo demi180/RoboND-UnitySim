@@ -15,7 +15,7 @@ using Path = Messages.nav_msgs.Path;
 using GetPlan = Messages.nav_msgs.GetPlan;
 using SetBool = Messages.std_srvs.SetBool;
 using Empty = Messages.std_srvs.Empty;
-using SetPose = Messages.geometry_msgs.SetPose;
+using SetPose = Messages.quad_controller.SetPose;
 
 
 /*
