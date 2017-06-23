@@ -396,6 +396,10 @@ namespace Messages
 		baxter_core_msgs__SolvePositionIK__Response,
 		quad_controller__SetPose__Request,
 		quad_controller__SetPose__Response,
+		quad_controller__SetInt__Request,
+		quad_controller__SetInt__Response,
+		quad_controller__SetFloat__Request,
+		quad_controller__SetFloat__Response,
 
 		// hector stuff
 		hector_uav_msgs__Altimeter = 1000,
@@ -512,6 +516,9 @@ namespace Messages
 		baxter_core_msgs__OpenCamera,
 		baxter_core_msgs__SolvePositionIK,
 		quad_controller__SetPose,
+		quad_controller__SetInt,
+		quad_controller__SetFloat,
+
 
 		// hector stuff
 		hector_uav_msgs__EnableMotors = 1000,
