@@ -1,4 +1,8 @@
-﻿using System.Collections;
+﻿// comment this out to not collect time samples for timestamp test
+// #define TIMETEST
+
+
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -16,6 +20,7 @@ using GetPlan = Messages.nav_msgs.GetPlan;
 using SetBool = Messages.std_srvs.SetBool;
 using Empty = Messages.std_srvs.Empty;
 using SetPose = Messages.quad_controller.SetPose;
+
 
 
 /*
@@ -162,8 +167,16 @@ public class QuadDrone : MonoBehaviour
 
 		int sleep = 1000 / 60;
 		Vector3 testPos = Vector3.zero;
+		#if TIMETEST
+		Queue<TimeData> tdq = new Queue<TimeData> ();
+		Queue<long> tq = new Queue<long> ();
+		#endif
 		while ( ROS.ok && !ROS.shutting_down )
 		{
+			#if TIMETEST
+			tdq.Enqueue ( ROS.GetTime ().data );
+			tq.Enqueue ( System.DateTime.Now.Ticks );
+			#endif
 			// publish pose
 			ps.header.frame_id = "";
 			ps.header.seq = frameSeq;
@@ -190,6 +203,16 @@ public class QuadDrone : MonoBehaviour
 			
 			Thread.Sleep ( sleep );
 		}
+
+		#if TIMETEST
+		while ( tdq.Count > 0 )
+		{
+			TimeData td = tdq.Dequeue ();
+			Debug.Log ( "t: " + td.sec + " " + td.nsec );
+		}
+		while ( tq.Count > 0 )
+			Debug.Log ( "ticks: " + tq.Dequeue () );
+		#endif
 	}
 
 	bool PathService (GetPlan.Request req, ref GetPlan.Response resp)

@@ -45,6 +45,10 @@ public class QuadController : MonoBehaviour
 	public ForceMode forceMode = ForceMode.Force;
 	public ForceMode torqueMode = ForceMode.Force;
 
+	public Texture2D[] axisArrows;
+	public Color[] axisColors;
+	public float arrowScreenSize = 100f;
+
 	public bool rotateWithTorque;
 
 	// recording vars
@@ -255,6 +259,56 @@ public class QuadController : MonoBehaviour
 		force = LinearAcceleration.ToRos ();
 //		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
+
+
+
+		return;
+
+		// draw the axis arrows
+		float arrowSize = arrowScreenSize * Screen.height / 1080f / 2;
+		Vector3 upAxis;
+		float rotAngle;
+		transform.rotation.ToAngleAxis ( out rotAngle, out upAxis );
+		Vector2 centerScreen = new Vector2 ( Screen.width/2, Screen.height/2 );
+		Vector2 arrow1Pos = centerScreen - Vector2.up * Screen.height / 4;
+		Vector2 arrow2Pos = centerScreen - Vector2.right * Screen.width / 4 - Vector2.up * Screen.height / 4;
+		Vector2 arrow3Pos = centerScreen + Vector2.right * Screen.width / 4 - Vector2.up * Screen.height / 4;
+
+		// begin rotation to drone axis
+		GUIUtility.RotateAroundPivot ( -rotAngle, centerScreen );
+
+		// top (z) arrow
+		GUIUtility.RotateAroundPivot ( -90, arrow1Pos );
+//		Vector2 pos = centerScreen - Vector2.up * Screen.height / 4;
+		Rect arrowRect = new Rect ( arrow1Pos.x - arrowSize, arrow1Pos.y - arrowSize, arrowSize * 2, arrowSize * 2 );
+//		GUI.color = Color.white;
+//		GUI.DrawTexture ( arrowRect, axisArrows [ 0 ] );
+		GUI.color = axisColors [ 2 ];
+		GUI.DrawTexture ( arrowRect, axisArrows [ 0 ] );
+		GUIUtility.RotateAroundPivot ( 90, arrow1Pos );
+
+		// y arrow
+		GUIUtility.RotateAroundPivot ( -135, arrow2Pos );
+//		pos = centerScreen - Vector2.right * Screen.width / 4 - Vector2.up * Screen.height / 4;
+		arrowRect = new Rect ( arrow2Pos.x - arrowSize, arrow2Pos.y - arrowSize, arrowSize * 2, arrowSize * 2 );
+		GUI.color = Color.white;
+		GUI.DrawTexture ( arrowRect, axisArrows [ 0 ] );
+		GUI.color = axisColors [ 1 ];
+		GUI.DrawTexture ( arrowRect, axisArrows [ 0 ] );
+		GUIUtility.RotateAroundPivot ( 135, arrow2Pos );
+
+		// x arrow
+		GUIUtility.RotateAroundPivot ( -45, arrow3Pos );
+//		pos = centerScreen + Vector2.right * Screen.width / 4 - Vector2.up * Screen.height / 4;
+		arrowRect = new Rect ( arrow3Pos.x - arrowSize, arrow3Pos.y - arrowSize, arrowSize * 2, arrowSize * 2 );
+		GUI.color = Color.white;
+		GUI.DrawTexture ( arrowRect, axisArrows [ 0 ] );
+		GUI.color = axisColors [ 0 ];
+		GUI.DrawTexture ( arrowRect, axisArrows [ 0 ] );
+		GUIUtility.RotateAroundPivot ( 45, arrow3Pos);
+
+		// reset rotation
+		GUI.matrix = Matrix4x4.identity;
 	}
 
 	public void ApplyMotorForce (Vector3 v, bool convertFromRos = false)

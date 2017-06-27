@@ -18,6 +18,8 @@ public enum CameraPoseType
 
 public class FollowCamera : MonoBehaviour
 {
+	public static FollowCamera ActiveCamera;
+
 	public QuadController target;
 //	public Transform target;
 	public float followDistance = 5;
@@ -37,6 +39,8 @@ public class FollowCamera : MonoBehaviour
 
 	void Awake ()
 	{
+		if ( ActiveCamera == null )
+			ActiveCamera = this;
 		initialFollowDistance = followDistance;
 	}
 
