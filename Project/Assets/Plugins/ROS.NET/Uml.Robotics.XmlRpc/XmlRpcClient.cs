@@ -26,6 +26,8 @@ namespace Uml.Robotics.XmlRpc
         const string REQUEST_END = "</methodCall>\r\n";
 
         Uri serverUri;
+		bool requestBegan;
+		bool hasResponse;
 
         public XmlRpcClient(Uri serverUri)
         {
@@ -47,13 +49,23 @@ namespace Uml.Robotics.XmlRpc
             get { return serverUri.Port; }
         }
 
-        public async Task<XmlRpcCallResult> ExecuteAsync(string methodName, XmlRpcValue parameters)
+		public Task<XmlRpcCallResult> ExecuteAsync(string methodName, XmlRpcValue parameters)
+//		public IEnumerator<XmlRpcCallResult> ExecuteAsAsync (string methodName, XmlRpcValue parameters)
+//        public async Task<XmlRpcCallResult> ExecuteAsync(string methodName, XmlRpcValue parameters)
         {
             var req = HttpWebRequest.CreateHttp(serverUri);
             req.Method = "POST";
             req.ContentType = "text/xml; charset=utf-8";
 
-            using (var stream = await req.GetRequestStreamAsync())
+			IAsyncResult result = req.BeginGetRequestStream ( new AsyncCallback ( ReqCallback ), req );
+			requestBegan = true;
+			hasResponse = false;
+
+			while ( !hasResponse )
+				yield return null;
+
+
+/*            using (var stream = await req.GetRequestStreamAsync())
             {
                 // serialize request into memory stream
                 var buffer = new MemoryStream();
@@ -73,8 +85,48 @@ namespace Uml.Robotics.XmlRpc
                     var responseText = await reader.ReadToEndAsync();
                     return ParseResponse(responseText);
                 }
-            }
+            }*/
         }
+		void ReqCallback (IAsyncResult ar)
+		{
+			HttpWebRequest request = (HttpWebRequest)ar.AsyncState;
+
+			// End the operation
+			Stream postStream = request.EndGetRequestStream(ar);
+
+			string postData = "";
+
+			// Convert the string into a byte array.
+			byte[] byteArray = Encoding.UTF8.GetBytes(postData);
+
+			// Write to the request stream.
+			postStream.Write(byteArray, 0, postData.Length);
+			postStream.Close();
+
+			requestBegan = false;
+			hasResponse = false;
+			// Start the asynchronous operation to get the response
+			request.BeginGetResponse(new AsyncCallback(RespCallback), request);
+		}
+		void RespCallback (IAsyncResult ar)
+		{
+			HttpWebRequest request = (HttpWebRequest)ar.AsyncState;
+
+			// End the operation
+			HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(ar);
+			Stream streamResponse = response.GetResponseStream();
+			StreamReader streamRead = new StreamReader(streamResponse);
+			string responseString = streamRead.ReadToEnd();
+			Console.WriteLine(responseString);
+			// Close the stream object
+			streamResponse.Close();
+			streamRead.Close();
+
+			// Release the HttpWebResponse
+			response.Close();
+			hasResponse = true;
+		}
+
 
         public XmlRpcCallResult Execute(string methodName, XmlRpcValue parameters)
         {

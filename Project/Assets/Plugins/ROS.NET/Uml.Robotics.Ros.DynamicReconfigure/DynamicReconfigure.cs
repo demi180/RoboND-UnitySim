@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Messages.dynamic_reconfigure;
 using Messages.std_msgs;
-using Ros_CSharp;
+//using Uml.Robotics.Ros;
 using String = Messages.std_msgs.String;
 
 #endregion
