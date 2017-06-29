@@ -51,6 +51,12 @@ public class QuadController : MonoBehaviour
 
 	public bool rotateWithTorque;
 
+	public bool spinRotors = true;
+	public float maxRotorRPM = 3600;
+	public float maxRotorSpeed = 360;
+	[SerializeField]
+	float curRotorSpeed;
+
 	// recording vars
 	public float pathRecordFrequency = 3;
 	[System.NonSerialized]
@@ -163,13 +169,21 @@ public class QuadController : MonoBehaviour
 			transform.Rotate ( Vector3.up * -zAngle * Time.deltaTime, Space.World );
 		}
 
-//		Position = transform.position;
-//		Rotation = transform.rotation;
-//		Forward = forward.forward;
-//		Right = right.forward;
-//		Up = transform.up;
-//		XAxis = xAxis.forward;
-//		YAxis = yAxis.forward;
+		// spin rotors if we need
+		if ( spinRotors )
+		{
+			float rps = maxRotorRPM / 60f;
+			float degPerSec = rps * 360;
+			curRotorSpeed = degPerSec * force.y / thrustForce;
+
+			// use forward for now because rotors are rotated -90x
+			Vector3 rot = Vector3.forward * ( force.y / thrustForce ) * degPerSec * Time.deltaTime;
+//			Vector3 rot = Vector3.forward * ( force.y / thrustForce ) * maxRotorSpeed * Time.deltaTime;
+			frontLeftRotor.Rotate ( -rot );
+			frontRightRotor.Rotate ( rot );
+			rearLeftRotor.Rotate ( rot );
+			rearRightRotor.Rotate ( -rot );
+		}
 
 		Profiler.BeginSample ( "Raycast" );
 		ray = droneCam1.ViewportPointToRay ( new Vector3 ( 0.5f, 0.5f, droneCam1.nearClipPlane ) );

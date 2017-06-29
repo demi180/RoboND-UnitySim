@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityStandardAssets.ImageEffects;
 using Ros_CSharp;
 using Messages;
 using Empty = Messages.std_srvs.Empty;
@@ -19,15 +20,16 @@ public enum CameraPoseType
 public class FollowCamera : MonoBehaviour
 {
 	public static FollowCamera ActiveCamera;
-
 	public QuadController target;
-//	public Transform target;
+	public CameraMotionBlur blurScript;
 	public float followDistance = 5;
 	public float height = 4;
 
 	public bool autoAlign = false;
 	public Vector3 forward;
 	public CameraPoseType poseType;
+
+	public bool blurRotors = true;
 
 	NodeHandle nh;
 	ServiceServer distanceSrv;
@@ -42,6 +44,7 @@ public class FollowCamera : MonoBehaviour
 		if ( ActiveCamera == null )
 			ActiveCamera = this;
 		initialFollowDistance = followDistance;
+		GetComponent<Camera> ().depthTextureMode |= DepthTextureMode.MotionVectors;
 	}
 
 	void Start ()
@@ -60,18 +63,17 @@ public class FollowCamera : MonoBehaviour
 		}
 
 		transform.position = target.Position - transform.forward * followDistance;
-/*		if ( autoAlign )
+		if ( blurRotors )
 		{
-			Vector3 forward = Vector3.ProjectOnPlane ( target.Force, Vector3.up ).normalized;
-			Vector3 localForward = Vector3.ProjectOnPlane ( transform.forward, Vector3.up ).normalized;
-			
-			transform.position = target.Position - forward * followDistance + Vector3.up * height;
-			Quaternion q = Quaternion.FromToRotation ( localForward, forward );
-			transform.rotation =  Quaternion.RotateTowards ( transform.rotation, q * transform.rotation, 360 * Time.deltaTime );
+			float forcePercent = Mathf.Abs ( target.Force.y / target.thrustForce );
+			blurScript.velocityScale = forcePercent * forcePercent * forcePercent;
+			if ( !blurScript.enabled )
+				blurScript.enabled = true;
 		} else
 		{
-			transform.position = target.Position - forward * followDistance + Vector3.up * height;
-		}*/
+			if ( blurScript.enabled )
+				blurScript.enabled = false;
+		}
 
 		if ( Input.GetKeyDown ( KeyCode.F8 ) )
 		{
