@@ -31,6 +31,7 @@ public class ROSController : MonoBehaviour
 			return;
 		}
 
+//		Application.targetFrameRate = 0;
 		if ( QualitySettings.vSyncCount == 2 )
 			Application.targetFrameRate = 30;
 		else

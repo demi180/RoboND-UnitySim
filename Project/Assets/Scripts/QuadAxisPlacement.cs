@@ -21,6 +21,9 @@ public class QuadAxisPlacement : MonoBehaviour
 
 	void LateUpdate ()
 	{
+		bool showMovement = quad.ConstrainForceX || quad.ConstrainForceY || quad.ConstrainForceZ;
+		bool showRotation = quad.ConstrainTorqueX || quad.ConstrainTorqueY || quad.ConstrainTorqueZ;
+
 		Vector3 up = quad.Up * 0.5f;
 		Vector3 fwd = -cam.transform.forward;
 		arrowParents [ 0 ].position = quad.Position + up;// + quad.XAxis * 2;
@@ -48,11 +51,11 @@ public class QuadAxisPlacement : MonoBehaviour
 		arrows [ 3 ].rectTransform.sizeDelta = arrows [ 4 ].rectTransform.sizeDelta = arrows [ 5 ].rectTransform.sizeDelta = circleSize;// * sizeMult;*/
 
 		// make sure they're enabled correctly
-		arrows [ 0 ].enabled = !quad.ConstrainForceX;
-		arrows [ 1 ].enabled = !quad.ConstrainForceY;
-		arrows [ 2 ].enabled = !quad.ConstrainForceZ;
-		arrows [ 3 ].enabled = !quad.ConstrainTorqueX;
-		arrows [ 4 ].enabled = !quad.ConstrainTorqueY;
-		arrows [ 5 ].enabled = !quad.ConstrainTorqueZ;
+		arrows [ 0 ].enabled = showMovement && !quad.ConstrainForceX;
+		arrows [ 1 ].enabled = showMovement && !quad.ConstrainForceY;
+		arrows [ 2 ].enabled = showMovement && !quad.ConstrainForceZ;
+		arrows [ 3 ].enabled = showRotation && !quad.ConstrainTorqueX;
+		arrows [ 4 ].enabled = showRotation && !quad.ConstrainTorqueY;
+		arrows [ 5 ].enabled = showRotation && !quad.ConstrainTorqueZ;
 	}
 }
