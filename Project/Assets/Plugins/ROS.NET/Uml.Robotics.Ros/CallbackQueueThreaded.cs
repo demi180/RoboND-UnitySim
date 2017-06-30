@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
@@ -13,7 +13,7 @@ namespace Uml.Robotics.Ros
     /// </summary>
     public class CallbackQueueThreaded : ICallbackQueue
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<CallbackQueueThreaded>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<CallbackQueueThreaded>();
         private int count;
         private int calling;
         private Thread callbackThread;
@@ -118,7 +118,7 @@ namespace Uml.Robotics.Ros
                 RemoveAll(ownerId);
             else
             {
-                Logger.LogDebug("removeByID w/ WRONG THREAD ID");
+//                Logger.LogDebug("removeByID w/ WRONG THREAD ID");
                 RemoveAll(ownerId);
             }
         }
@@ -147,7 +147,7 @@ namespace Uml.Robotics.Ros
                 if (remainingTime > TimeSpan.Zero)
                     Thread.Sleep(remainingTime);
             }
-            Logger.LogDebug("CallbackQueue thread broke out!");
+//            Logger.LogDebug("CallbackQueue thread broke out!");
         }
 
 

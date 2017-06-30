@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
@@ -34,7 +34,7 @@ namespace Uml.Robotics.Ros
         private object dropped_connections_mutex = new object();
         private TcpListener tcpserver_transport;
         private WrappedTimer acceptor;
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<ConnectionManager>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<ConnectionManager>();
         private static Lazy<ConnectionManager> instance = new Lazy<ConnectionManager>(LazyThreadSafetyMode.ExecutionAndPublication);
 
 
@@ -127,8 +127,8 @@ namespace Uml.Robotics.Ros
             }
             else
             {
-                Logger.LogWarning("Got a connection for a type other than topic or service from [" + conn.RemoteString +
-                              "].");
+//                Logger.LogWarning("Got a connection for a type other than topic or service from [" + conn.RemoteString +
+//                              "].");
                 return false;
             }
             //Logger.LogDebug("CONNECTED [" + val + "]. WIN.");
@@ -175,7 +175,7 @@ namespace Uml.Robotics.Ros
             {
                 foreach (Connection c in localDropped)
                 {
-                    Logger.LogDebug("Removing dropped connection: " + c.CallerID);
+//                    Logger.LogDebug("Removing dropped connection: " + c.CallerID);
                     connections.Remove(c);
                 }
             }

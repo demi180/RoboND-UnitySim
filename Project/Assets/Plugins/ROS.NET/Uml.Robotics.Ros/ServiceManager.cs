@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Uml.Robotics.XmlRpc;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
@@ -15,7 +15,7 @@ namespace Uml.Robotics.Ros
             get { return instance.Value; }
         }
 
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<ServiceManager>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<ServiceManager>();
         private static Lazy<ServiceManager> instance = new Lazy<ServiceManager>(LazyThreadSafetyMode.ExecutionAndPublication);
         private ConnectionManager connectionManager;
         private PollManager pollManager;
@@ -162,7 +162,7 @@ namespace Uml.Robotics.Ros
             {
                 if (IsServiceAdvertised(ops.service))
                 {
-                    Logger.LogWarning("Tried to advertise  a service that is already advertised in this node [{0}]", ops.service);
+//                    Logger.LogWarning("Tried to advertise  a service that is already advertised in this node [{0}]", ops.service);
                     return false;
                 }
                 if (ops.helper == null)
@@ -252,18 +252,18 @@ namespace Uml.Robotics.Ros
             args.Set(1, name);
             if (!Master.execute("lookupService", args, result, payload, false))
             {
-                Logger.LogWarning("Service [{0}]: Not available at ROS master", name);
+//                Logger.LogWarning("Service [{0}]: Not available at ROS master", name);
                 return false;
             }
             string serv_uri = payload.GetString();
             if (serv_uri.Length == 0)
             {
-                Logger.LogError("Service [{0}]: Empty server URI returned from master", name);
+//                Logger.LogError("Service [{0}]: Empty server URI returned from master", name);
                 return false;
             }
             if (!Network.SplitUri(serv_uri, out serv_host, out serv_port))
             {
-                Logger.LogError("Service [{0}]: Bad service uri [{0}]", name, serv_uri);
+//                Logger.LogError("Service [{0}]: Bad service uri [{0}]", name, serv_uri);
                 return false;
             }
             return true;

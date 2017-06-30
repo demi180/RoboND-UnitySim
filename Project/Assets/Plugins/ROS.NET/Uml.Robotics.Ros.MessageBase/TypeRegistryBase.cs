@@ -1,24 +1,27 @@
-﻿using Microsoft.Extensions.DependencyModel;
-using Microsoft.Extensions.Logging;
+﻿//using Microsoft.Extensions.DependencyModel;
+//using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
+//using System.Runtime.Loader;
 using System.Text;
 
 namespace Uml.Robotics.Ros
 {
     public class TypeRegistryBase
     {
-        public Dictionary<string, Type> TypeRegistry { get; } = new Dictionary<string, Type>();
-        public List<string> PackageNames { get; } = new List<string>();
-        protected ILogger Logger { get; set; }
+		public Dictionary<string, Type> TypeRegistry { get { return typeRegistry; } }
+		public List<string> PackageNames { get { return packageNames; } }
+//        protected ILogger Logger { get; set; }
 
-        protected TypeRegistryBase(ILogger logger)
-        {
-            this.Logger = logger;
-        }
+//        protected TypeRegistryBase(ILogger logger)
+//        {
+//            this.Logger = logger;
+//        }
+
+		Dictionary<string, Type> typeRegistry = new Dictionary<string, Type> ();
+		List<string> packageNames = new List<string> ();
 
         public IEnumerable<string> GetTypeNames()
         {

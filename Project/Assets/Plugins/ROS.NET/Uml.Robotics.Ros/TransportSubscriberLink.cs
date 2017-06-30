@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
     public class TransportSubscriberLink : SubscriberLink, IDisposable
     {
-        ILogger Logger { get; } = ApplicationLogging.CreateLogger<TransportSubscriberLink>();
+//        ILogger Logger { get; } = ApplicationLogging.CreateLogger<TransportSubscriberLink>();
         Connection connection;
         bool headerWritten;
         int maxQueue;
@@ -30,8 +30,9 @@ namespace Uml.Robotics.Ros
 
         public bool Initialize(Connection connection)
         {
-            if (parent != null)
-                Logger.LogDebug("Init transport subscriber link: " + parent.Name);
+			if ( parent != null )
+				UnityEngine.Debug.Log ( "l1" );
+//                Logger.LogDebug("Init transport subscriber link: " + parent.Name);
             this.connection = connection;
             connection.DroppedEvent += OnConnectionDropped;
             return true;
@@ -42,7 +43,7 @@ namespace Uml.Robotics.Ros
             if (!header.Values.ContainsKey("topic"))
             {
                 string msg = "Header from subscriber did not have the required element: topic";
-                Logger.LogWarning(msg);
+//                Logger.LogWarning(msg);
                 connection.sendHeaderError(ref msg);
                 return false;
             }
@@ -53,7 +54,7 @@ namespace Uml.Robotics.Ros
             {
                 string msg = "received a connection for a nonexistent topic [" + name + "] from [" +
                              connection.transport + "] [" + client_callerid + "]";
-                Logger.LogWarning(msg);
+//                Logger.LogWarning(msg);
                 connection.sendHeaderError(ref msg);
                 return false;
             }
@@ -61,7 +62,7 @@ namespace Uml.Robotics.Ros
             if (!pt.validateHeader(header, ref error_message))
             {
                 connection.sendHeaderError(ref error_message);
-                Logger.LogError(error_message);
+//                Logger.LogError(error_message);
                 return false;
             }
             destination_caller_id = client_callerid;
@@ -81,7 +82,7 @@ namespace Uml.Robotics.Ros
             m["latching"] = Convert.ToString(pt.Latch);
             connection.writeHeader(m, OnHeaderWritten);
             pt.addSubscriberLink(this);
-            Logger.LogDebug("Finalize transport subscriber link for " + name);
+//            Logger.LogDebug("Finalize transport subscriber link for " + name);
             return true;
         }
 

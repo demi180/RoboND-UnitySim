@@ -11,9 +11,26 @@ namespace Uml.Robotics.Ros
     [IgnoreRosMessage]
     public class WrappedFeedbackMessage<T> : RosMessage where T : InnerActionMessage, new()
     {
-        public std_msgs.Header Header { get; set; } = new std_msgs.Header();
-        public actionlib_msgs.GoalStatus GoalStatus { get; set; } = new actionlib_msgs.GoalStatus();
-        protected T Content { get; set; } = new T();
+		public std_msgs.Header Header
+		{
+			get { return header; }
+			set { header = value; }
+		}
+		public actionlib_msgs.GoalStatus GoalStatus
+		{
+			get { return goalStatus; }
+			set{ goalStatus = value; }
+		}
+
+		protected T Content
+		{
+			get { return content; }
+			set{ content = value; }
+		}
+
+		std_msgs.Header header = new std_msgs.Header ();
+		actionlib_msgs.GoalStatus goalStatus = new actionlib_msgs.GoalStatus ();
+		T content = new T ();
 
         public WrappedFeedbackMessage()
             : base()

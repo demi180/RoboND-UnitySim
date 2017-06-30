@@ -5,7 +5,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using FauxMessages;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 using Uml.Robotics.Ros;
 
 namespace YAMLParser
@@ -14,7 +14,7 @@ namespace YAMLParser
     {
         public static Dictionary<string, string> md5memo = new Dictionary<string, string>();
         public static Dictionary<string, string> srvmd5memo = new Dictionary<string, string>();
-        private static ILogger Logger { get; } = ApplicationLogging.CreateLogger("MD5");
+//        private static ILogger Logger { get; } = ApplicationLogging.CreateLogger("MD5");
 
         public static string Sum(SrvFile srvFile)
         {
@@ -163,7 +163,7 @@ namespace YAMLParser
                     }
                     if (rosMessage == null)
                     {
-                        Logger.LogDebug("NEEDS ANOTHER PASS: " + msgFile.Name + " B/C OF " + msgFile.Stuff[i].Type);
+//                        Logger.LogDebug("NEEDS ANOTHER PASS: " + msgFile.Name + " B/C OF " + msgFile.Stuff[i].Type);
                         return null;
                     }
                 }
@@ -173,7 +173,7 @@ namespace YAMLParser
                 }
                 if (sum == null)
                 {
-                    Logger.LogDebug("STILL NEEDS ANOTHER PASS: " + msgFile.Name + " B/C OF " + msgFile.Stuff[i].Type);
+//                    Logger.LogDebug("STILL NEEDS ANOTHER PASS: " + msgFile.Name + " B/C OF " + msgFile.Stuff[i].Type);
                     return null;
                 }
 

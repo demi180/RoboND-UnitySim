@@ -6,7 +6,7 @@ using System.Threading;
 using m = Messages.std_msgs;
 using gm = Messages.geometry_msgs;
 using nm = Messages.nav_msgs;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 using Uml.Robotics.Ros;
 using Uml.Robotics.XmlRpc;
 
@@ -14,7 +14,7 @@ namespace rosmaster
 {
     public class XmlRpcManager : IDisposable
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<XmlRpcManager>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<XmlRpcManager>();
         private static Lazy<XmlRpcManager> _instance = new Lazy<XmlRpcManager>(LazyThreadSafetyMode.ExecutionAndPublication);
 
         public static XmlRpcManager Instance
@@ -29,7 +29,7 @@ namespace rosmaster
         private List<AsyncXmlRpcConnection> connections = new List<AsyncXmlRpcConnection>();
         private Dictionary<string, FunctionInfo> functions = new Dictionary<string, FunctionInfo>();
         private object functions_mutex = new object();
-        private XMLRPCFunc getPid;
+        private XmlRpcFunc getPid;
         public int port;
         private List<AsyncXmlRpcConnection> removed_connections = new List<AsyncXmlRpcConnection>();
         private object removed_connections_mutex = new object();
@@ -160,7 +160,7 @@ namespace rosmaster
 
         private bool validateFailed(string method, string errorfmat, params object[] info)
         {
-            Logger.LogDebug("XML-RPC Call [{0}] {1} failed validation", method, string.Format(errorfmat, info));
+//            Logger.LogDebug("XML-RPC Call [{0}] {1} failed validation", method, string.Format(errorfmat, info));
             return false;
         }
 
@@ -218,7 +218,7 @@ namespace rosmaster
                 removed_connections.Add(conn);
         }
 
-        public bool bind(string function_name, XMLRPCFunc cb)
+        public bool bind(string function_name, XmlRpcFunc cb)
         {
             Console.WriteLine($"Binding function: {function_name}");
             lock (functions_mutex)
@@ -336,7 +336,7 @@ namespace rosmaster
                 uri = "http://" + network.host + ":" + port + "/";
             }
 
-            Logger.LogInformation("XmlRpc Server listening at " + uri);
+//            Logger.LogInformation("XmlRpc Server listening at " + uri);
             server_thread = new Thread(serverThreadFunc) { IsBackground = true };
             server_thread.Start();
         }
@@ -377,14 +377,14 @@ namespace rosmaster
                 removed_connections.Clear();
             }
 
-            Logger.LogDebug("XmlRpc Server shutted down.");
+//            Logger.LogDebug("XmlRpc Server shutted down.");
         }
 
         #region Nested type: FunctionInfo
 
         public class FunctionInfo
         {
-            public XMLRPCFunc function;
+            public XmlRpcFunc function;
             public string name = "";
             public XmlRpcServerMethod wrapper;
         }
@@ -394,7 +394,7 @@ namespace rosmaster
 
     public class CachedXmlRpcClient : IDisposable
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<CachedXmlRpcClient>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<CachedXmlRpcClient>();
         private XmlRpcClient client;
 
         public bool in_use
@@ -435,9 +435,10 @@ namespace rosmaster
         /// </summary>
         public void Dispose()
         {
-            lock (busyMutex)
-            	if (refs != 0)
-                	Logger.LogWarning("XmlRpcClient disposed with "+refs+" refs held");
+			lock ( busyMutex )
+				if ( refs != 0 )
+					UnityEngine.Debug.LogWarning ( "disposed " );
+//                	Logger.LogWarning("XmlRpcClient disposed with "+refs+" refs held");
             lock (client_lock)
             {
                 if (client != null)

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
     public class NodeHandle
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<NodeHandle>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<NodeHandle>();
         private string Namespace = "", UnresolvedNamespace = "";
         private ICallbackQueue _callback;
         private bool _ok = true;
@@ -218,7 +218,7 @@ namespace Uml.Robotics.Ros
                 }
                 return pub;
             }
-            Logger.LogError("Advertisement of publisher has failed");
+//            Logger.LogError("Advertisement of publisher has failed");
             return null;
         }
 

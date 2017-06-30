@@ -5,9 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Runtime.Loader;
+//using System.Runtime.Loader;
 
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 using Uml.Robotics.XmlRpc;
 using std_msgs = Messages.std_msgs;
 using System.IO;
@@ -20,7 +20,7 @@ namespace Uml.Robotics.Ros
     /// </summary>
     public static class ROS
     {
-        private static ILogger Logger { get; set; } = ApplicationLogging.CreateLogger(nameof(ROS));
+//        private static ILogger Logger { get; set; } = ApplicationLogging.CreateLogger(nameof(ROS));
 
         private static ICallbackQueue globalCallbackQueue;
         private static object startMutex = new object();
@@ -209,8 +209,8 @@ namespace Uml.Robotics.Ros
 
         private static void _rosout(object format, object[] args, RosOutAppender.ROSOUT_LEVEL level, CallerInfo callerInfo)
         {
-            using (Logger.BeginScope(nameof(_rosout)))
-            {
+//            using (Logger.BeginScope(nameof(_rosout)))
+//            {
                 if (format == null)
                     throw new ArgumentNullException(nameof(format));
 
@@ -223,17 +223,18 @@ namespace Uml.Robotics.Ros
                     printit = false;
     #endif
                 }
-                if (printit)
-                    Logger.LogDebug(ROSOUT_FMAT, ROSOUT_PREFIX[level], text);
+				if ( printit )
+					UnityEngine.Debug.Log ( "ll1" );
+//                    Logger.LogDebug(ROSOUT_FMAT, ROSOUT_PREFIX[level], text);
                 RosOutAppender.Instance.Append(text, level, callerInfo);
-            }
+//            }
         }
 
         /// <summary>
         ///     Set the logging factory for ROS.NET
         /// </summary>
         /// <param name="factory"> The logging factory to use for logging </param>
-        public static void SetLoggerFactory(ILoggerFactory factory)
+/*        public static void SetLoggerFactory(ILoggerFactory factory)
         {
             ApplicationLogging.LoggerFactory = factory;
 
@@ -243,7 +244,7 @@ namespace Uml.Robotics.Ros
             {
                 Logger.LogWarning("Logging should be configured before initializing the ROS system.");
             }
-        }
+        }*/
 
         /// <summary>
         ///     Initializes ROS so nodehandles and nodes can exist
@@ -324,7 +325,7 @@ namespace Uml.Robotics.Ros
                     var candidates = MessageTypeRegistry.GetCandidateAssemblies("Uml.Robotics.Ros.MessageBase");
                     foreach (var assembly in candidates)
                     {
-                        Logger.LogDebug($"Parse assembly: {assembly.Location}");
+//                        Logger.LogDebug($"Parse assembly: {assembly.Location}");
                         msgRegistry.ParseAssemblyAndRegisterRosMessages(assembly);
                         srvRegistry.ParseAssemblyAndRegisterRosServices(assembly);
                     }
@@ -391,8 +392,8 @@ namespace Uml.Robotics.Ros
             if (num_params > 1)
             {
                 string reason = parms[1].GetString();
-                Logger.LogInformation("Shutdown request received.");
-                Logger.LogInformation("Reason given for shutdown: [" + reason + "]");
+//                Logger.LogInformation("Shutdown request received.");
+//                Logger.LogInformation("Reason given for shutdown: [" + reason + "]");
                 shutdown();
             }
             XmlRpcManager.ResponseInt(1, "", 0)(r);
@@ -484,7 +485,7 @@ namespace Uml.Robotics.Ros
 
             if (started)
             {
-                Logger.LogInformation("ROS is shutting down.");
+//                Logger.LogInformation("ROS is shutting down.");
                 started = false;
                 _ok = false;
 

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 using Uml.Robotics.XmlRpc;
 using std_msgs = Messages.std_msgs;
@@ -22,7 +22,7 @@ namespace Uml.Robotics.Ros
         public readonly string MessageDefinition;
         public readonly string Name;
 
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<Publication>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<Publication>();
         private uint _seq;
         private List<SubscriberCallbacks> callbacks = new List<SubscriberCallbacks>();
         private object callbacks_mutex = new object();
@@ -152,7 +152,7 @@ namespace Uml.Robotics.Ros
                 !header.Values.ContainsKey("callerid"))
             {
                 const string msg = "Header from subscriber did not have the required elements: md5sum, topic, callerid";
-                Logger.LogWarning(msg);
+//                Logger.LogWarning(msg);
                 error_message = msg;
                 return false;
             }
@@ -163,7 +163,7 @@ namespace Uml.Robotics.Ros
             {
                 string msg = "Received a tcpros connection for a nonexistent topic [" + topic + "] from [" +
                              client_callerid + "].";
-                Logger.LogWarning(msg);
+//                Logger.LogWarning(msg);
                 error_message = msg;
                 return false;
             }
@@ -174,7 +174,7 @@ namespace Uml.Robotics.Ros
                 string msg = "Client [" + client_callerid + "] wants topic [" + topic + "] to hava datatype/md5sum [" +
                              datatype + "/" + md5sum + "], but our version has [" + DataType + "/" + Md5sum +
                              "]. Dropping connection";
-                Logger.LogWarning(msg);
+//                Logger.LogWarning(msg);
                 error_message = msg;
                 return false;
             }
@@ -359,7 +359,7 @@ namespace Uml.Robotics.Ros
 
     public class PeerConnDisconnCallback : CallbackInterface
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<PeerConnDisconnCallback>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<PeerConnDisconnCallback>();
         private SubscriberStatusCallback callback;
         private SubscriberLink sub_link;
 
@@ -373,7 +373,7 @@ namespace Uml.Robotics.Ros
         {
             ROS.Debug()("Called PeerConnDisconnCallback");
             SingleSubscriberPublisher pub = new SingleSubscriberPublisher(sub_link);
-            Logger.LogDebug($"Callback: Name: {pub.SubscriberName} Topic: {pub.Topic}");
+//            Logger.LogDebug($"Callback: Name: {pub.SubscriberName} Topic: {pub.Topic}");
             callback(pub);
             return CallResult.Success;
         }

@@ -1,11 +1,11 @@
-﻿#region USINGZ
+﻿/*#region USINGZ
 
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Messages.dynamic_reconfigure;
+//using Messages.dynamic_reconfigure;
 using Messages.std_msgs;
-//using Uml.Robotics.Ros;
+using Uml.Robotics.Ros;
 using String = Messages.std_msgs.String;
 
 #endregion
@@ -15,9 +15,9 @@ namespace DynamicReconfigure
     public class DynamicReconfigureInterface : IDisposable
     {
         private Dictionary<string, List<Action<bool>>> boolcbs = new Dictionary<string, List<Action<bool>>>();
-        private Subscriber<Config> configSub;
-        private Subscriber<ConfigDescription> descSub;
-        private Action<ConfigDescription> descriptionCallback;
+        private Subscriber configSub;
+        private Subscriber descSub;
+        private Action descriptionCallback;
 
         private Dictionary<string, List<Action<double>>> doublecbs = new Dictionary<string, List<Action<double>>>();
         private Dictionary<string, List<Action<int>>> intcbs = new Dictionary<string, List<Action<int>>>();
@@ -323,4 +323,4 @@ namespace DynamicReconfigure
 
         #endregion
     }
-}
+}*/

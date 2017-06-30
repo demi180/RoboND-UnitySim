@@ -3,7 +3,7 @@ using System.Threading;
 using System.Reflection;
 using System.Diagnostics;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
@@ -38,7 +38,7 @@ namespace Uml.Robotics.Ros
         private object reading = new object();
         private object writing = new object();
 
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<Connection>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<Connection>();
 
         /// <summary>
         ///     Returns the ID of the connection
@@ -213,8 +213,8 @@ namespace Uml.Robotics.Ros
                 if (header.Values.ContainsKey("error"))
                 {
                     error_val = (string) header.Values["error"];
-                    Logger.LogInformation("Received error message in header for connection to [{0}]: [{1}]",
-                        "TCPROS connection to [" + transport.cachedRemoteHost + "]", error_val);
+//                    Logger.LogInformation("Received error message in header for connection to [{0}]: [{1}]",
+//                        "TCPROS connection to [" + transport.cachedRemoteHost + "]", error_val);
                     drop(DropReason.HeaderError);
                     return false;
                 }
@@ -316,7 +316,7 @@ namespace Uml.Robotics.Ros
                             read_filled = 0;
                             if (!callback(this, buffer, size, false))
                             {
-                                Logger.LogError("Callbacks invoked by connection errored");
+//                                Logger.LogError("Callbacks invoked by connection errored");
                             }
                             callback = null;
                             lock (read_callback_mutex)
@@ -353,7 +353,7 @@ namespace Uml.Robotics.Ros
                         read_size = 0;
                         if (!callback(this, buffer, size, true))
                         {
-                            Logger.LogError("Callbacks invoked by connection errored");
+//                            Logger.LogError("Callbacks invoked by connection errored");
                         }
                         lock (read_callback_mutex)
                         {
@@ -403,7 +403,7 @@ namespace Uml.Robotics.Ros
                         write_size = 0;
                         if (!callback(this))
                         {
-                            Logger.LogError("Failed to invoke " + callback.GetMethodInfo().Name);
+//                            Logger.LogError("Failed to invoke " + callback.GetMethodInfo().Name);
                         }
                     }
                 }

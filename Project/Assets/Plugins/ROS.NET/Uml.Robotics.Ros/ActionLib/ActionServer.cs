@@ -14,9 +14,12 @@ namespace Uml.Robotics.Ros.ActionLib
         where TResult : InnerActionMessage, new()
         where TFeedback : InnerActionMessage, new()
     {
-        public int QueueSize { get; set; } = 50;
-        public TimeSpan StatusListTimeout { get; private set; } = new TimeSpan(0, 0, 5);
-        public double StatusFrequencySeconds { get; private set; } = 5;
+		public int QueueSize { get { return queueSize; } set { queueSize = value; } }
+		int queueSize = 50;
+		public TimeSpan StatusListTimeout { get { return statusListTimeout; } private set { statusListTimeout = value; } }
+		TimeSpan statusListTimeout = new TimeSpan (0, 0, 5);
+		public double StatusFrequencySeconds { get { return statusFrequencySeconds; } private set { statusFrequencySeconds = value; } }
+		double statusFrequencySeconds = 5;
 
         private const string ACTIONLIB_STATUS_FREQUENCY = "actionlib_status_frequency";
         private const string STATUS_LIST_TIMEOUT = "status_list_timeout";

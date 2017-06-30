@@ -1,8 +1,8 @@
 //using Microsoft.Extensions.Logging;
 //using Microsoft.Extensions.Logging.Console;
 //using DummyLogging;
-using UnityEngine;
-
+//using UnityEngine;
+/*
 namespace Uml.Robotics.Ros
 {
     public static class ApplicationLogging
@@ -49,3 +49,4 @@ namespace Uml.Robotics.Ros
 //            LoggerFactory.CreateLogger(category);
     }
 }
+*/

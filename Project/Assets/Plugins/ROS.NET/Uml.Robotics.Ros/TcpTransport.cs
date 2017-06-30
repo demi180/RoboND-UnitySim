@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
@@ -24,7 +24,7 @@ namespace Uml.Robotics.Ros
 
         public static bool use_keepalive = true;
 
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<TcpTransport>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<TcpTransport>();
 
         const int BITS_PER_BYTE = 8;
         const int POLLERR = 0x008;
@@ -80,7 +80,7 @@ namespace Uml.Robotics.Ros
             }
             else
             {
-                Logger.LogError("Null pollset in tcptransport ctor");
+//                Logger.LogError("Null pollset in tcptransport ctor");
             }
             this.flags = flags;
         }
@@ -120,7 +120,7 @@ namespace Uml.Robotics.Ros
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(e.ToString());
+//                    Logger.LogError(e.ToString());
                     close();
                     return false;
                 }
@@ -137,7 +137,7 @@ namespace Uml.Robotics.Ros
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+//                Logger.LogError(e.ToString());
             }
         }
 
@@ -231,7 +231,7 @@ namespace Uml.Robotics.Ros
                 if (ip == null)
                 {
                     close();
-                    Logger.LogError("Couldn't resolve host name [{0}]", host);
+//                    Logger.LogError("Couldn't resolve host name [{0}]", host);
                     return false;
                 }
             }
@@ -255,7 +255,7 @@ namespace Uml.Robotics.Ros
                         }
                         catch (Exception e)
                         {
-                            Logger.LogError(e.ToString());
+//                            Logger.LogError(e.ToString());
                         }
                     }
                 }
@@ -269,7 +269,7 @@ namespace Uml.Robotics.Ros
                     break;
                 if (DateTime.UtcNow.Subtract(connectionAttempted).TotalSeconds >= 3)
                 {
-                    Logger.LogInformation("Trying to connect for " + DateTime.UtcNow.Subtract(connectionAttempted).TotalSeconds + "s\t: " + this);
+//                    Logger.LogInformation("Trying to connect for " + DateTime.UtcNow.Subtract(connectionAttempted).TotalSeconds + "s\t: " + this);
                     if (!asyncres.AsyncWaitHandle.WaitOne(100))
                     {
                         socket.Close();
@@ -284,7 +284,7 @@ namespace Uml.Robotics.Ros
             }
             else
             {
-                Logger.LogDebug("TcpTransport connection established.");
+//                Logger.LogDebug("TcpTransport connection established.");
             }
 
             return ROS.ok && initializeSocket();
@@ -350,7 +350,7 @@ namespace Uml.Robotics.Ros
                     }
                     catch (Exception e)
                     {
-                        Logger.LogError(e.ToString());
+//                        Logger.LogError(e.ToString());
                         return;
                     }
                 }
@@ -446,7 +446,7 @@ namespace Uml.Robotics.Ros
 
             if (args.AcceptSocket == null)
             {
-                Logger.LogError("Nothing to accept, return null");
+//                Logger.LogError("Nothing to accept, return null");
                 return null;
             }
 
@@ -508,10 +508,11 @@ namespace Uml.Robotics.Ros
                     }
                     catch (Exception e)
                     {
-                        Logger.LogError("Failed to get sock options! (error: " + error + ")" + e);
+//                        Logger.LogError("Failed to get sock options! (error: " + error + ")" + e);
                     }
-                    if (error != 0)
-                        Logger.LogError("Socket error = " + error);
+					if ( error != 0 )
+						UnityEngine.Debug.Log ( "socket error = " + error );
+//                        Logger.LogError("Socket error = " + error);
                     close();
                 }
             }

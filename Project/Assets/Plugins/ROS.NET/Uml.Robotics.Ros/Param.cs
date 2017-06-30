@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 using Uml.Robotics.XmlRpc;
 
 namespace Uml.Robotics.Ros
@@ -14,7 +14,7 @@ namespace Uml.Robotics.Ros
 
     public static class Param
     {
-        private static ILogger Logger { get; } = ApplicationLogging.CreateLogger(nameof(Param));
+//        private static ILogger Logger { get; } = ApplicationLogging.CreateLogger(nameof(Param));
         public static Dictionary<string, XmlRpcValue> parms = new Dictionary<string, XmlRpcValue>();
         public static object parms_mutex = new object();
         public static List<string> subscribed_params = new List<string>();
@@ -265,7 +265,7 @@ namespace Uml.Robotics.Ros
                 return ret;
             if (result.Count != 3 || result[0].GetInt() != 1 || result[2].Type != XmlRpcType.Array)
             {
-                Logger.LogWarning("Expected a return code, a description, and a list!");
+//                Logger.LogWarning("Expected a return code, a description, and a list!");
                 return ret;
             }
             for (int i = 0; i < payload.Count; i++)

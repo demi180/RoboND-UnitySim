@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿//using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace Uml.Robotics.Ros
         }
 
         private static Lazy<TopicManager> instance = new Lazy<TopicManager>(LazyThreadSafetyMode.ExecutionAndPublication);
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<TopicManager>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<TopicManager>();
         private List<Publication> advertisedTopics = new List<Publication>();
         private object advertisedTopicsMutex = new object();
         private bool shuttingDown;
@@ -168,10 +168,10 @@ namespace Uml.Robotics.Ros
                 throw new Exception("Advertising on topic [" + ops.topic + "] with an empty datatype");
             if (string.IsNullOrEmpty(ops.messageDefinition))
             {
-                this.Logger.LogWarning(
-                    "Advertising on topic [" + ops.topic +
-                     "] with an empty message definition. Some tools may not work correctly"
-                );
+//                this.Logger.LogWarning(
+//                    "Advertising on topic [" + ops.topic +
+//                     "] with an empty message definition. Some tools may not work correctly"
+//                );
             }
             return true;
         }
@@ -199,11 +199,11 @@ namespace Uml.Robotics.Ros
                 {
                     if (pub.Md5sum != ops.md5Sum)
                     {
-                        this.Logger.LogError(
-                            "Tried to advertise on topic [{0}] with md5sum [{1}] and datatype [{2}], but the topic is already advertised as md5sum [{3}] and datatype [{4}]",
-                            ops.topic, ops.md5Sum,
-                            ops.dataType, pub.Md5sum, pub.DataType
-                        );
+//                        this.Logger.LogError(
+//                            "Tried to advertise on topic [{0}] with md5sum [{1}] and datatype [{2}], but the topic is already advertised as md5sum [{3}] and datatype [{4}]",
+//                            ops.topic, ops.md5Sum,
+//                            ops.dataType, pub.Md5sum, pub.DataType
+//                        );
                         return false;
                     }
                 }
@@ -238,7 +238,7 @@ namespace Uml.Robotics.Ros
 
             if (!Master.execute("registerPublisher", args, result, payload, true))
             {
-                this.Logger.LogError("RPC \"registerService\" for service " + ops.topic + " failed.");
+//                this.Logger.LogError("RPC \"registerService\" for service " + ops.topic + " failed.");
                 return false;
             }
 
@@ -270,7 +270,7 @@ namespace Uml.Robotics.Ros
             {
                 string error = $"Couldn't register subscriber on topic [{ops.topic}]";
                 s.shutdown();
-                this.Logger.LogError(error);
+//                this.Logger.LogError(error);
                 throw new RosException(error);
             }
 
@@ -315,8 +315,9 @@ namespace Uml.Robotics.Ros
                     subscriptions.Remove(sub);
                 }
 
-                if (!unregisterSubscriber(topic))
-                    this.Logger.LogWarning("Couldn't unregister subscriber for topic [" + topic + "]");
+				if ( !unregisterSubscriber ( topic ) )
+					UnityEngine.Debug.LogWarning ( "no" );
+//                    this.Logger.LogWarning("Couldn't unregister subscriber for topic [" + topic + "]");
 
                 sub.shutdown();
                 return true;
@@ -464,13 +465,13 @@ namespace Uml.Robotics.Ros
                 XmlRpcValue proto = protos[proto_idx];
                 if (proto.Type != XmlRpcType.Array)
                 {
-                    this.Logger.LogError("requestTopic protocol list was not a list of lists");
+//                    this.Logger.LogError("requestTopic protocol list was not a list of lists");
                     return false;
                 }
                 if (proto[0].Type != XmlRpcType.String)
                 {
-                    this.Logger.LogError(
-                        "requestTopic received a protocol list in which a sublist did not start with a string");
+//                    this.Logger.LogError(
+//                        "requestTopic received a protocol list in which a sublist did not start with a string");
                     return false;
                 }
 
@@ -486,15 +487,15 @@ namespace Uml.Robotics.Ros
                 }
                 if (proto_name == "UDPROS")
                 {
-                    this.Logger.LogWarning("Ignoring topics with UdpRos as protocol");
+//                    this.Logger.LogWarning("Ignoring topics with UdpRos as protocol");
                 }
                 else
                 {
-                    this.Logger.LogWarning("An unsupported protocol was offered: [{0}]", proto_name);
+//                    this.Logger.LogWarning("An unsupported protocol was offered: [{0}]", proto_name);
                 }
             }
 
-            this.Logger.LogError("No supported protocol was provided");
+//            this.Logger.LogError("No supported protocol was provided");
             return false;
         }
 
@@ -514,7 +515,7 @@ namespace Uml.Robotics.Ros
             var payload = new XmlRpcValue();
             if (!Master.execute("registerSubscriber", args, result, payload, true))
             {
-                Logger.LogError("RPC \"registerSubscriber\" for service " + s.name + " failed.");
+//                Logger.LogError("RPC \"registerSubscriber\" for service " + s.name + " failed.");
                 return false;
             }
             var pub_uris = new List<string>();
@@ -689,9 +690,9 @@ namespace Uml.Robotics.Ros
 
         public bool pubUpdate(string topic, List<string> pubs)
         {
-            using (this.Logger.BeginScope(nameof(pubUpdate)))
-            {
-                this.Logger.LogDebug("TopicManager is updating publishers for " + topic);
+//            using (this.Logger.BeginScope(nameof(pubUpdate)))
+//            {
+//                this.Logger.LogDebug("TopicManager is updating publishers for " + topic);
 
                 Subscription sub = null;
                 lock (subcriptionsMutex)
@@ -709,11 +710,11 @@ namespace Uml.Robotics.Ros
                 }
                 if (sub != null)
                     return sub.pubUpdate(pubs);
-                this.Logger.LogInformation(
-                    "Request for updating publishers of topic " + topic + ", which has no subscribers."
-                );
+//                this.Logger.LogInformation(
+//                    "Request for updating publishers of topic " + topic + ", which has no subscribers."
+//                );
                 return false;
-            }
+//            }
         }
 
 
@@ -727,7 +728,7 @@ namespace Uml.Robotics.Ros
             else
             {
                 const string error = "Unknown error while handling XmlRpc call to pubUpdate";
-                this.Logger.LogError(error);
+//                this.Logger.LogError(error);
                 XmlRpcManager.ResponseInt(0, error, 0)(result);
             }
         }
@@ -741,7 +742,7 @@ namespace Uml.Robotics.Ros
             if (!requestTopic(parm[1].GetString(), parm[2], ref res))
             {
                 const string error = "Unknown error while handling XmlRpc call to requestTopic";
-                this.Logger.LogError(error);
+//                this.Logger.LogError(error);
                 XmlRpcManager.ResponseInt(0, error, 0)(res);
             }
         }

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
+//using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,7 +7,9 @@ using Messages;
 using Messages.actionlib_msgs;
 using Messages.std_msgs;
 using System.Threading;
-using Microsoft.Extensions.Logging;
+using Uml.Robotics.Ros.ActionLib;
+using Uml.Robotics.Ros;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros.ActionLib
 {
@@ -32,7 +34,7 @@ namespace Uml.Robotics.Ros.ActionLib
         private Subscriber resultSubscriber;
         private int nextGoalId = 0; // Shared among all clients
         private string statusCallerId = null;
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<ActionClient<TGoal, TResult, TFeedback>>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<ActionClient<TGoal, TResult, TFeedback>>();
         private Object lockId = new Object();
         private Object lockGoalHandles = new Object();
 
@@ -57,7 +59,7 @@ namespace Uml.Robotics.Ros.ActionLib
             CancelPublisher = nodeHandle.advertise<GoalID>("cancel", QueueSize, OnCancelConnectCallback,
                 OnCancelDisconnectCallback);
 
-            Logger.LogInformation($"Callbackqueue of NodeHandle equals Global Callbackqueue: {ROS.GlobalCallbackQueue.Equals(nodeHandle.Callback)}");
+//            Logger.LogInformation($"Callbackqueue of NodeHandle equals Global Callbackqueue: {ROS.GlobalCallbackQueue.Equals(nodeHandle.Callback)}");
         }
 
 
@@ -468,7 +470,7 @@ namespace Uml.Robotics.Ros.ActionLib
                 // Remove goal handles that are done from the tracking list
                 foreach (var goalHandleId in completedGoals)
                 {
-                    Logger.LogInformation($"Remove goal handle id {goalHandleId} from tracked goal handles");
+//                    Logger.LogInformation($"Remove goal handle id {goalHandleId} from tracked goal handles");
                     lock (lockGoalHandles)
                     {
                         goalHandles.Remove(goalHandleId);
@@ -511,8 +513,8 @@ namespace Uml.Robotics.Ros.ActionLib
                     return;
                 } else
                 {
-                    Logger.LogDebug($"goal status is null for {goalHandle.Id}, most propably because it was just send and there" +
-                        $"and the server has not yet sent an update");
+//                    Logger.LogDebug($"goal status is null for {goalHandle.Id}, most propably because it was just send and there" +
+//                        $"and the server has not yet sent an update");
                     return;
                 }
             }

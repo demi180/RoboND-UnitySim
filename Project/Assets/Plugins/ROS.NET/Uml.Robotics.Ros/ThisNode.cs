@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
     public static class ThisNode
     {
-        private static ILogger Logger { get; } = ApplicationLogging.CreateLogger(nameof(ThisNode));
+//        private static ILogger Logger { get; } = ApplicationLogging.CreateLogger(nameof(ThisNode));
         public static string Name = "empty";
         public static string Namespace = "";
 
@@ -47,7 +47,7 @@ namespace Uml.Robotics.Ros
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+//                Logger.LogError(e.ToString());
             }
             if ((options & (int) InitOption.AnonymousName) == (int) InitOption.AnonymousName && !disableAnonymous)
             {

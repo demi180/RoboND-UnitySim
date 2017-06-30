@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿//using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -7,7 +7,7 @@ namespace Uml.Robotics.Ros
 {
     public class CallbackQueue : ICallbackQueue
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<CallbackQueue>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<CallbackQueue>();
         private int count;
         private int calling;
         private bool enabled;

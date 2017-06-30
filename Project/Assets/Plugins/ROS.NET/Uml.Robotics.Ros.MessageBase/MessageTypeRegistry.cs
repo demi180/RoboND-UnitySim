@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.DependencyModel;
-using Microsoft.Extensions.Logging;
+﻿//using Microsoft.Extensions.DependencyModel;
+//using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
+//using System.Runtime.Loader;
 using System.Threading;
 
 namespace Uml.Robotics.Ros
@@ -20,7 +20,7 @@ namespace Uml.Robotics.Ros
         }
 
         public MessageTypeRegistry()
-            : base(ApplicationLogging.CreateLogger<MessageTypeRegistry>())
+//            : base(ApplicationLogging.CreateLogger<MessageTypeRegistry>())
         {
         }
 

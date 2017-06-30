@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
@@ -38,7 +38,7 @@ namespace Uml.Robotics.Ros
 
     public class IServiceCallbackHelper
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<IServiceCallbackHelper>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<IServiceCallbackHelper>();
         protected ServiceFunction<RosMessage, RosMessage> _callback;
 
         public string type;

@@ -1,4 +1,4 @@
-﻿#region Using
+﻿/*#region Using
 
 using System;
 using Uml.Robotics.XmlRpc;
@@ -62,4 +62,4 @@ namespace rosmaster
             return false;
         }
     }
-}
+}*/

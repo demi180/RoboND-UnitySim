@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
     internal class Callback
         : CallbackInterface
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<Callback>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<Callback>();
         private volatile bool callback_state;
 
         private readonly bool allow_concurrent_callbacks;
@@ -121,7 +121,7 @@ namespace Uml.Robotics.Ros
         public delegate void CallbackDelegate(RosMessage msg);
         public event CallbackDelegate Event;
 
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<CallbackInterface>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<CallbackInterface>();
 
 
         public CallbackInterface()
@@ -150,7 +150,7 @@ namespace Uml.Robotics.Ros
             }
             else
             {
-                Logger.LogError($"{nameof(Event)} is null");
+//                Logger.LogError($"{nameof(Event)} is null");
             }
         }
 

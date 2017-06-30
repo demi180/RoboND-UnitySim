@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
     public class IServiceServerLink : IDisposable
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<IServiceServerLink>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<IServiceServerLink>();
         public bool IsValid;
         public string RequestMd5Sum;
         public string RequestType;
@@ -92,7 +92,7 @@ namespace Uml.Robotics.Ros
         {
             if (connection != this.connection) throw new ArgumentException("Unkown connection", nameof(connection));
 
-            Logger.LogDebug("Service client from [{0}] for [{1}] dropped", connection.RemoteString, name);
+//            Logger.LogDebug("Service client from [{0}] for [{1}] dropped", connection.RemoteString, name);
 
             clearCalls();
 
@@ -109,7 +109,7 @@ namespace Uml.Robotics.Ros
             else
             {
                 ROS.Error()("TcpRos header from service server did not have required element: md5sum");
-                Logger.LogError("TcpRos header from service server did not have required element: md5sum");
+//                Logger.LogError("TcpRos header from service server did not have required element: md5sum");
                 return false;
             }
             //TODO check md5sum
@@ -224,7 +224,7 @@ namespace Uml.Robotics.Ros
 
         private bool onRequestWritten(Connection conn)
         {
-            Logger.LogInformation("onRequestWritten(Connection conn)");
+//            Logger.LogInformation("onRequestWritten(Connection conn)");
             connection.read(5, onResponseOkAndLength);
             return true;
         }
@@ -248,7 +248,7 @@ namespace Uml.Robotics.Ros
             if (len > lengthLimit)
             {
                 ROS.Error()($"Message length exceeds limit of {lengthLimit}. Dropping connection.");
-                Logger.LogError($"Message length exceeds limit of {lengthLimit}. Dropping connection.");
+//                Logger.LogError($"Message length exceeds limit of {lengthLimit}. Dropping connection.");
                 connection.drop(Connection.DropReason.Destructing);
                 return false;
             }
@@ -261,7 +261,7 @@ namespace Uml.Robotics.Ros
             }
             if (len > 0)
             {
-                Logger.LogDebug($"Reading message with length of {len}.");
+//                Logger.LogDebug($"Reading message with length of {len}.");
                 connection.read(len, onResponse);
             }
             else
@@ -333,7 +333,7 @@ namespace Uml.Robotics.Ros
 
             while (!info.finished)
             {
-                Logger.LogDebug("info.finished_condition.WaitOne();");
+//                Logger.LogDebug("info.finished_condition.WaitOne();");
                 info.finished_condition.WaitOne();
             }
 
@@ -346,7 +346,7 @@ namespace Uml.Robotics.Ros
             if (!string.IsNullOrEmpty(info.exception))
             {
                 ROS.Error()("Service call failed: service [{0}] responded with an error: {1}", name, info.exception);
-                Logger.LogError("Service call failed: service [{0}] responded with an error: {1}", name, info.exception);
+//                Logger.LogError("Service call failed: service [{0}] responded with an error: {1}", name, info.exception);
             }
             return info.success;
         }
@@ -376,7 +376,7 @@ namespace Uml.Robotics.Ros
     public class ServiceServerLink<MSrv> : IServiceServerLink
         where MSrv : RosService, new()
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<ServiceServerLink<MSrv>>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<ServiceServerLink<MSrv>>();
         public ServiceServerLink(string name, bool persistent, string requestMd5Sum, string responseMd5Sum,
             IDictionary<string, string> header_values)
             : base(name, persistent, requestMd5Sum, responseMd5Sum, header_values)
@@ -402,7 +402,7 @@ namespace Uml.Robotics.Ros
                 {
                     throw;
                 }
-                Logger.LogError($"Exception occurred while calling a {name}, but ROS is not started OR is shutting down\n{ex}");
+//                Logger.LogError($"Exception occurred while calling a {name}, but ROS is not started OR is shutting down\n{ex}");
             }
             return result;
         }

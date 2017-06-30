@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
@@ -127,7 +127,7 @@ namespace Uml.Robotics.Ros
             get { return instance.Value; }
         }
 
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<PollManager>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<PollManager>();
         private static Lazy<PollManager> instance = new Lazy<PollManager>(LazyThreadSafetyMode.ExecutionAndPublication);
         private List<PollSignal> signals = new List<PollSignal>();
         private Thread thread;
@@ -153,7 +153,7 @@ namespace Uml.Robotics.Ros
 
         public void AddPollThreadListener(Action poll)
         {
-            Logger.LogDebug("Adding pollthreadlistener " + poll.Target + ":" + poll.GetMethodInfo().Name);
+//            Logger.LogDebug("Adding pollthreadlistener " + poll.Target + ":" + poll.GetMethodInfo().Name);
             lock (signal_mutex)
             {
                 signals.Add(new PollSignal(poll));
@@ -187,7 +187,7 @@ namespace Uml.Robotics.Ros
                 if (shutting_down)
                     return;
             }
-            Logger.LogDebug("PollManager thread finished");
+//            Logger.LogDebug("PollManager thread finished");
         }
 
 
@@ -212,7 +212,7 @@ namespace Uml.Robotics.Ros
                 signals.Clear();
                 if (!thread.Join(2000))
                 {
-                    Logger.LogError("thread.Join() timed out.");
+//                    Logger.LogError("thread.Join() timed out.");
                 }
                 thread = null;
             }

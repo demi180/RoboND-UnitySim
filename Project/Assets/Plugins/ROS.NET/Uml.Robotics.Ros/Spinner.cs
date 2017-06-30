@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿//using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +8,7 @@ namespace Uml.Robotics.Ros
     public class SingleThreadSpinner
     {
         ICallbackQueue callbackQueue;
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<SingleThreadSpinner>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<SingleThreadSpinner>();
 
 
         /// <summary>
@@ -33,14 +33,14 @@ namespace Uml.Robotics.Ros
         public void Spin()
         {
             Spin(CancellationToken.None);
-            Logger.LogCritical("CallbackQueue thread broke out! This only can happen if ROS.ok is false.");
+//            Logger.LogCritical("CallbackQueue thread broke out! This only can happen if ROS.ok is false.");
         }
 
 
         public void Spin(CancellationToken token)
         {
             TimeSpan wallDuration = new TimeSpan(0, 0, 0, 0, ROS.WallDuration);
-            Logger.LogInformation("Start spinning");
+//            Logger.LogInformation("Start spinning");
             while (ROS.ok)
             {
                 DateTime begin = DateTime.UtcNow;

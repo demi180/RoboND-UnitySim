@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿//using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
 using System.Net.Sockets;
@@ -10,7 +10,7 @@ namespace Uml.Robotics.XmlRpc
     {
         private const int READ_BUFFER_LENGTH = 4096;
 
-        private ILogger Logger { get; } = XmlRpcLogging.CreateLogger<XmlRpcSource>();
+//        private ILogger Logger { get; } = XmlRpcLogging.CreateLogger<XmlRpcSource>();
 
         private bool keepOpen;      // In the client, keep connections open if you intend to make multiple calls.
 
@@ -68,12 +68,12 @@ namespace Uml.Robotics.XmlRpc
             }
             catch (SocketException ex)
             {
-                Logger.LogError("XmlRpcServerConnection::readHeader: error while reading header ({0}).", ex.Message);
+//                Logger.LogError("XmlRpcServerConnection::readHeader: error while reading header ({0}).", ex.Message);
                 return false;
             }
             catch (Exception ex)
             {
-                Logger.LogError("XmlRpcServerConnection::readHeader: error while reading header ({0}).", ex.Message);
+//                Logger.LogError("XmlRpcServerConnection::readHeader: error while reading header ({0}).", ex.Message);
                 return false;
             }
 

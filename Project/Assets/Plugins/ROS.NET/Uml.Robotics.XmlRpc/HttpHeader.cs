@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿//using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -71,7 +71,7 @@ namespace Uml.Robotics.XmlRpc
             COMPLETE_HEADER
         }
 
-        private ILogger Logger { get; } = XmlRpcLogging.CreateLogger<HttpHeader>();
+//        private ILogger Logger { get; } = XmlRpcLogging.CreateLogger<HttpHeader>();
         Dictionary<HttpHeaderField, string> m_StrHTTPField = new Dictionary<HttpHeaderField, string>();
         Dictionary<HttpHeaderField, string> HeaderFieldToStrings = new Dictionary<HttpHeaderField, string>();
         byte[] data = new byte[4096];
@@ -191,7 +191,7 @@ namespace Uml.Robotics.XmlRpc
                 if (ContentComplete)
                 {
                     Data = Encoding.ASCII.GetBytes(DataString);
-                    Logger.LogDebug("DONE READING CONTENT");
+//                    Logger.LogDebug("DONE READING CONTENT");
                 }
             }
 
@@ -245,9 +245,9 @@ namespace Uml.Robotics.XmlRpc
 
                 if (m_StrHTTPField[HHField].Length == 0)
                 {
-                    Logger.LogWarning("HTTP HEADER: field \"{0}\" has a length of 0", HHField.ToString());
+//                    Logger.LogWarning("HTTP HEADER: field \"{0}\" has a length of 0", HHField.ToString());
                 }
-                Logger.LogDebug("HTTP HEADER: Index={0} | champ={1} = {2}", f, HTTPfield.Substring(1), m_StrHTTPField[HHField]);
+//                Logger.LogDebug("HTTP HEADER: Index={0} | champ={1} = {2}", f, HTTPfield.Substring(1), m_StrHTTPField[HHField]);
             }
         }
     }

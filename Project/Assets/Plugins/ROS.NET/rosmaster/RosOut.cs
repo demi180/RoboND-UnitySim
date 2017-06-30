@@ -20,7 +20,7 @@ namespace rosmaster
     {
 
         static Publisher<Messages.rosgraph_msgs.Log> pub;
-        static Subscriber<Messages.rosgraph_msgs.Log> sub;
+        static Subscriber sub;
         static NodeHandle nh;
 
         public static void Start()

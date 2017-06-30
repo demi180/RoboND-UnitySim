@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 using Messages.rosgraph_msgs;
 
@@ -16,7 +16,7 @@ namespace Uml.Robotics.Ros
             get { return instance.Value; }
         }
 
-        private static ILogger Logger { get; } = ApplicationLogging.CreateLogger<SimTime>();
+//        private static ILogger Logger { get; } = ApplicationLogging.CreateLogger<SimTime>();
         private static Lazy<SimTime> instance = new Lazy<SimTime>(LazyThreadSafetyMode.ExecutionAndPublication);
         private bool checkedSimTime;
         private NodeHandle nodeHandle;
@@ -54,7 +54,7 @@ namespace Uml.Robotics.Ros
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError("Caught exception in sim time thread: " + e.Message);
+//                    Logger.LogError("Caught exception in sim time thread: " + e.Message);
                 }
             }).Start();
         }

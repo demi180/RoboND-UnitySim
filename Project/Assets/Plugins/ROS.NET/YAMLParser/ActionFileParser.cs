@@ -1,5 +1,5 @@
 ﻿using FauxMessages;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +9,7 @@ namespace YAMLParser
 {
     public class ActionFileParser
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<ActionFileParser>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<ActionFileParser>();
         private List<MsgFileLocation> actionFileLocations;
 
 
@@ -38,13 +38,13 @@ namespace YAMLParser
             }
 
             // Resolve type dependencies between message files
-            Logger.LogInformation($"Start parsing action files");
+//            Logger.LogInformation($"Start parsing action files");
             foreach (var messageFile in result)
             {
-                Logger.LogInformation($"Parse action file: {messageFile.Name}");
+//                Logger.LogInformation($"Parse action file: {messageFile.Name}");
                 messageFile.ParseAndResolveTypes();
             }
-            Logger.LogInformation($"Parsing of action files completed");
+//            Logger.LogInformation($"Parsing of action files completed");
 
             return result;
         }

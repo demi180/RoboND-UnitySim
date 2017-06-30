@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Uml.Robotics.XmlRpc;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace Uml.Robotics.Ros
 {
     public class Subscription
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<Subscription>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<Subscription>();
 
         private List<ICallbackInfo> callbacks = new List<ICallbackInfo>();
         private bool _dropped;
@@ -183,8 +183,8 @@ namespace Uml.Robotics.Ros
 
         public bool pubUpdate(IEnumerable<string> publisherUris)
         {
-            using (Logger.BeginScope(nameof(pubUpdate)))
-            {
+//            using (Logger.BeginScope(nameof(pubUpdate)))
+//            {
                 lock (shutdown_mutex)
                 {
                     if (shutting_down || _dropped)
@@ -193,7 +193,7 @@ namespace Uml.Robotics.Ros
 
                 bool retval = true;
 
-                Logger.LogDebug("Publisher update for [" + name + "]");
+//                Logger.LogDebug("Publisher update for [" + name + "]");
 
                 var additions = new List<string>();
                 List<PublisherLink> subtractions;
@@ -222,28 +222,28 @@ namespace Uml.Robotics.Ros
                 {
                     if (link.XmlRpcUri != XmlRpcManager.Instance.Uri)
                     {
-                        Logger.LogDebug("Disconnecting from publisher [" + link.CallerID + "] of topic [" + name +
-                                    "] at [" + link.XmlRpcUri + "]");
+//                        Logger.LogDebug("Disconnecting from publisher [" + link.CallerID + "] of topic [" + name +
+//                                    "] at [" + link.XmlRpcUri + "]");
                         link.drop();
                     }
                     else
                     {
-                        Logger.LogWarning("Cannot disconnect from self for topic: " + name);
+//                        Logger.LogWarning("Cannot disconnect from self for topic: " + name);
                     }
                 }
 
                 foreach (string i in additions)
                 {
-                    if (XmlRpcManager.Instance.Uri != i)
-                    {
-                        retval &= NegotiateConnection(i);
-                        //Logger.LogDebug("NEGOTIATINGING");
-                    }
-                    else
-                        Logger.LogInformation("Skipping myself (" + name + ", " + XmlRpcManager.Instance.Uri + ")");
+				if ( XmlRpcManager.Instance.Uri != i )
+				{
+					retval &= NegotiateConnection ( i );
+					//Logger.LogDebug("NEGOTIATINGING");
+				} else
+					UnityEngine.Debug.Log ( "l1" );
+//                        Logger.LogInformation("Skipping myself (" + name + ", " + XmlRpcManager.Instance.Uri + ")");
                 }
                 return retval;
-            }
+//            }
         }
 
         public bool NegotiateConnection(string xmlRpcUri)

@@ -6,7 +6,7 @@ using System.Linq;
 using n = System.Net;
 using ns = System.Net.Sockets;
 using ROS_Comm.APMWorkaround;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
@@ -44,7 +44,7 @@ namespace Uml.Robotics.Ros
         }
 
 
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<Socket>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<Socket>();
         internal ns.Socket realSocket { get; private set; }
 
         private string attemptedConnectionEndpoint;
@@ -186,7 +186,7 @@ namespace Uml.Robotics.Ros
             }
             catch (ns.SocketException e)
             {
-                Logger.LogError(e.ToString());
+//                Logger.LogError(e.ToString());
                 res = !disposed && sm == ns.SelectMode.SelectError;
             }
             return res;

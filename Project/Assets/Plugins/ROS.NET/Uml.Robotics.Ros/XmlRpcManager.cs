@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Uml.Robotics.XmlRpc;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
@@ -26,7 +26,7 @@ namespace Uml.Robotics.Ros
 
         private static Lazy<XmlRpcManager> instance = new Lazy<XmlRpcManager>(LazyThreadSafetyMode.ExecutionAndPublication);
 
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<XmlRpcManager>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<XmlRpcManager>();
         private Dictionary<string, XmlRpcServerMethod> functions = new Dictionary<string, XmlRpcServerMethod>();
         private object functionsGate = new object();
         private XmlRpcFunc getPid;
@@ -158,7 +158,7 @@ namespace Uml.Robotics.Ros
 
         private bool ValidateFailed(string method, string errorFormat, params object[] args)
         {
-            Logger.LogDebug("XML-RPC Call [{0}] {1} failed validation", method, string.Format(errorFormat, args));
+//            Logger.LogDebug("XML-RPC Call [{0}] {1} failed validation", method, string.Format(errorFormat, args));
             return false;
         }
 
@@ -216,7 +216,7 @@ namespace Uml.Robotics.Ros
                 this.uri = ROS.ROS_MASTER_URI;       // if port is not 0 we are be the master
             }
 
-            Logger.LogInformation("XmlRpc Server listening at " + uri);
+//            Logger.LogInformation("XmlRpc Server listening at " + uri);
             serverThread = new Thread(ServerThreadFunc) { IsBackground = true };
             serverThread.Start();
         }
@@ -236,7 +236,7 @@ namespace Uml.Robotics.Ros
                 functions.Clear();
             }
 
-            Logger.LogDebug("XmlRpc Server shutted down.");
+//            Logger.LogDebug("XmlRpc Server shutted down.");
         }
     }
 }

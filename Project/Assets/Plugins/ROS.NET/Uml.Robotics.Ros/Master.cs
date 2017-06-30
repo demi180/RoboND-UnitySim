@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 using Uml.Robotics.XmlRpc;
 
 namespace Uml.Robotics.Ros
@@ -10,7 +10,7 @@ namespace Uml.Robotics.Ros
     public static class Master
     {
         // cannot use the usubal CreateLogger<master>(); here because this calls is static
-        private static ILogger Logger {get;} = ApplicationLogging.CreateLogger(nameof(Master));
+//        private static ILogger Logger {get;} = ApplicationLogging.CreateLogger(nameof(Master));
 
         private static int port;
         private static string host;
@@ -173,9 +173,11 @@ namespace Uml.Robotics.Ros
                         else
                         {
                             if (response.IsArray && response.Count >= 2)
-                                Logger.LogError("Execute failed: return={0}, desc={1}", response[0].GetInt(), response[1].GetString());
+								UnityEngine.Debug.LogError ("e1");
+//                                Logger.LogError("Execute failed: return={0}, desc={1}", response[0].GetInt(), response[1].GetString());
                             else
-                                Logger.LogError("response type: " + response.Type.ToString());
+								UnityEngine.Debug.LogError ("e2");
+//                                Logger.LogError("response type: " + response.Type.ToString());
                         }
                     }
                     catch (Exception ex)
@@ -185,19 +187,19 @@ namespace Uml.Robotics.Ros
                         {
                             if (!printed)
                             {
-                                Logger.LogWarning(
-                                    "[{0}] Could not connect to master at [{1}:{2}]. " +
-                                    "Retrying for the next {3} seconds.",
-                                    method, master_host, master_port,
-                                    retryTimeout.TotalSeconds);
+//                                Logger.LogWarning(
+//                                    "[{0}] Could not connect to master at [{1}:{2}]. " +
+//                                    "Retrying for the next {3} seconds.",
+//                                    method, master_host, master_port,
+//                                    retryTimeout.TotalSeconds);
                                 printed = true;
                             }
 
                             // timeout expired, throw exception
                             if (retryTimeout.TotalSeconds > 0 && DateTime.UtcNow.Subtract(startTime) > retryTimeout)
                             {
-                                Logger.LogError("[{0}] Timed out trying to connect to the master [{1}:{2}] after [{1}] seconds",
-                                                method, master_host, master_port, retryTimeout.TotalSeconds);
+//                                Logger.LogError("[{0}] Timed out trying to connect to the master [{1}:{2}] after [{1}] seconds",
+//                                                method, master_host, master_port, retryTimeout.TotalSeconds);
 
                                 throw new RosException(String.Format("Cannot connect to ROS Master at {0}:{1}", master_host, master_port), ex);
                             }
@@ -216,9 +218,9 @@ namespace Uml.Robotics.Ros
             }
             catch (ArgumentNullException e)
             {
-                Logger.LogError(e.ToString());
+//                Logger.LogError(e.ToString());
             }
-            Logger.LogError("Master API call: {0} failed!\n\tRequest:\n{1}", method, request);
+//            Logger.LogError("Master API call: {0} failed!\n\tRequest:\n{1}", method, request);
             return false;
         }
     }

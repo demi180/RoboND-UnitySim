@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
     public class TransportPublisherLink : PublisherLink, IDisposable
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<TransportPublisherLink>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<TransportPublisherLink>();
         public Connection connection;
         public bool dropping;
         private bool needs_retry;
@@ -36,7 +36,7 @@ namespace Uml.Robotics.Ros
 
         public bool initialize(Connection connection)
         {
-            Logger.LogDebug("Init transport publisher link: " + parent.name);
+//            Logger.LogDebug("Init transport publisher link: " + parent.name);
             this.connection = connection;
             connection.DroppedEvent += onConnectionDropped;
             if (connection.transport.getRequiresHeader())
@@ -66,13 +66,13 @@ namespace Uml.Robotics.Ros
                 parent.removePublisherLink(this);
             else
             {
-                Logger.LogDebug("Last publisher link removed");
+//                Logger.LogDebug("Last publisher link removed");
             }
         }
 
         private void onConnectionDropped(Connection conn, Connection.DropReason reason)
         {
-            Logger.LogDebug("TransportPublisherLink: onConnectionDropped -- " + reason);
+//            Logger.LogDebug("TransportPublisherLink: onConnectionDropped -- " + reason);
 
             if (dropping || conn != connection)
                 return;
@@ -93,8 +93,8 @@ namespace Uml.Robotics.Ros
             {
                 if (reason == Connection.DropReason.HeaderError)
                 {
-                    Logger.LogError("Error in the Header: " +
-                                    (parent != null ? parent.name : "unknown"));
+//                    Logger.LogError("Error in the Header: " +
+//                                    (parent != null ? parent.name : "unknown"));
                 }
                 drop();
             }
@@ -147,7 +147,7 @@ namespace Uml.Robotics.Ros
             int lengthLimit = 1000000000;
             if (len > lengthLimit)
             {
-                Logger.LogError($"TransportPublisherLink length exceeds limit of {lengthLimit}. Dropping connection");
+//                Logger.LogError($"TransportPublisherLink length exceeds limit of {lengthLimit}. Dropping connection");
                 drop();
                 return false;
             }
@@ -174,7 +174,7 @@ namespace Uml.Robotics.Ros
 
         private void onRetryTimer(object o)
         {
-            Logger.LogDebug("TransportPublisherLink: onRetryTimer");
+//            Logger.LogDebug("TransportPublisherLink: onRetryTimer");
             if (dropping)
                 return;
 

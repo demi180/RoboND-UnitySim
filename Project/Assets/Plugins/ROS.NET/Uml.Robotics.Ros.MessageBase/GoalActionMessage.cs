@@ -11,9 +11,9 @@ namespace Uml.Robotics.Ros
     [IgnoreRosMessage]
     public class GoalActionMessage<TGoal> : RosMessage where TGoal : InnerActionMessage, new()
     {
-        public std_msgs.Header Header { get; set; } = new std_msgs.Header();
-        public actionlib_msgs.GoalID GoalId { get; set; } = new actionlib_msgs.GoalID();
-        public TGoal Goal { get; set; } = new TGoal();
+		public std_msgs.Header Header { get { return header; } set { header = value; } }
+		public actionlib_msgs.GoalID GoalId { get { return goalID; } set { goalID = value; } }
+		public TGoal Goal { get { return goal; } set { goal = value; } }
         public override string MessageType
         {
             get
@@ -25,6 +25,10 @@ namespace Uml.Robotics.Ros
                 return typeName;
             }
         }
+
+		std_msgs.Header header = new std_msgs.Header ();
+		actionlib_msgs.GoalID goalID = new actionlib_msgs.GoalID ();
+		TGoal goal = new TGoal ();
 
         public GoalActionMessage()
             : base()

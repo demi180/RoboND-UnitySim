@@ -5,6 +5,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using Uml.Robotics.Ros;
 using Messages.std_msgs;
+using Header = Messages.std_msgs.Header;
 
 namespace Messages.geometry_msgs
 {

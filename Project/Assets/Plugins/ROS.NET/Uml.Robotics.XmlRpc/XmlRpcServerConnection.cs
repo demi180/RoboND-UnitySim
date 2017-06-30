@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿//using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Net.Sockets;
@@ -11,7 +11,7 @@ namespace Uml.Robotics.XmlRpc
     /// </summary>
     public class XmlRpcServerConnection : XmlRpcSource
     {
-        private ILogger Logger { get; } = XmlRpcLogging.CreateLogger<XmlRpcServerConnection>();
+//        private ILogger Logger { get; } = XmlRpcLogging.CreateLogger<XmlRpcServerConnection>();
 
         private int _bytesWritten;
         private ServerConnectionState _connectionState;
@@ -31,7 +31,7 @@ namespace Uml.Robotics.XmlRpc
         // The server delegates handling client requests to a serverConnection object.
         public XmlRpcServerConnection(Socket fd, XmlRpcServer server)
         {
-            Logger.LogInformation("XmlRpcServerConnection: new socket {0}.", fd.RemoteEndPoint.ToString());
+//            Logger.LogInformation("XmlRpcServerConnection: new socket {0}.", fd.RemoteEndPoint.ToString());
             this.server = server;
             socket = fd;
             stream = new NetworkStream(socket,true);
@@ -78,7 +78,7 @@ namespace Uml.Robotics.XmlRpc
             {
                 if (header.HeaderStatus == HttpHeader.ParseStatus.COMPLETE_HEADER)
                 {
-                    Logger.LogDebug("KeepAlive: {0}", _keepAlive);
+//                    Logger.LogDebug("KeepAlive: {0}", _keepAlive);
                     _connectionState = ServerConnectionState.READ_REQUEST;
                 }
 
@@ -90,7 +90,7 @@ namespace Uml.Robotics.XmlRpc
 
         public override void Close()
         {
-            Logger.LogInformation("XmlRpcServerConnection is closing");
+//            Logger.LogInformation("XmlRpcServerConnection is closing");
             if (socket != null)
             {
                 //socket.Close(100);    // ## AKo: Will be part of .net core 1.2, see https://github.com/dotnet/corefx/issues/12060
@@ -113,19 +113,19 @@ namespace Uml.Robotics.XmlRpc
                     dataLen = stream.Read(data, 0, left);
                     if (dataLen == 0)
                     {
-                        Logger.LogError("XmlRpcServerConnection::readRequest: Stream was closed");
+//                        Logger.LogError("XmlRpcServerConnection::readRequest: Stream was closed");
                         return false;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("XmlRpcServerConnection::readRequest: error while reading the rest of data ({0}).", ex.Message);
+//                    Logger.LogError("XmlRpcServerConnection::readRequest: error while reading the rest of data ({0}).", ex.Message);
                     return false;
                 }
                 header.Append(Encoding.ASCII.GetString(data, 0, dataLen));
             }
             // Otherwise, parse and dispatch the request
-            Logger.LogDebug("XmlRpcServerConnection::readRequest read {0} bytes.", dataLen);
+//            Logger.LogDebug("XmlRpcServerConnection::readRequest read {0} bytes.", dataLen);
 
             if (!header.ContentComplete)
             {
@@ -141,7 +141,7 @@ namespace Uml.Robotics.XmlRpc
             string response = server.executeRequest(request);
             if (response.Length == 0)
             {
-                Logger.LogError("XmlRpcServerConnection::writeResponse: empty response.");
+//                Logger.LogError("XmlRpcServerConnection::writeResponse: empty response.");
                 return false;
             }
             try
@@ -160,16 +160,16 @@ namespace Uml.Robotics.XmlRpc
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(string.Format("Exception while writing response: {0}", ex.Message));
+//                    Logger.LogError(string.Format("Exception while writing response: {0}", ex.Message));
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogError("XmlRpcServerConnection::writeResponse: write error ({0}).", ex.Message);
+//                Logger.LogError("XmlRpcServerConnection::writeResponse: write error ({0}).", ex.Message);
                 return false;
             }
 
-            Logger.LogDebug("XmlRpcServerConnection::writeResponse: wrote {0} of {0} bytes.", _bytesWritten, response.Length);
+//            Logger.LogDebug("XmlRpcServerConnection::writeResponse: wrote {0} of {0} bytes.", _bytesWritten, response.Length);
 
             // Prepare to read the next request
             if (_bytesWritten == response.Length)

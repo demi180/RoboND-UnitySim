@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
@@ -106,7 +106,7 @@ namespace Uml.Robotics.Ros
     /// </summary>
     public class WrappedTimer : IDisposable
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<WrappedTimer>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<WrappedTimer>();
         //variable backing for properties
         private int _delay = Timeout.Infinite;
         private int _period = Timeout.Infinite;
@@ -217,7 +217,7 @@ namespace Uml.Robotics.Ros
             }
             catch (Exception ex)
             {
-                Logger.LogError("Error starting timer: " + ex);
+//                Logger.LogError("Error starting timer: " + ex);
             }
         }
 
@@ -239,7 +239,7 @@ namespace Uml.Robotics.Ros
             }
             catch (Exception ex)
             {
-                Logger.LogError("Error starting timer: " + ex);
+//                Logger.LogError("Error starting timer: " + ex);
             }
         }
 
@@ -268,7 +268,7 @@ namespace Uml.Robotics.Ros
             }
             catch (Exception ex)
             {
-                Logger.LogError("Error starting timer: " + ex);
+//                Logger.LogError("Error starting timer: " + ex);
             }
         }
     }

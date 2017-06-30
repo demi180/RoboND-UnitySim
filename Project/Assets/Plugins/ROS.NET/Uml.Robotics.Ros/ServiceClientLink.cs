@@ -7,7 +7,7 @@ namespace Uml.Robotics.Ros
 {
     public class IServiceClientLink
     {
-        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<IServiceClientLink>();
+//        private ILogger Logger { get; } = ApplicationLogging.CreateLogger<IServiceClientLink>();
         public Connection connection;
         public IServicePublication parent;
         public bool persistent;
@@ -25,7 +25,7 @@ namespace Uml.Robotics.Ros
             {
                 string bbq = "Error in TcpRos header. Required elements (md5sum, service, callerid) are missing";
                 ROS.Error()(bbq);
-                Logger.LogError(bbq);
+//                Logger.LogError(bbq);
                 connection.sendHeaderError(ref bbq);
                 return false;
             }
@@ -37,13 +37,13 @@ namespace Uml.Robotics.Ros
                 persistent = true;
 
             //ROS.Debug()("Service client [{0}] wants service [{1}] with md5sum [{2}]", client_callerid, service, md5sum);
-            Logger.LogDebug($"Service client [{client_callerid}] wants service [{service}] with md5sum [{md5sum}]" );
+//            Logger.LogDebug($"Service client [{client_callerid}] wants service [{service}] with md5sum [{md5sum}]" );
             IServicePublication isp = ServiceManager.Instance.LookupServicePublication(service);
             if (isp == null)
             {
                 string bbq = string.Format("Received a TcpRos connection for a nonexistent service [{0}]", service);
                 //ROS.Error()(bbq);
-                Logger.LogWarning(bbq);
+//                Logger.LogWarning(bbq);
                 connection.sendHeaderError(ref bbq);
                 return false;
             }
@@ -52,7 +52,7 @@ namespace Uml.Robotics.Ros
             {
                 string bbq = "Client wants service " + service + " to have md5sum " + md5sum + " but it has " + isp.md5sum + ". Dropping connection";
                 //ROS.Error()(bbq);
-                Logger.LogError(bbq);
+//                Logger.LogError(bbq);
                 connection.sendHeaderError(ref bbq);
                 return false;
             }
@@ -61,7 +61,7 @@ namespace Uml.Robotics.Ros
             {
                 string bbq = "[ERROR] Received a TcpRos connection for a nonexistent service [" + service + "]";
                 //ROS.Error()(bbq);
-                Logger.LogWarning(bbq);
+//                Logger.LogWarning(bbq);
                 connection.sendHeaderError(ref bbq);
                 return false;
             }

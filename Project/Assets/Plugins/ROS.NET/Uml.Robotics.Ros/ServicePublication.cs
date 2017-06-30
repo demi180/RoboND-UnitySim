@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace Uml.Robotics.Ros
 {
@@ -49,7 +49,7 @@ namespace Uml.Robotics.Ros
 
         public class ServiceCallback : CallbackInterface
         {
-            private ILogger Logger { get; } = ApplicationLogging.CreateLogger<ServiceCallback>();
+//            private ILogger Logger { get; } = ApplicationLogging.CreateLogger<ServiceCallback>();
             private bool _hasTrackedObject;
             private int _numBytes;
             private object _trackedObject;
@@ -98,7 +98,7 @@ namespace Uml.Robotics.Ros
                 {
                     string str = "Exception thrown while processing service call: " + e;
                     ROS.Error()(str);
-                    Logger.LogError(str);
+//                    Logger.LogError(str);
                     link.processResponse(str, false);
                     return CallResult.Invalid;
                 }

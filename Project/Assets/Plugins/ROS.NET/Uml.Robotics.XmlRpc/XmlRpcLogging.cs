@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
+﻿//using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging.Console;
 
 namespace Uml.Robotics.XmlRpc
 {
     public static class XmlRpcLogging
     {
-        private static ILoggerFactory _loggerFactory;
+//        private static ILoggerFactory _loggerFactory;
 
         public static bool Initialized
         {
@@ -13,12 +13,13 @@ namespace Uml.Robotics.XmlRpc
             {
                 lock (typeof(XmlRpcLogging))
                 {
-                    return _loggerFactory != null;
+					return true;
+//                    return _loggerFactory != null;
                 }
             }
         }
 
-        public static ILoggerFactory LoggerFactory
+/*        public static ILoggerFactory LoggerFactory
         {
             get
             {
@@ -42,16 +43,16 @@ namespace Uml.Robotics.XmlRpc
                     _loggerFactory = value;
                 }
             }
-        }
+        }*/
 
-		public static ILogger CreateLogger<T>()
+/*		public static ILogger CreateLogger<T>()
 		{
 			return LoggerFactory.CreateLogger<T>();
-		}
+		}*/
 
-        public static ILogger CreateLogger(string category)
+/*        public static ILogger CreateLogger(string category)
 		{
 			return LoggerFactory.CreateLogger(category);
-		}
+		}*/
     }
 }

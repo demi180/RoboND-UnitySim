@@ -34,7 +34,8 @@ namespace FauxMessages
         public bool HasHeader;
         public string Name;
         public string Namespace = "Messages";
-        public ActionMessageType ActionMessageType { get; set; } = ActionMessageType.NoAction;
+		public ActionMessageType ActionMessageType { get { return actionMessageType; } set { actionMessageType = value; } }
+		ActionMessageType actionMessageType = ActionMessageType.NoAction;
         public List<SingleType> Stuff = new List<SingleType>();
         public string backhalf;
         public string classname;

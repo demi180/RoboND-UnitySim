@@ -1,7 +1,7 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
+//using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging.Console;
 
-
+/*
 namespace YAMLParser
 {
     public static class ApplicationLogging
@@ -39,4 +39,4 @@ namespace YAMLParser
 		}
     }
 
-}
+}*/

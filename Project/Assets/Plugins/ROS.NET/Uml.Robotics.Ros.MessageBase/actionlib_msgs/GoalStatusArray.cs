@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Uml.Robotics.Ros;
 using Messages.std_msgs;
+using Header = Messages.std_msgs.Header;
 
 namespace Messages.actionlib_msgs
 {
