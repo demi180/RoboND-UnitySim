@@ -109,7 +109,7 @@ namespace rosmaster
             //master_node.bind("get_time", tobind(new Func<String, String, String, String, XmlRpcValue>(get_time)));
         }
 
-        public XMLRPCFunc tobind(Func<XmlRpcValue> act)
+        public XmlRpcFunc tobind(Func<XmlRpcValue> act)
         {
             return (XmlRpcValue parm, XmlRpcValue res) =>
             {
@@ -120,7 +120,7 @@ namespace rosmaster
             };
         }
 
-        public XMLRPCFunc tobind<A>(Func<A, XmlRpcValue> act)
+        public XmlRpcFunc tobind<A>(Func<A, XmlRpcValue> act)
         {
             return (XmlRpcValue parm, XmlRpcValue res) =>
             {
@@ -131,7 +131,7 @@ namespace rosmaster
             };
         }
 
-        public XMLRPCFunc tobind<A,B>(Func<A, B, XmlRpcValue> act)
+        public XmlRpcFunc tobind<A,B>(Func<A, B, XmlRpcValue> act)
         {
             return (XmlRpcValue parm, XmlRpcValue res) =>
             {
@@ -142,7 +142,7 @@ namespace rosmaster
             };
         }
 
-        public XMLRPCFunc tobind<A,B,C>(Func<A, B, C, XmlRpcValue> act)
+        public XmlRpcFunc tobind<A,B,C>(Func<A, B, C, XmlRpcValue> act)
         {
             return (XmlRpcValue parm, XmlRpcValue res) =>
             {
@@ -153,7 +153,7 @@ namespace rosmaster
             };
         }
 
-        public XMLRPCFunc tobind<A,B,C,D>(Func<A, B, C, D, XmlRpcValue> act)
+        public XmlRpcFunc tobind<A,B,C,D>(Func<A, B, C, D, XmlRpcValue> act)
         {
             return (XmlRpcValue parm, XmlRpcValue res) =>
             {

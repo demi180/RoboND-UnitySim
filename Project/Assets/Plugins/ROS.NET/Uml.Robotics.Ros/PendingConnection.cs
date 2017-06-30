@@ -5,7 +5,7 @@ using Uml.Robotics.XmlRpc;
 
 namespace Uml.Robotics.Ros
 {
-    internal class PendingConnection
+    public class PendingConnection
     {
         public string RemoteUri { get; private set; }
         public XmlRpcClient Client { get; private set; }

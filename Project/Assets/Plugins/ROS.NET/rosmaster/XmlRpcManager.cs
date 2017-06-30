@@ -5,7 +5,7 @@ using System.Threading;
 
 using m = Messages.std_msgs;
 using gm = Messages.geometry_msgs;
-using nm = Messages.nav_msgs;
+//using nm = Messages.nav_msgs;
 //using Microsoft.Extensions.Logging;
 using Uml.Robotics.Ros;
 using Uml.Robotics.XmlRpc;
@@ -22,16 +22,16 @@ namespace rosmaster
             get { return _instance.Value; }
         }
 
-        private List<AsyncXmlRpcConnection> added_connections = new List<AsyncXmlRpcConnection>();
+        private List<PendingConnection> added_connections = new List<PendingConnection>();
         private object added_connections_mutex = new object();
         private List<CachedXmlRpcClient> clients = new List<CachedXmlRpcClient>();
         private object clients_mutex = new object();
-        private List<AsyncXmlRpcConnection> connections = new List<AsyncXmlRpcConnection>();
+        private List<PendingConnection> connections = new List<PendingConnection>();
         private Dictionary<string, FunctionInfo> functions = new Dictionary<string, FunctionInfo>();
         private object functions_mutex = new object();
         private XmlRpcFunc getPid;
         public int port;
-        private List<AsyncXmlRpcConnection> removed_connections = new List<AsyncXmlRpcConnection>();
+        private List<PendingConnection> removed_connections = new List<PendingConnection>();
         private object removed_connections_mutex = new object();
         private XmlRpcServer server;
         public Thread server_thread;
@@ -75,7 +75,7 @@ namespace rosmaster
                 }
                 lock (added_connections_mutex)
                 {
-                    foreach (AsyncXmlRpcConnection con in added_connections)
+                    foreach (PendingConnection con in added_connections)
                     {
                         //Logger.LogDebug("Completed ASYNC XmlRpc connection to: " + ((con as PendingConnection) != null ? ((PendingConnection) con).RemoteUri : "SOMEWHERE OVER THE RAINBOW"));
                         con.addToDispatch(server.Dispatch);
@@ -94,7 +94,7 @@ namespace rosmaster
                     Thread.Sleep(ROS.WallDuration);
                 }
 
-                foreach (AsyncXmlRpcConnection con in connections)
+                foreach (PendingConnection con in connections)
                 {
                     if (con.check())
                         removeASyncXMLRPCClient(con);
@@ -102,7 +102,7 @@ namespace rosmaster
 
                 lock (removed_connections_mutex)
                 {
-                    foreach (AsyncXmlRpcConnection con in removed_connections)
+                    foreach (PendingConnection con in removed_connections)
                     {
                         con.removeFromDispatch(server.Dispatch);
                         connections.Remove(con);
@@ -206,13 +206,13 @@ namespace rosmaster
             client.Dispose();
         }
 
-        public void addAsyncConnection(AsyncXmlRpcConnection conn)
+        public void addAsyncConnection(PendingConnection conn)
         {
             lock (added_connections_mutex)
                 added_connections.Add(conn);
         }
 
-        public void removeASyncXMLRPCClient(AsyncXmlRpcConnection conn)
+        public void removeASyncXMLRPCClient(PendingConnection conn)
         {
             lock (removed_connections_mutex)
                 removed_connections.Add(conn);
@@ -362,7 +362,7 @@ namespace rosmaster
             }
             if (server != null)
             {
-                foreach (AsyncXmlRpcConnection ass in connections)
+                foreach (PendingConnection ass in connections)
                 {
                     ass.removeFromDispatch(server.Dispatch);
                 }
