@@ -194,13 +194,13 @@ namespace actionlib
 							statusCallerID, curStatusCallerID );
 						statusCallerID = curStatusCallerID;
 					}
-					latestStatusTime = status.header.stamp;
+					latestStatusTime = status.header.Stamp;
 				} else
 				{
 					ROS.Debug ( "processStatus: Just got our first status message from the ActionServer at node [%s]", curStatusCallerID );
 					statusReceived = true;
 					statusCallerID = curStatusCallerID;
-					latestStatusTime = status.header.stamp;
+					latestStatusTime = status.header.Stamp;
 				}
 			}
 //			check_connection_condition_.notify_all();

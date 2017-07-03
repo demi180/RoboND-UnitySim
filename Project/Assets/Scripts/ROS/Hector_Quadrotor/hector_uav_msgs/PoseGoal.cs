@@ -38,9 +38,9 @@ namespace hector_uav_msgs
 			target_pose.pose.position.y = pg.target_pose.pose.position.y;
 			target_pose.pose.position.z = pg.target_pose.pose.position.z;
 			target_pose.header = new Header ();
-			target_pose.header.frame_id = pg.target_pose.header.frame_id;
-			target_pose.header.seq = pg.target_pose.header.seq;
-			target_pose.header.stamp = new Time ( pg.target_pose.header.stamp.data );
+			target_pose.header.Frame_id = pg.target_pose.header.Frame_id;
+			target_pose.header.Seq = pg.target_pose.header.Seq;
+			target_pose.header.Stamp = new Time ( pg.target_pose.header.Stamp.data );
 		}
 
 		public override AGoal Clone ()

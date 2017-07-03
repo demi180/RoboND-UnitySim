@@ -263,7 +263,7 @@ namespace hector_quadrotor_model
 		{
 			lock ( mutex_ )
 			{
-				last_command_time_ = voltage.header.stamp;
+				last_command_time_ = voltage.header.Stamp;
 				
 				if ( motor_status_.on && voltage.pwm.Length >= 4 )
 				{
@@ -314,7 +314,7 @@ namespace hector_quadrotor_model
 					engage ();
 				}
 				
-				ROS.Debug ( "quadrotor_propulsion", "Received motor command valid at " + pwm.header.stamp.ToString () );
+				ROS.Debug ( "quadrotor_propulsion", "Received motor command valid at " + pwm.header.Stamp.ToString () );
 				command_queue_.Enqueue ( pwm );
 				command_condition_.Set ();
 			}
@@ -341,7 +341,7 @@ namespace hector_quadrotor_model
 					while ( command_queue_.Count > 0 )
 					{
 						MotorPWM new_motor_voltage = command_queue_.Peek ();
-						Time new_time = new_motor_voltage.header.stamp;
+						Time new_time = new_motor_voltage.header.Stamp;
 						
 						if (new_time.data.toSec () == 0.0 || (new_time >= min && new_time <= max))
 						{

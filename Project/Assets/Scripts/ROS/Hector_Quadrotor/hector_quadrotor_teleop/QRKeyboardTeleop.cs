@@ -182,8 +182,8 @@ public class QRKeyboardTeleop : MonoBehaviour
 		ang.z = angular.y;
 		twist.twist.linear = lin;
 		twist.twist.angular = ang;
-		twist.header.frame_id = baseLinkFrame;
-		twist.header.stamp = ROS.GetTime ();
+		twist.header.Frame_id = baseLinkFrame;
+		twist.header.Stamp = ROS.GetTime ();
 		velocityPublisher.publish ( twist );
 	}
 
@@ -207,7 +207,7 @@ public class QRKeyboardTeleop : MonoBehaviour
 		SetBool.Response resp = new SetBool.Response ();
 		if ( resetService.call ( req, ref resp ) )
 		{
-			Debug.Log ( "called!" );
+			Debug.Log ( "reset called!" );
 		}
 	}
 
@@ -215,19 +215,19 @@ public class QRKeyboardTeleop : MonoBehaviour
 	{
 		Position = poseInfo.pose.position.ToUnity ();
 		Rotation = poseInfo.pose.orientation.ToUnity ();
-//		Debug.Log ( "Pose " + poseInfo.header.seq );
-//		Debug.Log ( "Pose " + poseInfo.header.frame_id + " " + poseInfo.header.stamp.data.toSec () );
-//		Debug.Log ( "Pose " + poseInfo.header.stamp.data.toSec () );
+//		Debug.Log ( "Pose " + poseInfo.header.Seq );
+//		Debug.Log ( "Pose " + poseInfo.header.Frame_id + " " + poseInfo.header.Stamp.data.toSec () );
+//		Debug.Log ( "Pose " + poseInfo.header.Stamp.data.toSec () );
 	}
 
 	void ImuCallback (Imu imu)
 	{
-//		Debug.Log ( "Imu " + imu.header.seq );
+//		Debug.Log ( "Imu " + imu.header.Seq );
 	}
 
 	void HeaderCallback (Messages.std_msgs.Header header)
 	{
-//		Debug.Log ( "Header " + header.stamp.data.toSec () );
-//		Debug.Log ( "Header " + header.seq );
+//		Debug.Log ( "Header " + header.Stamp.data.toSec () );
+//		Debug.Log ( "Header " + header.Seq );
 	}
 }

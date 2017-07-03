@@ -38,9 +38,9 @@ namespace hector_uav_msgs
 			current_pose.pose.position.y = tf.current_pose.pose.position.y;
 			current_pose.pose.position.z = tf.current_pose.pose.position.z;
 			current_pose.header = new Header ();
-			current_pose.header.frame_id = tf.current_pose.header.frame_id;
-			current_pose.header.seq = tf.current_pose.header.seq;
-			current_pose.header.stamp = new Time ( tf.current_pose.header.stamp.data );
+			current_pose.header.Frame_id = tf.current_pose.header.Frame_id;
+			current_pose.header.Seq = tf.current_pose.header.Seq;
+			current_pose.header.Stamp = new Time ( tf.current_pose.header.Stamp.data );
 		}
 
 		public override AFeedback Clone ()

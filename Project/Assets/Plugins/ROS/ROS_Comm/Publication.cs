@@ -270,14 +270,14 @@ namespace Ros_CSharp
                     header = new m.Header();
                 else
                     header = (m.Header) h;
-                header.seq = seq;
-                if (header.stamp == null)
+				header.Seq = seq;
+				if (header.Stamp == null)
                 {
-                    header.stamp = ROS.GetTime();
+					header.Stamp = ROS.GetTime();
                 }
-                if (header.frame_id == null)
+                if (header.Frame_id == null)
                 {
-                    header.frame_id = "";
+                    header.Frame_id = "";
                 }
                 holder.msg.GetType().GetField("header").SetValue(holder.msg, header);
             }

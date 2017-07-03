@@ -87,10 +87,10 @@ namespace hector_quadrotor_interface
 		void odomCallback (Odometry odom)
 		{
 			// calculate acceleration
-			if ( header_.stamp.data.toSec () != 0.0 && odom.header.stamp.data.toSec () != 0.0 )
+			if ( header_.Stamp.data.toSec () != 0.0 && odom.header.Stamp.data.toSec () != 0.0 )
 			{
 				double acceleration_time_constant = 0.1;
-				double dt = ( ( odom.header.stamp - header_.stamp ).data.toSec () );
+				double dt = ( ( odom.header.Stamp - header_.Stamp ).data.toSec () );
 				if ( dt > 0.0 )
 				{
 					acceleration_.linear.x = ( ( odom.twist.twist.linear.x - twist_.linear.x ) + acceleration_time_constant * acceleration_.linear.x ) / ( dt + acceleration_time_constant );
@@ -244,7 +244,7 @@ namespace hector_quadrotor_interface
 			pose_.position.z = transform.transform.translation.z;
 			pose_.orientation = transform.transform.rotation;
 
-			diff_.updateAndEstimate ( header_.stamp, pose_, twist_, accel_ );
+			diff_.updateAndEstimate ( header_.Stamp, pose_, twist_, accel_ );
 			available_ = true;
 		}
 
@@ -312,9 +312,9 @@ namespace hector_quadrotor_interface
 			lock ( command_mutex_ )
 			{
 				attitude_command_ = command;
-				if ( attitude_command_.header.stamp.data.toSec () == 0.0 )
+				if ( attitude_command_.header.Stamp.data.toSec () == 0.0 )
 				{
-					attitude_command_.header.stamp = ROS.GetTime ();
+					attitude_command_.header.Stamp = ROS.GetTime ();
 				}
 			}
 		}
@@ -324,9 +324,9 @@ namespace hector_quadrotor_interface
 			lock ( command_mutex_ )
 			{
 				yawrate_command_ = command;
-				if ( yawrate_command_.header.stamp.data.toSec () == 0.0 )
+				if ( yawrate_command_.header.Stamp.data.toSec () == 0.0 )
 				{
-					yawrate_command_.header.stamp = ROS.GetTime ();
+					yawrate_command_.header.Stamp = ROS.GetTime ();
 				}
 			}
 		}
@@ -336,9 +336,9 @@ namespace hector_quadrotor_interface
 			lock ( command_mutex_ )
 			{
 				thrust_command_ = command;
-				if ( thrust_command_.header.stamp.data.toSec () == 0.0 )
+				if ( thrust_command_.header.Stamp.data.toSec () == 0.0 )
 				{
-					attitude_command_.header.stamp = ROS.GetTime ();
+					attitude_command_.header.Stamp = ROS.GetTime ();
 				}
 			}
 		}

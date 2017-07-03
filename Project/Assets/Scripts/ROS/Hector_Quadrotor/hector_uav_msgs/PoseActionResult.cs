@@ -33,9 +33,9 @@ namespace hector_uav_msgs
 		{
 			PoseActionResult par = new PoseActionResult ();
 			par.header = new Header ();
-			par.header.frame_id = header.frame_id;
-			par.header.seq = header.seq;
-			par.header.stamp = new Time ( header.stamp.data );
+			par.header.Frame_id = header.Frame_id;
+			par.header.Seq = header.Seq;
+			par.header.Stamp = new Time ( header.Stamp.data );
 			par.GoalStatus = new GoalStatus ();
 			par.GoalStatus.goal_id = new GoalID ();
 			par.GoalStatus.goal_id.id = status.goal_id.id;

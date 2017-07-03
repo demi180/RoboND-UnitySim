@@ -98,9 +98,9 @@ public class QuadrotorTeleop : MonoBehaviour
 		ThrustCommand thrust = new ThrustCommand ();
 		YawRateCommand yawrate = new YawRateCommand ();
 
-		attitude.header.stamp = thrust.header.stamp = yawrate.header.stamp = ROS.GetTime ();
-		attitude.header.frame_id = yawrate.header.frame_id = baseStabilizedFrame;
-		thrust.header.frame_id = baseLinkFrame;
+		attitude.header.Stamp = thrust.header.Stamp = yawrate.header.Stamp = ROS.GetTime ();
+		attitude.header.Frame_id = yawrate.header.Frame_id = baseStabilizedFrame;
+		thrust.header.Frame_id = baseLinkFrame;
 
 		attitude.roll = (float) ( -getAxis ( joy, sAxes.y ) * Math.PI / 180.0 );
 		attitude.pitch = (float) ( getAxis ( joy, sAxes.x ) * Math.PI / 180.0 );
@@ -135,8 +135,8 @@ public class QuadrotorTeleop : MonoBehaviour
 	void joyTwistCallback(Joy joy)
 	{
 		TwistStamped velocity = new TwistStamped ();
-		velocity.header.frame_id = baseStabilizedFrame;
-		velocity.header.stamp = ROS.GetTime ();
+		velocity.header.Frame_id = baseStabilizedFrame;
+		velocity.header.Stamp = ROS.GetTime ();
 
 		velocity.twist.linear.x = getAxis(joy, sAxes.x);
 		velocity.twist.linear.y = getAxis(joy, sAxes.y);
@@ -165,17 +165,17 @@ public class QuadrotorTeleop : MonoBehaviour
 	{
 		Messages.std_msgs.Time now = ROS.GetTime ();
 		double dt = 0.0;
-		if ( ( pose.header.stamp.data.sec == 0 && pose.header.stamp.data.nsec == 0 ) )
+		if ( ( pose.header.Stamp.data.sec == 0 && pose.header.Stamp.data.nsec == 0 ) )
 		{
-			TimeData td = ( now - pose.header.stamp ).data;
+			TimeData td = ( now - pose.header.Stamp ).data;
 			double sec = td.toSec ();
 			dt = Mathf.Max ( 0, Mathf.Min ( 1f, (float) sec ) );
 		}
 
 		if (getButton(joy, sButtons.go))
 		{
-			pose.header.stamp = ROS.GetTime ();
-			pose.header.frame_id = worldFrame;
+			pose.header.Stamp = ROS.GetTime ();
+			pose.header.Frame_id = worldFrame;
 			pose.pose.position.x += (Math.Cos(yaw) * getAxis(joy, sAxes.x) - Math.Sin(yaw) * getAxis(joy, sAxes.y)) * dt;
 			pose.pose.position.y += (Math.Cos(yaw) * getAxis(joy, sAxes.y) + Math.Sin(yaw) * getAxis(joy, sAxes.x)) * dt;
 			pose.pose.position.z += getAxis(joy, sAxes.z) * dt;

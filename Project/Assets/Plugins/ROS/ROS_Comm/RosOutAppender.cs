@@ -103,7 +103,7 @@ namespace Ros_CSharp
             Log logmsg = new Log
             {
                 msg = m, name = this_node.Name, file = sf.GetFileName(), function = sf.GetMethod().Name, line = (uint) sf.GetFileLineNumber(), level = ((byte) ((int) lvl)),
-                header = new m.Header() { stamp = ROS.GetTime() }
+                header = new m.Header() { Stamp = ROS.GetTime() }
             };
             TopicManager.Instance.getAdvertisedTopics(out logmsg.topics);
             lock (log_queue)

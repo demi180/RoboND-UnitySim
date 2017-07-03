@@ -149,21 +149,45 @@ public class QuadDrone : MonoBehaviour
 
 	void PublishAll ()
 	{
+		int sleep = 1000 / 60;
+		while ( ROS.ok && !ROS.shutting_down )
+		{
+			PoseStamped ps = new PoseStamped ();
+			ps.pose = new Messages.geometry_msgs.Pose ();
+			ps.pose.position = new Messages.geometry_msgs.Point ( droneController.Position.ToRos () );
+			ps.pose.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation.ToRos () );
+			posePub.publish ( ps );
+
+			Imu imu = new Imu ();
+			imu.angular_velocity_covariance = new double[9] { -1, 0, 0, 0, 0, 0, 0, 0, 0 };
+			imu.linear_acceleration_covariance = new double[9] { -1, 0, 0, 0, 0, 0, 0, 0, 0 };
+			imu.orientation_covariance = new double[9] { -1, 0, 0, 0, 0, 0, 0, 0, 0 };
+			imu.angular_velocity = new GVector3 ( droneController.AngularVelocity.ToRos () );
+			imu.linear_acceleration = new GVector3 ( droneController.LinearAcceleration.ToRos () );
+			imu.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation.ToRos () );
+			imuPub.publish ( imu );
+
+			Thread.Sleep ( sleep );
+		}
+	}
+
+	void OldPublishAll ()
+	{
 		// pose info
 		PoseStamped ps = new PoseStamped ();
-		ps.header = new Messages.std_msgs.Header ();
-		ps.header.stamp = ROS.GetTime ();
-		ps.header.frame_id = "";
+//		ps.header = new Messages.std_msgs.Header ();
+//		ps.header.Stamp = ROS.GetTime ();
+//		ps.header.Frame_id = "";
 		ps.pose = new Messages.geometry_msgs.Pose ();
 		Imu imu = new Imu ();
 		// imu info
-		imu.header = new Messages.std_msgs.Header ( ps.header );
+//		imu.header = new Messages.std_msgs.Header ( ps.header );
 		imu.angular_velocity_covariance = new double[9] { -1, 0, 0, 0, 0, 0, 0, 0, 0 };
 		imu.linear_acceleration_covariance = new double[9] { -1, 0, 0, 0, 0, 0, 0, 0, 0 };
 		imu.orientation_covariance = new double[9] { -1, 0, 0, 0, 0, 0, 0, 0, 0 };
 		// image info
 		Image img = new Image ();
-		img.header = new Messages.std_msgs.Header ( ps.header );
+//		img.header = new Messages.std_msgs.Header ( ps.header );
 		img.width = (uint) QuadController.ImageWidth;
 		img.height = (uint) QuadController.ImageHeight;
 		img.encoding = "mono16"; // "rgba8";
@@ -188,38 +212,43 @@ public class QuadDrone : MonoBehaviour
 			#endif
 			// publish pose
 ///*
-			ps.header.stamp = ROS.GetTime ();
-//			ps.header.frame_id = ps.header.stamp.data.toSec ().ToString ();
-			ps.header.frame_id = "";
-			ps.header.seq = frameSeq;
+//			ps.header = new Messages.std_msgs.Header ();
+//			ps.header.Stamp = ROS.GetTime ();
+//			ps.header.Frame_id = ps.header.Stamp.data.toSec ().ToString ();
+//			ps.header.Frame_id = "";
+//			ps.header.Seq = frameSeq;
 			ps.pose.position = new Messages.geometry_msgs.Point ( droneController.Position.ToRos () );
 			ps.pose.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation.ToRos () );
 			posePub.publish ( ps );
-//			Debug.Log ( "Send Time " + ps.header.stamp.data.toSec () );
+			if ( ps.header != null )
+				Debug.Log ( "Send Time " + ps.header.Stamp.data.toSec () );
+			else
+				Debug.Log ( "Send time null header" );
 //			*/
 
 			// publish imu
 ///*
-			imu.header.frame_id = "";
-			imu.header.seq = frameSeq++;
-			ps.header.stamp = ROS.GetTime ();
-//			imu.header.stamp = ps.header.stamp;
+//			imu.header = new Messages.std_msgs.Header ();
+//			imu.header.Frame_id = "";
+//			imu.header.Seq = frameSeq++;
+//			imu.header.Stamp = ROS.GetTime ();
+//			imu.header.Stamp = ps.header.Stamp;
 			imu.angular_velocity = new GVector3 ( droneController.AngularVelocity.ToRos () );
 			imu.linear_acceleration = new GVector3 ( droneController.LinearAcceleration.ToRos () );
 			imu.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation.ToRos () );
 			imuPub.publish ( imu );
-//			Debug.Log ( "Send Imu " + imu.header.seq );
+//			Debug.Log ( "Send Imu " + imu.header.Seq );
 			
 			// publish image
 //			img.data = droneController.GetImageData ();
 //			imgPub.publish ( img );
 //			*/
 
-			Messages.std_msgs.Header h = new Messages.std_msgs.Header ();
-			h.seq = frameSeq;//++;
-			h.frame_id = "";
-			h.stamp = ROS.GetTime ();
-			headerPub.publish ( h );
+//			Messages.std_msgs.Header h = new Messages.std_msgs.Header ();
+//			h.Seq = frameSeq;//++;
+//			h.Frame_id = "";
+//			h.Stamp = ROS.GetTime ();
+//			headerPub.publish ( h );
 			
 			Thread.Sleep ( sleep );
 		}
@@ -239,10 +268,10 @@ public class QuadDrone : MonoBehaviour
 	{
 		Debug.Log ( "path service called!" );
 		Path path = new Path ();
-		path.header = new Messages.std_msgs.Header ();
-		path.header.frame_id = "global";
-		path.header.stamp = ROS.GetTime ();
-		path.header.seq = 0;
+//		path.header = new Messages.std_msgs.Header ();
+//		path.header.Frame_id = "global";
+//		path.header.Stamp = ROS.GetTime ();
+//		path.header.Seq = 0;
 		PathSample[] samples = PathPlanner.GetPath ();
 		int count = samples.Length;
 		path.poses = new PoseStamped[ count ];
@@ -250,10 +279,10 @@ public class QuadDrone : MonoBehaviour
 		for ( int i = 0; i < count; i++ )
 		{
 			PoseStamped pst = new PoseStamped ();
-			pst.header = new Messages.std_msgs.Header ();
-			pst.header.frame_id = "local";
-			pst.header.stamp = ROS.GetTime ();
-			pst.header.seq = (uint) i;
+//			pst.header = new Messages.std_msgs.Header ();
+//			pst.header.Frame_id = "local";
+//			pst.header.Stamp = ROS.GetTime ();
+//			pst.header.Seq = (uint) i;
 			pst.pose = new Messages.geometry_msgs.Pose ();
 			pst.pose.position = new Messages.geometry_msgs.Point ( samples [ i ].position.ToRos () );
 			pst.pose.orientation = new Messages.geometry_msgs.Quaternion ( samples [ i ].orientation.ToRos () );

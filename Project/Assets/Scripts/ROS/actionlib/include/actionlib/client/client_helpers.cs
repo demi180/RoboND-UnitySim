@@ -82,10 +82,10 @@ namespace actionlib
 		{
 			AActionGoal actionGoal = new ActionSpec ().NewActionGoal ();
 //			AActionGoal actionGoal = new AActionGoal ();
-			actionGoal.Header.stamp = ROS.GetTime ();
+			actionGoal.Header.Stamp = ROS.GetTime ();
 			actionGoal.GoalID = idGenerator.generateID ();
 			actionGoal.Goal = goal;
-//			actionGoal.header.stamp = ROS.GetTime ();
+//			actionGoal.header.Stamp = ROS.GetTime ();
 //			actionGoal.goal_id = idGenerator.generateID ();
 //			actionGoal.goal = goal;
 

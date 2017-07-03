@@ -1,3 +1,5 @@
+// enable this define to try and log when values in the header are set
+//#define VALUE_LOGGING
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +21,45 @@ namespace Messages.std_msgs
 #endif
     public class Header : IRosMessage
     {
+		public uint Seq
+		{
+			get { return seq; }
+			set
+			{
+				#if VALUE_LOGGING
+				UnityEngine.Debug.Log ("Setting seq to " + value);
+				#endif
+				seq = value;
+			}
+		}
 
-			public uint seq; //woo
-			public Time stamp; //woo
-			public string frame_id; //woo
+		public Time Stamp
+		{
+			get { return stamp; }
+			set 
+			{
+				#if VALUE_LOGGING
+				UnityEngine.Debug.Log ("Setting stamp to " + value.data.toSec ().ToString ());
+				#endif
+				stamp = value;
+			}
+		}
+
+		public string Frame_id
+		{
+			get { return frame_id; }
+			set
+			{
+				#if VALUE_LOGGING
+				UnityEngine.Debug.Log ("Setting frame_id to " + value);
+				#endif
+				frame_id = value;
+			}
+		}
+
+		uint seq; //woo
+		Time stamp; //woo
+		string frame_id; //woo
 
 
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -61,9 +98,9 @@ string frame_id"; }
 
 		public Header (Header other)
 		{
-			this.frame_id = other.frame_id;
-			this.seq = other.seq;
-			this.stamp = new Time ( other.stamp );
+			this.Frame_id = other.Frame_id;
+			this.Seq = other.Seq;
+			this.Stamp = new Time ( other.Stamp );
 		}
 
         [System.Diagnostics.DebuggerStepThrough]
@@ -185,9 +222,9 @@ string frame_id"; }
             bool ret = true;
             std_msgs.Header other = (Messages.std_msgs.Header)____other;
 
-            ret &= seq == other.seq;
-            ret &= stamp.data.Equals(other.stamp.data);
-            ret &= frame_id == other.frame_id;
+            ret &= seq == other.Seq;
+            ret &= stamp.data.Equals(other.Stamp.data);
+            ret &= frame_id == other.Frame_id;
             // for each SingleType st:
             //    ret &= {st.Name} == other.{st.Name};
             return ret;

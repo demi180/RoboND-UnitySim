@@ -34,9 +34,9 @@ namespace hector_uav_msgs
 		{
 			LandingActionResult lar = new LandingActionResult ();
 			lar.header = new Header ();
-			lar.header.frame_id = header.frame_id;
-			lar.header.seq = header.seq;
-			lar.header.stamp = new Time ( header.stamp.data );
+			lar.header.Frame_id = header.Frame_id;
+			lar.header.Seq = header.Seq;
+			lar.header.Stamp = new Time ( header.Stamp.data );
 			lar.GoalStatus = new GoalStatus ();
 			lar.GoalStatus.goal_id = new GoalID ();
 			lar.GoalStatus.goal_id.id = status.goal_id.id;

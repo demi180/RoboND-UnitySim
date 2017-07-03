@@ -34,9 +34,9 @@ namespace hector_uav_msgs
 		{
 			TakeoffActionResult tar = new TakeoffActionResult ();
 			tar.header = new Header ();
-			tar.header.frame_id = header.frame_id;
-			tar.header.seq = header.seq;
-			tar.header.stamp = new Time ( header.stamp.data );
+			tar.header.Frame_id = header.Frame_id;
+			tar.header.Seq = header.Seq;
+			tar.header.Stamp = new Time ( header.Stamp.data );
 			tar.GoalStatus = new GoalStatus ();
 			tar.GoalStatus.goal_id = new GoalID ();
 			tar.GoalStatus.goal_id.id = status.goal_id.id;
