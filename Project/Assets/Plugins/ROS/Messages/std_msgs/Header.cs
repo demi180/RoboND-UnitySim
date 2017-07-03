@@ -70,6 +70,7 @@ string frame_id"; }
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public override void Deserialize(byte[] SERIALIZEDSTUFF, ref int currentIndex)
         {
+			UnityEngine.Debug.Log ( "deserializing header" );
             int arraylength=-1;
             bool hasmetacomponents = false;
             object __thing;
@@ -82,10 +83,21 @@ string frame_id"; }
             h = IntPtr.Zero;
             if (SERIALIZEDSTUFF.Length - currentIndex != 0)
             {
-                h = Marshal.AllocHGlobal(piecesize);
+				try
+				{h = Marshal.AllocHGlobal(piecesize);}
+				catch (Exception e)
+				{
+					UnityEngine.Debug.LogError ( "exception: " + e.GetType ().ToString () + " : " + ( e.Message != null ? e.Message : "" ) );
+					return;
+				}
                 Marshal.Copy(SERIALIZEDSTUFF, currentIndex, h, piecesize);
             }
-            if (h == IntPtr.Zero) throw new Exception("Alloc failed");
+			if ( h == IntPtr.Zero )
+			{
+				UnityEngine.Debug.LogError ( "Zero pointer!" );
+				return;
+			}
+//            if (h == IntPtr.Zero) throw new Exception("Alloc failed");
             seq = (uint)Marshal.PtrToStructure(h, typeof(uint));
             Marshal.FreeHGlobal(h);
             currentIndex+= piecesize;
@@ -139,6 +151,7 @@ string frame_id"; }
                 Array.Copy(__p__,0,__a_b__d,__a_b__e,__p__.Length);
                 __a_b__e += __p__.Length;
             }
+//			UnityEngine.Debug.Log ( "Header: " + __a_b__d.GetString () );
             return __a_b__d;
         }
 

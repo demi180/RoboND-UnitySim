@@ -95,6 +95,7 @@ namespace Ros_CSharp
 
         public override void addCallback(CallbackInterface cb, UInt64 owner_id)
         {
+//			UnityEngine.Debug.Log ( "addcallback" );
             ICallbackInfo info = new ICallbackInfo {Callback = cb, removal_id = owner_id};
 
             lock (mutex)
@@ -240,6 +241,7 @@ namespace Ros_CSharp
 
         public bool callAvailable(int timeout)
         {
+//			UnityEngine.Debug.Log ( "calling" );
             setupTLS();
             int called = 0;
             lock (mutex)

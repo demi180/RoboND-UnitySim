@@ -84,34 +84,35 @@ namespace Messages.std_srvs
 
             public override void Deserialize(byte[] SERIALIZEDSTUFF, ref int currentIndex)
             {
-                int arraylength=-1;
-                bool hasmetacomponents = false;
-                byte[] thischunk, scratch1, scratch2;
-                object __thing;
-                int piecesize=0;
-                IntPtr h;
+//                int arraylength=-1;
+//                bool hasmetacomponents = false;
+//                byte[] thischunk, scratch1, scratch2;
+//                object __thing;
+//                int piecesize=0;
+//                IntPtr h;
                 
             }
 
             [System.Diagnostics.DebuggerStepThrough]
             public override byte[] Serialize(bool partofsomethingelse)
             {
-                int currentIndex=0, length=0;
-                bool hasmetacomponents = false;
-                byte[] thischunk, scratch1, scratch2;
-                List<byte[]> pieces = new List<byte[]>();
-                GCHandle h;
-                
-                //combine every array in pieces into one array and return it
-                int __a_b__f = pieces.Sum((__a_b__c)=>__a_b__c.Length);
-                int __a_b__e=0;
-                byte[] __a_b__d = new byte[__a_b__f];
-                foreach(var __p__ in pieces)
-				{
-					Array.Copy(__p__,0,__a_b__d,__a_b__e,__p__.Length);
-					__a_b__e += __p__.Length;
-				}
-                return __a_b__d;
+//                int currentIndex=0, length=0;
+//                bool hasmetacomponents = false;
+//                byte[] thischunk, scratch1, scratch2;
+//                List<byte[]> pieces = new List<byte[]>();
+//                GCHandle h;
+//                
+//                //combine every array in pieces into one array and return it
+//                int __a_b__f = pieces.Sum((__a_b__c)=>__a_b__c.Length);
+//                int __a_b__e=0;
+//                byte[] __a_b__d = new byte[__a_b__f];
+//                foreach(var __p__ in pieces)
+//				{
+//					Array.Copy(__p__,0,__a_b__d,__a_b__e,__p__.Length);
+//					__a_b__e += __p__.Length;
+//				}
+//                return __a_b__d;
+				return new byte[0];
             }
 
             public override void Randomize()
@@ -174,34 +175,35 @@ namespace Messages.std_srvs
             public override void Deserialize(byte[] SERIALIZEDSTUFF, ref int currentIndex)
             {
 
-                int arraylength=-1;
-                bool hasmetacomponents = false;
-                int piecesize=0;
-                byte[] thischunk, scratch1, scratch2;
-                IntPtr h;
-                object __thing;
+//                int arraylength=-1;
+//                bool hasmetacomponents = false;
+//                int piecesize=0;
+//                byte[] thischunk, scratch1, scratch2;
+//                IntPtr h;
+//                object __thing;
                 
             }
 
             [System.Diagnostics.DebuggerStepThrough]
             public override byte[] Serialize(bool partofsomethingelse)
             {
-                int currentIndex=0, length=0;
-                bool hasmetacomponents = false;
-                byte[] thischunk, scratch1, scratch2;
-                List<byte[]> pieces = new List<byte[]>();
-                GCHandle h;
-                
-                //combine every array in pieces into one array and return it
-                int __a_b__f = pieces.Sum((__a_b__c)=>__a_b__c.Length);
-                int __a_b__e=0;
-                byte[] __a_b__d = new byte[__a_b__f];
-                foreach(var __p__ in pieces)
-				{
-					Array.Copy(__p__,0,__a_b__d,__a_b__e,__p__.Length);
-					__a_b__e += __p__.Length;
-				}
-                return __a_b__d;
+//                int currentIndex=0, length=0;
+//                bool hasmetacomponents = false;
+//                byte[] thischunk, scratch1, scratch2;
+//                List<byte[]> pieces = new List<byte[]>();
+//                GCHandle h;
+//                
+//                //combine every array in pieces into one array and return it
+//                int __a_b__f = pieces.Sum((__a_b__c)=>__a_b__c.Length);
+//                int __a_b__e=0;
+//                byte[] __a_b__d = new byte[__a_b__f];
+//                foreach(var __p__ in pieces)
+//				{
+//					Array.Copy(__p__,0,__a_b__d,__a_b__e,__p__.Length);
+//					__a_b__e += __p__.Length;
+//				}
+//                return __a_b__d;
+				return new byte[0];
             }
             
             public override void Randomize()

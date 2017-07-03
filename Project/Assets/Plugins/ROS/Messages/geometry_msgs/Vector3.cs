@@ -46,11 +46,13 @@ float64 z"; }
             
         }
 
-		public Vector3 (UnityEngine.Vector3 source, bool swapAxes = false, bool invertX = false)
+		public Vector3 (UnityEngine.Vector3 source, bool convertToRos = false)
 		{
-			x = invertX ? -source.x : source.x;
-			y = swapAxes ? source.z : source.y;
-			z = swapAxes ? source.y : source.z;
+			if ( convertToRos )
+				source = source.ToRos ();
+			x = source.x;
+			y = source.y;
+			z = source.z;
 		}
 
         [System.Diagnostics.DebuggerStepThrough]

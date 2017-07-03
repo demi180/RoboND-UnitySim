@@ -19,6 +19,7 @@ using Path = Messages.nav_msgs.Path;
 using GetPlan = Messages.nav_msgs.GetPlan;
 using SetBool = Messages.std_srvs.SetBool;
 using Empty = Messages.std_srvs.Empty;
+using Trigger = Messages.std_srvs.Trigger;
 using SetPose = Messages.quad_controller.SetPose;
 
 
@@ -35,13 +36,14 @@ public class QuadDrone : MonoBehaviour
 	// node to link everything up to ros
 	NodeHandle nh;
 	// service to set drone orientation. still working on getting it to work
-	ServiceServer setOrientSrv;
+//	ServiceServer resetOrientSrv;
 	// service to turn drone motor on/off. still working on it..
 	ServiceServer enableMotorSrv;
 	// publishers for drone and camera info
 	Publisher<PoseStamped> posePub;
 	Publisher<Imu> imuPub;
 	Publisher<Image> imgPub;
+	Publisher<Messages.std_msgs.Header> headerPub;
 	// service for the drone's current path
 	ServiceServer pathSrv;
 	// subscribers for drone movement
@@ -58,8 +60,9 @@ public class QuadDrone : MonoBehaviour
 	ServiceServer constrainTorqueXSrv;
 	ServiceServer constrainTorqueYSrv;
 	ServiceServer constrainTorqueZSrv;
-	ServiceServer TriggerResetSrv;
+	ServiceServer triggerResetSrv;
 	ServiceServer setPoseSrv;
+//	ServiceServer resetS
 
 	uint frameSeq = 0;
 
@@ -70,6 +73,7 @@ public class QuadDrone : MonoBehaviour
 			enabled = false;
 			return;
 		}
+
 		ROSController.StartROS ( OnRosInit );
 	}
 
@@ -78,7 +82,7 @@ public class QuadDrone : MonoBehaviour
 		nh = ROS.GlobalNodeHandle;
 //		nh = new NodeHandle ( "~" );
 		pathSrv = nh.advertiseService<GetPlan.Request, GetPlan.Response> ( "quad_rotor/get_plan", PathService );
-//		setOrientSrv = nh.advertiseService<Messages.std_srvs.Empty.Request>
+//		setOrientSrv = nh.advertiseService<Messages.std_srvs.Empty.Request> ("quad_rotor/reset_orientation", TriggerReset)
 //		enableMotorSrv = nh.advertiseService<EnableMotors.Request, EnableMotors.Response> ( "enable_motors", OnEnableMotors );
 		nh.setParam ( "control_mode", "wrench" ); // for now force twist mode
 //		twistSub = nh.subscribe<TwistStamped> ( "command/twist", 10, TwistCallback );
@@ -86,6 +90,7 @@ public class QuadDrone : MonoBehaviour
 		posePub = nh.advertise<PoseStamped> ( "quad_rotor/pose", 10, false );
 		imuPub = nh.advertise<Imu> ( "quad_rotor/imu", 10, false );
 		imgPub = nh.advertise<Image> ( "quad_rotor/image", 10, false );
+		headerPub = nh.advertise<Messages.std_msgs.Header> ( "quad_rotor/header", 10, false );
 		pubThread = new Thread ( PublishAll );
 		pubThread.Start ();
 
@@ -96,7 +101,8 @@ public class QuadDrone : MonoBehaviour
 		constrainTorqueXSrv = nh.advertiseService<SetBool.Request, SetBool.Response> ( "quad_rotor/x_torque_constrained", ConstrainTorqueX );
 		constrainTorqueYSrv = nh.advertiseService<SetBool.Request, SetBool.Response> ( "quad_rotor/y_torque_constrained", ConstrainTorqueY );
 		constrainTorqueZSrv = nh.advertiseService<SetBool.Request, SetBool.Response> ( "quad_rotor/z_torque_constrained", ConstrainTorqueZ );
-		TriggerResetSrv = nh.advertiseService<Empty.Request, Empty.Response> ( "quad_rotor/reset_orientation", TriggerReset );
+		triggerResetSrv = nh.advertiseService<SetBool.Request, SetBool.Response> ( "quad_rotor/reset_orientation", TriggerReset );
+//		triggerResetSrv = nh.advertiseService<Empty.Request, Empty.Response> ( "quad_rotor/reset_orientation", TriggerReset );
 		setPoseSrv = nh.advertiseService<SetPose.Request, SetPose.Response> ( "quad_rotor/set_pose", SetPoseService );
 	}
 
@@ -165,8 +171,11 @@ public class QuadDrone : MonoBehaviour
 		img.is_bigendian = 1;
 
 
+//		int sleep = 1000 / 30;
+//		int sleep = 1000 / 2;
 		int sleep = 1000 / 60;
-		Vector3 testPos = Vector3.zero;
+//		int sleep = 1000 / 120;
+//		int sleep = 1000 / 250;
 		#if TIMETEST
 		Queue<TimeData> tdq = new Queue<TimeData> ();
 		Queue<long> tq = new Queue<long> ();
@@ -178,28 +187,39 @@ public class QuadDrone : MonoBehaviour
 			tq.Enqueue ( System.DateTime.Now.Ticks );
 			#endif
 			// publish pose
+///*
+			ps.header.stamp = ROS.GetTime ();
+//			ps.header.frame_id = ps.header.stamp.data.toSec ().ToString ();
 			ps.header.frame_id = "";
 			ps.header.seq = frameSeq;
-			ps.header.stamp = ROS.GetTime ();
 			ps.pose.position = new Messages.geometry_msgs.Point ( droneController.Position.ToRos () );
-//			ps.pose.position = new Messages.geometry_msgs.Point ( droneController.Position, true, true );
 			ps.pose.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation.ToRos () );
 			posePub.publish ( ps );
+//			Debug.Log ( "Send Time " + ps.header.stamp.data.toSec () );
+//			*/
 
 			// publish imu
+///*
 			imu.header.frame_id = "";
 			imu.header.seq = frameSeq++;
-			imu.header.stamp = ps.header.stamp;
+			ps.header.stamp = ROS.GetTime ();
+//			imu.header.stamp = ps.header.stamp;
 			imu.angular_velocity = new GVector3 ( droneController.AngularVelocity.ToRos () );
-//			imu.angular_velocity = new GVector3 ( droneController.AngularVelocity, true, true );
 			imu.linear_acceleration = new GVector3 ( droneController.LinearAcceleration.ToRos () );
-//			imu.linear_acceleration = new GVector3 ( droneController.LinearAcceleration, true, true );
 			imu.orientation = new Messages.geometry_msgs.Quaternion ( droneController.Rotation.ToRos () );
 			imuPub.publish ( imu );
-
+//			Debug.Log ( "Send Imu " + imu.header.seq );
+			
 			// publish image
-			img.data = droneController.GetImageData ();
-			imgPub.publish ( img );
+//			img.data = droneController.GetImageData ();
+//			imgPub.publish ( img );
+//			*/
+
+			Messages.std_msgs.Header h = new Messages.std_msgs.Header ();
+			h.seq = frameSeq;//++;
+			h.frame_id = "";
+			h.stamp = ROS.GetTime ();
+			headerPub.publish ( h );
 			
 			Thread.Sleep ( sleep );
 		}
@@ -336,10 +356,10 @@ public class QuadDrone : MonoBehaviour
 		return true;
 	}
 
-	bool TriggerReset (Empty.Request req, ref Empty.Response resp)
+	bool TriggerReset (SetBool.Request req, ref SetBool.Response resp)
 	{
 		Debug.Log ( "reset orientation service!" );
-//		droneController.TriggerReset ();
+		droneController.TriggerReset ();
 		droneController.ApplyMotorForce ( Vector3.zero );
 		droneController.ApplyMotorTorque ( Vector3.zero );
 		return true;

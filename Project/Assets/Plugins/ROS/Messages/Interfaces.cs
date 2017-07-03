@@ -354,6 +354,16 @@ namespace Messages
             return (sec == timer.sec && nsec == timer.nsec);
         }
 
+		public static bool operator == (TimeData lhs, TimeData rhs)
+		{
+			return ( lhs.sec == rhs.sec && lhs.nsec == rhs.nsec );
+		}
+
+		public static bool operator != (TimeData lhs, TimeData rhs)
+		{
+			return ( lhs.sec != rhs.sec || lhs.nsec != rhs.nsec );
+		}
+
 		public double toSec ()
 		{
 			return (double) sec + 1e-9 * (double) nsec;

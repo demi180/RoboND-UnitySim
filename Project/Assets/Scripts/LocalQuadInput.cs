@@ -35,54 +35,23 @@ public class LocalQuadInput : MonoBehaviour
 
 		if ( useTeleop )
 		{
-//			if ( Input.GetKeyDown ( KeyCode.Return ) )
-//				teleop.enableMotors ( !motorEnabled );
 			motorEnabled = droneController.MotorsEnabled;
 
-			teleop.SendWrench ( force.ToRos (), torque.ToRos () );
-//			teleop.SendTwist ( force, torque );
+			teleop.SendWrench ( force, torque );
 
 		} else
 		{
-//			torque = new Vector3 ( Input.GetAxis ( "Roll" ), Input.GetAxis ( "Yaw" ), Input.GetAxis ( "Pitch" ) );
-			
 			droneController.ApplyMotorForce ( force );
 			droneController.ApplyMotorTorque ( torque );
 			motorEnabled = droneController.MotorsEnabled;
 		}
-	}
 
-
-/*	void OnGUI ()
-	{
-		Rect r = new Rect ( 10, 10, 180, 200 );
-		GUI.Box ( r, "" );
-		GUI.Box ( r, "" );
-		r.x = 15;
-		r.height = 20;
-		GUI.Label ( r, "Motors enabled: <color=yellow>" + motorEnabled + "</color>" );
-		r.y += r.height;
-		Vector3 force = droneController.Force;
-		force = new Vector3 ( force.x, force.z, force.y );
-		GUI.Label ( r, "Force: " + force.ToString () );
-		r.y += r.height;
-		force = droneController.Torque;
-		force = new Vector3 ( force.x, force.z, force.y );
-		GUI.Label ( r, "Torque: " + force.ToString () );
-		if ( useTeleop )
+		if ( Input.GetKeyDown ( KeyCode.R ) )
 		{
-			r.y += r.height;
-			GUI.Label ( r, "Position: " + teleop.Position.ToString () );
-			r.y += r.height;
-			GUI.Label ( r, "PRY: " + teleop.Rotation.eulerAngles.ToString () );
+			if ( useTeleop )
+				teleop.TriggerReset ();
+			else
+				droneController.ResetOrientation ();
 		}
-		r.y += r.height;
-		force = droneController.AngularVelocity;
-		force = new Vector3 ( force.x, force.z, force.y );
-		GUI.Label ( r, "Angular Vel.: " + force.ToString () );
-		r.y += r.height;
-		force = droneController.LinearAcceleration;
-		force = new Vector3 ( force.x, force.z, force.y );
-		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
-	}*/
+	}
 }

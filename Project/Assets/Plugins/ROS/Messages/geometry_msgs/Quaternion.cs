@@ -92,10 +92,23 @@ float64 w"; }
             h = IntPtr.Zero;
             if (SERIALIZEDSTUFF.Length - currentIndex != 0)
             {
-                h = Marshal.AllocHGlobal(piecesize);
+				try
+				{h = Marshal.AllocHGlobal(piecesize);}
+				catch (Exception e)
+				{
+					UnityEngine.Debug.LogError ( "exception: " + e.GetType ().ToString () + " : " + ( e.Message != null ? e.Message : "" ) );
+					return;
+				}
+//                h = Marshal.AllocHGlobal(piecesize);
                 Marshal.Copy(SERIALIZEDSTUFF, currentIndex, h, piecesize);
             }
-            if (h == IntPtr.Zero) throw new Exception("Alloc failed");
+
+			if ( h == IntPtr.Zero )
+			{
+				UnityEngine.Debug.LogError ( "Zero pointer!" );
+				return;
+			}
+//            if (h == IntPtr.Zero) throw new Exception("Alloc failed");
             x = (double)Marshal.PtrToStructure(h, typeof(double));
             Marshal.FreeHGlobal(h);
             currentIndex+= piecesize;

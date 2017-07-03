@@ -12,6 +12,9 @@ using hector_uav_msgs;
 using LandingClient = actionlib.SimpleActionClient<hector_uav_msgs.LandingAction>;
 using TakeoffClient = actionlib.SimpleActionClient<hector_uav_msgs.TakeoffAction>;
 using PoseClient = actionlib.SimpleActionClient<hector_uav_msgs.PoseAction>;
+using Empty = Messages.std_srvs.Empty;
+using Trigger = Messages.std_srvs.Trigger;
+using SetBool = Messages.std_srvs.SetBool;
 
 /*
  * QRKeyboardTeleop: a basic teleop class for a quadrotor drone using Hector_Quadrotor commands
@@ -31,11 +34,11 @@ public class QRKeyboardTeleop : MonoBehaviour
 	Publisher<YawRateCommand> yawRatePublisher;
 	Publisher<ThrustCommand> thrustPublisher;
 	ServiceClient<EnableMotors> motorEnableService;
-	LandingClient landingClient;
-	TakeoffClient takeoffClient;
-	PoseClient poseClient;
+	ServiceClient<SetBool.Request, SetBool.Response> resetService;
 	Thread pubThread;
 	Subscriber<PoseStamped> poseSub;
+	Subscriber<Imu> imuSub;
+	Subscriber<Messages.std_msgs.Header> headerSub;
 
 	PoseStamped pose;
 	double yaw;
@@ -86,9 +89,11 @@ public class QRKeyboardTeleop : MonoBehaviour
 		{
 			wrenchPub = nh.advertise<Wrench> ( "quad_rotor/cmd_force", 10 );
 			poseSub = nh.subscribe<PoseStamped> ( "quad_rotor/pose", 10, PoseCallback );
+			imuSub = nh.subscribe<Imu> ( "quad_rotor/imu", 10, ImuCallback );
+			headerSub = nh.subscribe<Messages.std_msgs.Header> ( "quad_rotor/header", 10, HeaderCallback );
 //			pubThread = new Thread ()
 		}
-		else if (control_mode == "attitude")
+/*		else if (control_mode == "attitude")
 		{
 //			nh.param<double>("pitch_max", ref sAxes.x.factor, 30.0);
 //			nh.param<double>("roll_max", ref sAxes.y.factor, 30.0);
@@ -121,13 +126,14 @@ public class QRKeyboardTeleop : MonoBehaviour
 			pose.pose.orientation.y = 0;
 			pose.pose.orientation.z = 0;
 			pose.pose.orientation.w = 1;
-		}
+		}*/
 		else
 		{
 			ROS.Error("Unsupported control mode: " + control_mode);
 		}
 
 		motorEnableService = nh.serviceClient<EnableMotors> ( "enable_motors" );
+		resetService = nh.serviceClient<SetBool.Request, SetBool.Response> ( "quad_rotor/reset_orientation" );
 //		takeoffClient = new TakeoffClient ( nh, "action/takeoff" );
 //		landingClient = new LandingClient ( nh, "action/landing" );
 //		poseClient = new PoseClient ( nh, "action/pose" );
@@ -184,15 +190,44 @@ public class QRKeyboardTeleop : MonoBehaviour
 	public void SendWrench (UnityEngine.Vector3 force, UnityEngine.Vector3 torque)
 	{
 		Wrench wrench = new Wrench ();
-		wrench.force = new Messages.geometry_msgs.Vector3 ( force, true );
-		wrench.torque = new Messages.geometry_msgs.Vector3 ( torque );
+		wrench.force = new Messages.geometry_msgs.Vector3 ( force.ToRos () );
+		wrench.torque = new Messages.geometry_msgs.Vector3 ( torque.ToRos () );
 
 		wrenchPub.publish ( wrench );
+	}
+
+	public void TriggerReset ()
+	{
+		new Thread ( CallReset ).Start ();
+	}
+
+	void CallReset ()
+	{
+		SetBool.Request req = new SetBool.Request ();
+		SetBool.Response resp = new SetBool.Response ();
+		if ( resetService.call ( req, ref resp ) )
+		{
+			Debug.Log ( "called!" );
+		}
 	}
 
 	void PoseCallback (PoseStamped poseInfo)
 	{
 		Position = poseInfo.pose.position.ToUnity ();
 		Rotation = poseInfo.pose.orientation.ToUnity ();
+//		Debug.Log ( "Pose " + poseInfo.header.seq );
+//		Debug.Log ( "Pose " + poseInfo.header.frame_id + " " + poseInfo.header.stamp.data.toSec () );
+//		Debug.Log ( "Pose " + poseInfo.header.stamp.data.toSec () );
+	}
+
+	void ImuCallback (Imu imu)
+	{
+//		Debug.Log ( "Imu " + imu.header.seq );
+	}
+
+	void HeaderCallback (Messages.std_msgs.Header header)
+	{
+//		Debug.Log ( "Header " + header.stamp.data.toSec () );
+//		Debug.Log ( "Header " + header.seq );
 	}
 }
