@@ -17,6 +17,7 @@ public class ROSController : MonoBehaviour
 
 	public string rosMasterURI = "http://localhost:11311";
 	public string nodePrefix = "";
+	public bool overrideURI;
 
 	bool starting;
 	bool stopping;
@@ -38,8 +39,8 @@ public class ROSController : MonoBehaviour
 			Application.targetFrameRate = 60;
 
 //		Debug.Log ( "ros master is " + ROS.ROS_MASTER_URI );
-		if ( string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.User ) ) &&
-		     string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.Machine ) ) )
+		if ( ( string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.User ) ) &&
+		     string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.Machine ) ) ) || overrideURI )
 			ROS.ROS_MASTER_URI = rosMasterURI;
 //			delayedStart = true;
 		instance = this;
@@ -124,7 +125,11 @@ public class ROSController : MonoBehaviour
 		Debug.Log ( "ROS is starting" );
 		if ( instance.nodePrefix == null )
 			instance.nodePrefix = "";
-		ROS.Init ( new string[0], instance.nodePrefix );
+		new System.Threading.Thread ( () =>
+		{
+			ROS.Init ( new string[0], instance.nodePrefix );
+		} ).Start ();
+//		ROS.Init ( new string[0], instance.nodePrefix );
 		instance.StartCoroutine ( instance.WaitForInit () );
 		XmlRpcUtil.SetLogLevel(XmlRpcUtil.XMLRPC_LOG_LEVEL.ERROR);
 	}

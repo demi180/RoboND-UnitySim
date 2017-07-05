@@ -100,6 +100,7 @@ public class QuadController : MonoBehaviour
 		transform.position = Vector3.up * 10;
 		UseGravity = rb.useGravity;
 		UpdateConstraints ();
+		rb.maxAngularVelocity = Mathf.Infinity;
 	}
 
 	void Update ()

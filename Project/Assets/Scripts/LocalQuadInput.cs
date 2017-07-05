@@ -35,15 +35,15 @@ public class LocalQuadInput : MonoBehaviour
 
 		if ( useTeleop )
 		{
-			motorEnabled = droneController.MotorsEnabled;
+//			motorEnabled = droneController.MotorsEnabled;
 
-			teleop.SendWrench ( force, torque );
+			teleop.SendWrench ( force, -torque );
 
 		} else
 		{
 			droneController.ApplyMotorForce ( force );
 			droneController.ApplyMotorTorque ( torque );
-			motorEnabled = droneController.MotorsEnabled;
+//			motorEnabled = droneController.MotorsEnabled;
 		}
 
 		if ( Input.GetKeyDown ( KeyCode.R ) )
