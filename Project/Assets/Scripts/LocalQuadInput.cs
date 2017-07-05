@@ -17,6 +17,10 @@ public class LocalQuadInput : MonoBehaviour
 	bool motorEnabled;
 	float thrust = 0;
 
+	bool useTwist;
+	float yAngVel;
+	float yLinVel;
+
 	// Update is called once per frame
 	void LateUpdate ()
 	{
@@ -27,27 +31,50 @@ public class LocalQuadInput : MonoBehaviour
 			thrust = 0;
 		thrust = Mathf.Clamp ( thrust, -1f, 1f );
 
-		Vector3 input = new Vector3 ( Input.GetAxis ( "Horizontal" ), thrust, Input.GetAxis ( "Vertical" ) );
-		Vector3 force = new Vector3 ( 0, input.y, 0 );
-		float x = input.z / 2 + input.x / 2;
-		float z = input.z / 2 - input.x / 2;
-		Vector3 torque = new Vector3 ( x, Input.GetAxis ( "Yaw" ), z );
+		if ( Input.GetKeyDown ( KeyCode.B ) )
+			useTwist = !useTwist;
 
-		if ( useTeleop )
+		if ( useTwist )
 		{
-//			motorEnabled = droneController.MotorsEnabled;
+			float yaw = Input.GetAxis ( "Yaw" );
+			yAngVel += yaw * Time.deltaTime;
+			yLinVel += thrustInput * Time.deltaTime;
 
-			teleop.SendWrench ( force, -torque );
+			if ( useTeleop )
+			{
+				teleop.SendTwist ( Vector3.up * yLinVel, Vector3.up * yAngVel );
+
+			} else
+			{
+				droneController.SetLinearVelocity ( Vector3.up * yLinVel );
+				droneController.SetAngularVelocity ( Vector3.up * yAngVel );
+			}
 
 		} else
 		{
-			droneController.ApplyMotorForce ( force );
-			droneController.ApplyMotorTorque ( torque );
-//			motorEnabled = droneController.MotorsEnabled;
+			Vector3 input = new Vector3 ( Input.GetAxis ( "Horizontal" ), thrust, Input.GetAxis ( "Vertical" ) );
+			Vector3 force = new Vector3 ( 0, input.y, 0 );
+			float x = input.z / 2 + input.x / 2;
+			float z = input.z / 2 - input.x / 2;
+			Vector3 torque = new Vector3 ( x, Input.GetAxis ( "Yaw" ), z );
+			
+			if ( useTeleop )
+			{
+				teleop.SendWrench ( force, -torque );
+				
+			} else
+			{
+				droneController.ApplyMotorForce ( force );
+				droneController.ApplyMotorTorque ( torque );
+			}
 		}
+
+
 
 		if ( Input.GetKeyDown ( KeyCode.R ) )
 		{
+			yLinVel = 0;
+			yAngVel = 0;
 			if ( useTeleop )
 				teleop.TriggerReset ();
 			else

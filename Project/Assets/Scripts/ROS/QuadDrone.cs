@@ -9,7 +9,7 @@ using UnityEngine;
 using Ros_CSharp;
 using hector_uav_msgs;
 using Messages;
-using TwistStamped = Messages.geometry_msgs.TwistStamped;
+using Twist = Messages.geometry_msgs.Twist;
 using GVector3 = Messages.geometry_msgs.Vector3;
 using PoseStamped = Messages.geometry_msgs.PoseStamped;
 using Wrench = Messages.geometry_msgs.Wrench;
@@ -43,11 +43,10 @@ public class QuadDrone : MonoBehaviour
 	Publisher<PoseStamped> posePub;
 	Publisher<Imu> imuPub;
 	Publisher<Image> imgPub;
-	Publisher<Messages.std_msgs.Header> headerPub;
 	// service for the drone's current path
 	ServiceServer pathSrv;
 	// subscribers for drone movement
-	Subscriber<TwistStamped> twistSub;
+	Subscriber<Twist> twistSub;
 	Subscriber<Wrench> wrenchSub;
 	// thread to run the publishers on
 	Thread pubThread;
@@ -85,12 +84,11 @@ public class QuadDrone : MonoBehaviour
 //		setOrientSrv = nh.advertiseService<Messages.std_srvs.Empty.Request> ("quad_rotor/reset_orientation", TriggerReset)
 //		enableMotorSrv = nh.advertiseService<EnableMotors.Request, EnableMotors.Response> ( "enable_motors", OnEnableMotors );
 		nh.setParam ( "control_mode", "wrench" ); // for now force twist mode
-//		twistSub = nh.subscribe<TwistStamped> ( "command/twist", 10, TwistCallback );
+		twistSub = nh.subscribe<Twist> ( "quad_rotor/cmd_vel", 10, TwistCallback );
 		wrenchSub = nh.subscribe<Wrench> ( "quad_rotor/cmd_force", 10, WrenchCallback );
 		posePub = nh.advertise<PoseStamped> ( "quad_rotor/pose", 10, false );
 		imuPub = nh.advertise<Imu> ( "quad_rotor/imu", 10, false );
 		imgPub = nh.advertise<Image> ( "quad_rotor/image", 10, false );
-		headerPub = nh.advertise<Messages.std_msgs.Header> ( "quad_rotor/header", 10, false );
 		pubThread = new Thread ( PublishAll );
 		pubThread.Start ();
 
@@ -119,16 +117,16 @@ public class QuadDrone : MonoBehaviour
 		return false;
 	}
 
-	void TwistCallback (TwistStamped msg)
+	void TwistCallback (Twist msg)
 	{
-		Vector3 linear = msg.twist.linear.ToUnityVector ();
-		Vector3 angular = msg.twist.angular.ToUnityVector ();
+		Vector3 linear = msg.linear.ToUnityVector ();
+		Vector3 angular = msg.angular.ToUnityVector ();
 		if ( droneController != null )
 		{
-			droneController.ApplyMotorForce ( linear, true );
-			droneController.ApplyMotorTorque ( angular, true );
-//			droneController.ApplyMotorForce ( (float) linear.x, (float) linear.y, (float) linear.z, true, true );
-//			droneController.ApplyMotorTorque ( (float) angular.x, (float) angular.y, (float) angular.z, true, true );
+			if ( !droneController.MotorsEnabled )
+				droneController.MotorsEnabled = true;
+			droneController.SetLinearVelocity ( linear, true );
+			droneController.SetAngularVelocity ( angular, true );
 		}
 	}
 
@@ -142,8 +140,6 @@ public class QuadDrone : MonoBehaviour
 				droneController.MotorsEnabled = true;
 			droneController.ApplyMotorForce ( force, true );
 			droneController.ApplyMotorTorque ( torque, true );
-//			droneController.ApplyMotorForce ( force.x, force.y, force.z, true, true );
-//			droneController.ApplyMotorTorque ( torque.x, torque.y, torque.z, true, true );
 		}
 	}
 
@@ -244,12 +240,6 @@ public class QuadDrone : MonoBehaviour
 //			imgPub.publish ( img );
 //			*/
 
-//			Messages.std_msgs.Header h = new Messages.std_msgs.Header ();
-//			h.Seq = frameSeq;//++;
-//			h.Frame_id = "";
-//			h.Stamp = ROS.GetTime ();
-//			headerPub.publish ( h );
-			
 			Thread.Sleep ( sleep );
 		}
 

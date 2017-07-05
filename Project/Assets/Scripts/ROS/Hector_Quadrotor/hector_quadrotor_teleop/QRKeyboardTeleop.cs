@@ -29,7 +29,7 @@ public class QRKeyboardTeleop : MonoBehaviour
 	NodeHandle nh;
 	Subscriber<Joy> joySubscriber;
 	Publisher<Wrench> wrenchPub;
-	Publisher<TwistStamped> velocityPublisher;
+	Publisher<Twist> velocityPublisher;
 	Publisher<AttitudeCommand> attitudePublisher;
 	Publisher<YawRateCommand> yawRatePublisher;
 	Publisher<ThrustCommand> thrustPublisher;
@@ -91,7 +91,7 @@ public class QRKeyboardTeleop : MonoBehaviour
 			poseSub = nh.subscribe<PoseStamped> ( "quad_rotor/pose", 10, PoseCallback );
 			imuSub = nh.subscribe<Imu> ( "quad_rotor/imu", 10, ImuCallback );
 			headerSub = nh.subscribe<Messages.std_msgs.Header> ( "quad_rotor/header", 10, HeaderCallback );
-//			pubThread = new Thread ()
+			velocityPublisher = nh.advertise<Twist> ( "quad_rotor/cmd_vel", 10 );
 		}
 /*		else if (control_mode == "attitude")
 		{
@@ -110,7 +110,7 @@ public class QRKeyboardTeleop : MonoBehaviour
 			nh.param<double>("y_velocity_max", ref zVelocityMax, 2.0);
 			nh.param<double>("z_velocity_max", ref yVelocityMax, 2.0);
 
-			velocityPublisher = nh.advertise<TwistStamped> ( "command/twist", 10 );
+			velocityPublisher = nh.advertise<Twist> ( "command/twist", 10 );
 		}
 		else if (control_mode == "position")
 		{
@@ -150,7 +150,7 @@ public class QRKeyboardTeleop : MonoBehaviour
 	{
 		if ( velocityPublisher != null && velocityPublisher.getNumSubscribers () > 0 )
 		{
-			velocityPublisher.publish ( new TwistStamped () );
+			velocityPublisher.publish ( new Twist () );
 		}
 		if ( attitudePublisher != null && attitudePublisher.getNumSubscribers () > 0 )
 		{
@@ -168,22 +168,10 @@ public class QRKeyboardTeleop : MonoBehaviour
 
 	public void SendTwist (UnityEngine.Vector3 linear, UnityEngine.Vector3 angular)
 	{
-		TwistStamped twist = new TwistStamped ();
-		twist.twist = new Twist ();
-		twist.header = new Messages.std_msgs.Header ();
-		var lin = new Messages.geometry_msgs.Vector3 ();
-		var ang = new Messages.geometry_msgs.Vector3 ();
+		Twist twist = new Twist ();
+		twist.linear = new Messages.geometry_msgs.Vector3 ( linear.ToRos () );
+		twist.angular = new Messages.geometry_msgs.Vector3 ( angular.ToRos () );
 
-		lin.x = linear.x;
-		lin.y = linear.z;
-		lin.z = linear.y;
-		ang.x = angular.x;
-		ang.y = angular.z;
-		ang.z = angular.y;
-		twist.twist.linear = lin;
-		twist.twist.angular = ang;
-		twist.header.Frame_id = baseLinkFrame;
-		twist.header.Stamp = ROS.GetTime ();
 		velocityPublisher.publish ( twist );
 	}
 

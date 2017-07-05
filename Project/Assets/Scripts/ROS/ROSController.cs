@@ -8,9 +8,24 @@ using XmlRpc_Wrapper;
 using UnityEditor;
 #endif
 
+public enum ROSStatus
+{
+	Disconnected,
+	Connecting,
+	Connected
+}
+
 public class ROSController : MonoBehaviour
 {
 	public static ROSController instance;
+	public static ROSStatus Status
+	{
+		get {
+			if ( instance == null )
+				return ROSStatus.Disconnected;
+			return instance.status;
+		}
+	}
 	static Queue<Action> callbacks = new Queue<Action> ();
 	static Queue<NodeHandle> nodes = new Queue<NodeHandle> ();
 	public static bool delayedStart;
@@ -19,6 +34,7 @@ public class ROSController : MonoBehaviour
 	public string nodePrefix = "";
 	public bool overrideURI;
 
+	ROSStatus status;
 	bool starting;
 	bool stopping;
 	bool delete;
@@ -31,6 +47,8 @@ public class ROSController : MonoBehaviour
 			Destroy ( gameObject );
 			return;
 		}
+
+		status = ROSStatus.Disconnected;
 
 //		Application.targetFrameRate = 0;
 		if ( QualitySettings.vSyncCount == 2 )
@@ -125,6 +143,7 @@ public class ROSController : MonoBehaviour
 		Debug.Log ( "ROS is starting" );
 		if ( instance.nodePrefix == null )
 			instance.nodePrefix = "";
+		instance.status = ROSStatus.Connecting;
 		new System.Threading.Thread ( () =>
 		{
 			ROS.Init ( new string[0], instance.nodePrefix );
@@ -138,6 +157,7 @@ public class ROSController : MonoBehaviour
 	{
 		if ( ROS.isStarted () && !ROS.shutting_down && !instance.stopping )
 		{
+			instance.status = ROSStatus.Disconnected;
 			instance.starting = false;
 			instance.stopping = true;
 			while ( nodes.Count > 0 )
@@ -170,6 +190,7 @@ public class ROSController : MonoBehaviour
 		if ( ROS.ok && !stopping )
 		{
 			starting = false;
+			status = ROSStatus.Connected;
 			Debug.Log ( "ROS Init successful" );
 			while ( callbacks != null && callbacks.Count > 0 )
 				callbacks.Dequeue () ();

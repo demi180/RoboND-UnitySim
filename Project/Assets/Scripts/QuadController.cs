@@ -15,6 +15,7 @@ public class QuadController : MonoBehaviour
 	public Vector3 Position { get; protected set; }
 	public Quaternion Rotation { get; protected set; }
 	public Vector3 AngularVelocity { get; protected set; }
+	public Vector3 LinearVelocity { get; protected set; }
 	public Vector3 LinearAcceleration { get; protected set; }
 	public Vector3 Forward { get; protected set; }
 	public Vector3 Right { get; protected set; }
@@ -77,6 +78,7 @@ public class QuadController : MonoBehaviour
 	byte[] cameraData;
 	bool resetFlag;
 	bool setPoseFlag;
+	bool useTwist;
 
 	Vector3 posePosition;
 	Quaternion poseOrientation;
@@ -224,110 +226,84 @@ public class QuadController : MonoBehaviour
 		CheckConstraints ();
 		if ( MotorsEnabled )
 		{
-			// add force
-			rb.AddRelativeForce ( force * Time.deltaTime, forceMode );
-
-			// add torque
-			if ( inverseFlag )
+			if ( useTwist )
 			{
-				inverseFlag = false;
-				torque = transform.InverseTransformDirection ( torque ) * torqueForce;
-			}
-			rb.AddRelativeTorque ( torque * Time.deltaTime, torqueMode );
-//			rb.AddTorque ( torque * Time.deltaTime, torqueMode );
+				// just set linear and angular velocities, ignoring forces
+				rb.velocity = LinearVelocity;
+				rb.angularVelocity = AngularVelocity;
 
-			// update acceleration
-			LinearAcceleration = ( rb.velocity - lastVelocity ) / Time.deltaTime;
-			lastVelocity = rb.velocity;
-			AngularVelocity = rb.angularVelocity;
+			} else
+			{
+				// add force
+				rb.AddRelativeForce ( force * Time.deltaTime, forceMode );
+				
+				// add torque
+				if ( inverseFlag )
+				{
+					inverseFlag = false;
+					torque = transform.InverseTransformDirection ( torque ) * torqueForce;
+				}
+				rb.AddRelativeTorque ( torque * Time.deltaTime, torqueMode );
+				
+				// update acceleration
+				LinearAcceleration = ( rb.velocity - lastVelocity ) / Time.deltaTime;
+				lastVelocity = rb.velocity;
+				LinearVelocity = rb.velocity;
+				AngularVelocity = rb.angularVelocity;
+			}
 		}
 	}
 
 	void OnGUI ()
 	{
+		// background box
 		Rect r = new Rect ( 10, 10, 180, 200 );
 		GUI.Box ( r, "" );
 		GUI.Box ( r, "" );
+
+		// motor status
 		r.x = 15;
 		r.height = 20;
 		GUI.Label ( r, "Motors enabled: <color=yellow>" + MotorsEnabled + "</color>" );
+
+		// input force
 		r.y += r.height;
 		Vector3 force = Force.ToRos ();
-//		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Force: " + force.ToString () );
+
+		// input torque
 		r.y += r.height;
 		force = Torque.ToRos ();
 		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Torque: " + force.ToString () );
-//		if ( useTeleop )
-//		{
-			r.y += r.height;
+
+		// position
+		r.y += r.height;
 		GUI.Label ( r, "Position: " + Position.ToRos ().ToString () );
-			r.y += r.height;
+
+		// orientation
+		r.y += r.height;
 		GUI.Label ( r, "PRY: " + Rotation.eulerAngles.ToRos ().ToString () );
-//		}
+
+		// linear velocity
+		r.y += r.height;
+		force = LinearVelocity.ToRos ();
+		GUI.Label ( r, "Linear Vel.:" + force.ToString () );
+
+		// angular velocity
 		r.y += r.height;
 		force = AngularVelocity.ToRos ();
-//		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Angular Vel.: " + force.ToString () );
-		r.y += r.height;
-		force = LinearAcceleration.ToRos ();
-//		force = new Vector3 ( -force.x, force.z, force.y );
-		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
 
-
-
-		return;
-
-		// draw the axis arrows
-		float arrowSize = arrowScreenSize * Screen.height / 1080f / 2;
-		Vector3 upAxis;
-		float rotAngle;
-		transform.rotation.ToAngleAxis ( out rotAngle, out upAxis );
-		Vector2 centerScreen = new Vector2 ( Screen.width/2, Screen.height/2 );
-		Vector2 arrow1Pos = centerScreen - Vector2.up * Screen.height / 4;
-		Vector2 arrow2Pos = centerScreen - Vector2.right * Screen.width / 4 - Vector2.up * Screen.height / 4;
-		Vector2 arrow3Pos = centerScreen + Vector2.right * Screen.width / 4 - Vector2.up * Screen.height / 4;
-
-		// begin rotation to drone axis
-		GUIUtility.RotateAroundPivot ( -rotAngle, centerScreen );
-
-		// top (z) arrow
-		GUIUtility.RotateAroundPivot ( -90, arrow1Pos );
-//		Vector2 pos = centerScreen - Vector2.up * Screen.height / 4;
-		Rect arrowRect = new Rect ( arrow1Pos.x - arrowSize, arrow1Pos.y - arrowSize, arrowSize * 2, arrowSize * 2 );
-//		GUI.color = Color.white;
-//		GUI.DrawTexture ( arrowRect, axisArrows [ 0 ] );
-		GUI.color = axisColors [ 2 ];
-		GUI.DrawTexture ( arrowRect, axisArrows [ 0 ] );
-		GUIUtility.RotateAroundPivot ( 90, arrow1Pos );
-
-		// y arrow
-		GUIUtility.RotateAroundPivot ( -135, arrow2Pos );
-//		pos = centerScreen - Vector2.right * Screen.width / 4 - Vector2.up * Screen.height / 4;
-		arrowRect = new Rect ( arrow2Pos.x - arrowSize, arrow2Pos.y - arrowSize, arrowSize * 2, arrowSize * 2 );
-		GUI.color = Color.white;
-		GUI.DrawTexture ( arrowRect, axisArrows [ 0 ] );
-		GUI.color = axisColors [ 1 ];
-		GUI.DrawTexture ( arrowRect, axisArrows [ 0 ] );
-		GUIUtility.RotateAroundPivot ( 135, arrow2Pos );
-
-		// x arrow
-		GUIUtility.RotateAroundPivot ( -45, arrow3Pos );
-//		pos = centerScreen + Vector2.right * Screen.width / 4 - Vector2.up * Screen.height / 4;
-		arrowRect = new Rect ( arrow3Pos.x - arrowSize, arrow3Pos.y - arrowSize, arrowSize * 2, arrowSize * 2 );
-		GUI.color = Color.white;
-		GUI.DrawTexture ( arrowRect, axisArrows [ 0 ] );
-		GUI.color = axisColors [ 0 ];
-		GUI.DrawTexture ( arrowRect, axisArrows [ 0 ] );
-		GUIUtility.RotateAroundPivot ( 45, arrow3Pos);
-
-		// reset rotation
-		GUI.matrix = Matrix4x4.identity;
+		// linear acceleration
+//		r.y += r.height;
+//		force = LinearAcceleration.ToRos ();
+//		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
 	}
 
 	public void ApplyMotorForce (Vector3 v, bool convertFromRos = false)
 	{
+		useTwist = false;
 		force = v;
 		if ( convertFromRos )
 			force = force.ToUnity ();
@@ -336,10 +312,25 @@ public class QuadController : MonoBehaviour
 
 	public void ApplyMotorTorque (Vector3 v, bool convertFromRos = false)
 	{
+		useTwist = false;
 		torque = v;
 		if ( convertFromRos )
 			torque = torque.ToUnity ();
 		torque *= convertFromRos ? -torqueForce : torqueForce;
+	}
+
+	public void SetLinearVelocity (Vector3 v, bool convertFromRos = false)
+	{
+		useTwist = true;
+		force = torque = Vector3.zero;
+		LinearVelocity = convertFromRos ? v.ToUnity () : v;
+	}
+
+	public void SetAngularVelocity (Vector3 v, bool convertFromRos = false)
+	{
+		useTwist = true;
+		force = torque = Vector3.zero;
+		AngularVelocity = convertFromRos ? v.ToUnity () : v;
 	}
 
 	public void TriggerReset ()
@@ -355,6 +346,10 @@ public class QuadController : MonoBehaviour
 		rb.velocity = Vector3.zero;
 		rb.angularVelocity = Vector3.zero;
 		LinearAcceleration = Vector3.zero;
+		LinearVelocity = Vector3.zero;
+		AngularVelocity = Vector3.zero;
+		rb.isKinematic = true;
+		rb.isKinematic = false;
 	}
 
 	void CheckSetPose ()
