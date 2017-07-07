@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using UnityEngine;
 using Ros_CSharp;
 using XmlRpc_Wrapper;
@@ -17,6 +19,7 @@ public enum ROSStatus
 
 public class ROSController : MonoBehaviour
 {
+	static object instanceLock = new object ();
 	public static ROSController instance;
 	public static ROSStatus Status
 	{
@@ -26,6 +29,7 @@ public class ROSController : MonoBehaviour
 			return instance.status;
 		}
 	}
+	static object callbackLock = new object ();
 	static Queue<Action> callbacks = new Queue<Action> ();
 	static Queue<NodeHandle> nodes = new Queue<NodeHandle> ();
 	public static bool delayedStart;
@@ -38,6 +42,7 @@ public class ROSController : MonoBehaviour
 	bool starting;
 	bool stopping;
 	bool delete;
+	bool connectedToMaster;
 
 	void Awake ()
 	{
@@ -47,6 +52,10 @@ public class ROSController : MonoBehaviour
 			Destroy ( gameObject );
 			return;
 		}
+
+		GetConfigFile ();
+
+		Debug.LogWarning ( "Main thread ID " + System.Threading.Thread.CurrentThread.ManagedThreadId );
 
 		status = ROSStatus.Disconnected;
 
@@ -63,6 +72,18 @@ public class ROSController : MonoBehaviour
 //			delayedStart = true;
 		instance = this;
 		StartROS ();
+		new Thread ( new ThreadStart ( UpdateMasterConnection ) ).Start ();
+	}
+
+	void Update ()
+	{
+		if ( ROS.isStarted () && ROS.ok && connectedToMaster )
+			status = ROSStatus.Connected;
+		else
+			if ( ROS.shutting_down || !ROS.isStarted () || !ROS.ok )
+			status = ROSStatus.Disconnected;
+		else
+			status = ROSStatus.Connecting;
 	}
 
 	void OnDestroy ()
@@ -73,6 +94,48 @@ public class ROSController : MonoBehaviour
 	void OnApplicationQuit ()
 	{
 		StopROS ();
+	}
+
+	void GetConfigFile ()
+	{
+		string filename = Application.dataPath + "/ros_settings.txt";
+
+		if ( File.Exists ( filename ) )
+		{
+//			Debug.Log ( "exists" );
+			using ( var fs = new FileStream ( filename, FileMode.Open, FileAccess.Read ) )
+			{
+				byte[] bytes = new byte[fs.Length]; 
+				fs.Read ( bytes, 0, bytes.Length );
+				string json = System.Text.Encoding.UTF8.GetString ( bytes );
+//				Debug.Log ( "json: " + json );
+				JSONObject jo = new JSONObject ( json );
+				if ( jo.HasField ( "override" ) && jo.GetField ( "override" ).b )
+				{
+					if ( jo.HasField ( "ip" ) && jo.GetField ( "ip" ).IsString )
+						rosMasterURI = "http://" + jo.GetField ( "ip" ).str;
+					if ( jo.HasField ( "port" ) && jo.GetField ( "port" ).IsNumber )
+						rosMasterURI += ":" + ( (int) ( jo.GetField ( "port" ).n ) ).ToString ();
+					else
+						rosMasterURI += ":11311";
+					Debug.Log ( "setting ip to " + rosMasterURI );
+				}
+			}
+		} else
+		{
+//			Debug.Log ( "not exists" );
+		}
+	}
+
+	void UpdateMasterConnection ()
+	{
+		while ( !ROS.shutting_down )
+		{
+			connectedToMaster = master.check ();
+			Thread.Sleep ( 500 );
+		}
+		connectedToMaster = false;
+		Thread.CurrentThread.Join ( 10 );
 	}
 
 /*	void OnGUI ()
@@ -110,27 +173,42 @@ public class ROSController : MonoBehaviour
 			return;
 		#endif
 
-		if ( instance == null )
+		lock ( instanceLock )
 		{
-			if ( callback != null )
-				callbacks.Enqueue ( callback );
-			GameObject go = new GameObject ( "ROSController" );
-			go.AddComponent<ROSController> ();
-			return;
+			if ( instance == null )
+			{
+				lock ( callbackLock )
+				{
+					if ( callback != null )
+						callbacks.Enqueue ( callback );
+				}
+				GameObject go = new GameObject ( "ROSController" );
+				go.AddComponent<ROSController> ();
+				return;
+			}
 		}
 
 		if ( ROS.isStarted () && ROS.ok )
 		{
 			if ( callback != null )
-				callback ();
+			{
+				new Thread ( new ThreadStart ( callback ) ).Start ();
+//				callback ();
+			}
 			return;
 		}
 
-		if ( callback != null )
-			callbacks.Enqueue ( callback );
-		
-		if ( instance.starting )
-			return;
+		lock ( callbackLock )
+		{
+			if ( callback != null )
+				callbacks.Enqueue ( callback );
+		}
+
+		lock ( instanceLock )
+		{
+			if ( instance.starting )
+				return;
+		}
 
 		// this gets set when the environment variable ROS_MASTER_URI isn't set
 		if ( delayedStart )
@@ -138,26 +216,31 @@ public class ROSController : MonoBehaviour
 
 //		string timeString = DateTime.UtcNow.ToString ( "MM_dd_yy_HH_MM_ss" );
 //		Debug.Log ( timeString );
-		instance.starting = true;
-		instance.stopping = false;
-		Debug.Log ( "ROS is starting" );
-		if ( instance.nodePrefix == null )
-			instance.nodePrefix = "";
-		instance.status = ROSStatus.Connecting;
-		new System.Threading.Thread ( () =>
+		lock ( instanceLock )
 		{
-			ROS.Init ( new string[0], instance.nodePrefix );
-		} ).Start ();
-//		ROS.Init ( new string[0], instance.nodePrefix );
-		instance.StartCoroutine ( instance.WaitForInit () );
-		XmlRpcUtil.SetLogLevel(XmlRpcUtil.XMLRPC_LOG_LEVEL.ERROR);
+			if ( instance.starting )
+				return;
+			
+			instance.starting = true;
+			instance.stopping = false;
+			Debug.Log ( "ROS is starting" );
+			if ( instance.nodePrefix == null )
+				instance.nodePrefix = "";
+//			instance.status = ROSStatus.Connecting;
+			new System.Threading.Thread ( () =>
+			{
+				ROS.Init ( new string[0], instance.nodePrefix );
+			} ).Start ();
+			//		ROS.Init ( new string[0], instance.nodePrefix );
+			instance.StartCoroutine ( instance.WaitForInit () );
+		}
 	}
 
 	public static void StopROS ()
 	{
 		if ( ROS.isStarted () && !ROS.shutting_down && !instance.stopping )
 		{
-			instance.status = ROSStatus.Disconnected;
+//			instance.status = ROSStatus.Disconnected;
 			instance.starting = false;
 			instance.stopping = true;
 			while ( nodes.Count > 0 )
@@ -179,21 +262,27 @@ public class ROSController : MonoBehaviour
 
 	IEnumerator WaitForInit ()
 	{
-		// apparently ROS.shutting_down never gets turned off...
-//		if ( ROS.shutting_down )
-//		{
-//			Debug.LogError ( "ROS is already shutting down" );
-//		}
 		while ( !ROS.isStarted () && !ROS.ok && !stopping )
 			yield return null;
-		
+
+		XmlRpcUtil.SetLogLevel(XmlRpcUtil.XMLRPC_LOG_LEVEL.ERROR);
 		if ( ROS.ok && !stopping )
 		{
-			starting = false;
-			status = ROSStatus.Connected;
+			lock ( instanceLock )
+			{
+				starting = false;
+			}
+//			status = ROSStatus.Connected;
 			Debug.Log ( "ROS Init successful" );
-			while ( callbacks != null && callbacks.Count > 0 )
-				callbacks.Dequeue () ();
+			lock ( callbackLock )
+			{
+				while ( callbacks != null && callbacks.Count > 0 )
+				{
+					Action action = callbacks.Dequeue ();
+					new Thread ( new ThreadStart ( action ) ).Start ();
+//					callbacks.Dequeue () ();
+				}
+			}
 		}
 	}
 }

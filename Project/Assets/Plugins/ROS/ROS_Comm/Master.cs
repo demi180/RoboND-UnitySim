@@ -31,7 +31,7 @@ namespace Ros_CSharp
         public static int port;
         public static string host = "";
         public static string uri = "";
-        public static TimeSpan retryTimeout = TimeSpan.FromSeconds(5);
+//        public static TimeSpan retryTimeout = TimeSpan.FromSeconds(5);
 
         public static void init(IDictionary remapping_args)
         {
@@ -165,6 +165,7 @@ namespace Ros_CSharp
                 CachedXmlRpcClient client = XmlRpcManager.Instance.getXMLRPCClient(master_host, master_port, "/");
                 bool printed = false;
                 bool success = false;
+//				UnityEngine.Debug.LogWarning ( "Current thread ID " + Thread.CurrentThread.ManagedThreadId );
 
                 while (!success)
                 {

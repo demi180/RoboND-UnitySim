@@ -54,6 +54,7 @@ public class QRKeyboardTeleop : MonoBehaviour
 	double xVelocityMax;
 	double yVelocityMax;
 	double zVelocityMax;
+	bool init;
 
 	void Awake ()
 	{
@@ -62,6 +63,7 @@ public class QRKeyboardTeleop : MonoBehaviour
 			enabled = false;
 			return;
 		}
+		init = false;
 		ROSController.StartROS ( OnRosInit );
 	}
 
@@ -137,10 +139,14 @@ public class QRKeyboardTeleop : MonoBehaviour
 //		takeoffClient = new TakeoffClient ( nh, "action/takeoff" );
 //		landingClient = new LandingClient ( nh, "action/landing" );
 //		poseClient = new PoseClient ( nh, "action/pose" );
+
+		init = true;
 	}
 
 	public bool enableMotors (bool enable)
 	{
+		if ( !init )
+			return false;
 		EnableMotors srv = new EnableMotors ();
 		srv.req.enable = enable;
 		return motorEnableService.call ( srv );
@@ -148,6 +154,9 @@ public class QRKeyboardTeleop : MonoBehaviour
 
 	public void stop ()
 	{
+		if ( !init )
+			return;
+		
 		if ( velocityPublisher != null && velocityPublisher.getNumSubscribers () > 0 )
 		{
 			velocityPublisher.publish ( new Twist () );
@@ -168,6 +177,9 @@ public class QRKeyboardTeleop : MonoBehaviour
 
 	public void SendTwist (UnityEngine.Vector3 linear, UnityEngine.Vector3 angular)
 	{
+		if ( !init )
+			return;
+		
 		Twist twist = new Twist ();
 		twist.linear = new Messages.geometry_msgs.Vector3 ( linear.ToRos () );
 		twist.angular = new Messages.geometry_msgs.Vector3 ( angular.ToRos () );
@@ -177,6 +189,9 @@ public class QRKeyboardTeleop : MonoBehaviour
 
 	public void SendWrench (UnityEngine.Vector3 force, UnityEngine.Vector3 torque)
 	{
+		if ( !init )
+			return;
+		
 		Wrench wrench = new Wrench ();
 		wrench.force = new Messages.geometry_msgs.Vector3 ( force.ToRos () );
 		wrench.torque = new Messages.geometry_msgs.Vector3 ( torque.ToRos () );
@@ -186,11 +201,17 @@ public class QRKeyboardTeleop : MonoBehaviour
 
 	public void TriggerReset ()
 	{
+		if ( !init )
+			return;
+		
 		new Thread ( CallReset ).Start ();
 	}
 
 	void CallReset ()
 	{
+		if ( !init )
+			return;
+		
 		SetBool.Request req = new SetBool.Request ();
 		SetBool.Response resp = new SetBool.Response ();
 		if ( resetService.call ( req, ref resp ) )
