@@ -16,7 +16,7 @@ public class QuadUI : MonoBehaviour
 
 	void Awake ()
 	{
-		lastStatus = ROSStatus.Connected;
+		lastStatus = ROSStatus.Unknown;
 	}
 
 	void Update ()

@@ -12,6 +12,7 @@ using UnityEditor;
 
 public enum ROSStatus
 {
+	Unknown,
 	Disconnected,
 	Connecting,
 	Connected

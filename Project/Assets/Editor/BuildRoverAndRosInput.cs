@@ -5,7 +5,7 @@ using UnityEditor;
 
 public class BuildRoverAndRosInput : MonoBehaviour
 {
-	[MenuItem ("Build/Build Rover and ROS Input", false, 10)]
+/*	[MenuItem ("Build/Build Rover and ROS Input", false, 10)]
 	static void BuildRoverAndInput ()
 	{
 		string buildOutput = "Builds/ROS/";
@@ -24,26 +24,39 @@ public class BuildRoverAndRosInput : MonoBehaviour
 			fileName += ".app";
 		levels [ 0 ] = "Assets/Scenes/ros_rover_control.unity";
 			BuildPipeline.BuildPlayer ( levels, buildOutput + fileName, EditorUserBuildSettings.activeBuildTarget, BuildOptions.ShowBuiltPlayer );
-	}
+	}*/
 
-	[MenuItem ("Build/Build Quad and ROS Input", false, 10)]
-	static void BuildQuadAndInput ()
+	[MenuItem ("Build/Build Quad_Indoor", false, 10)]
+	static void BuildQuadIndoor ()
 	{
 		string buildOutput = "Builds/ROS/";
-		string fileName = "proto4-ros";
-		if ( EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows || EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows64 )
-			fileName += ".exe";
-		else
-			fileName += ".app";
-		string[] levels = new string[1] { "Assets/Scenes/proto4.unity" };
-		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName, EditorUserBuildSettings.activeBuildTarget, BuildOptions.None );
+		string fileName = "quad_indoor";
+		string[] levels = new string[1] { "Assets/Scenes/quad_indoor.unity" };
 
-		fileName = "ros-quad-input";
-		if ( EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows || EditorUserBuildSettings.activeBuildTarget == BuildTarget.StandaloneWindows64 )
-			fileName += ".exe";
-		else
-			fileName += ".app";
-		levels [ 0 ] = "Assets/Scenes/ros_quad_control.unity";
-		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName, EditorUserBuildSettings.activeBuildTarget, BuildOptions.ShowBuiltPlayer );
+		// build windows
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "-win.exe", BuildTarget.StandaloneWindows64, BuildOptions.None );
+
+		// build mac
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "-osx.app", BuildTarget.StandaloneOSXIntel64, BuildOptions.None );
+
+		// build linux
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "-lin.x86-64", BuildTarget.StandaloneLinux64, BuildOptions.ShowBuiltPlayer );
+	}
+
+	[MenuItem ("Build/Build Uda-City", false, 10)]
+	static void BuildUdaCity ()
+	{
+		string buildOutput = "Builds/ROS/";
+		string fileName = "uda-city-ros";
+		string[] levels = new string[1] { "Assets/Scenes/proto4.unity" };
+
+		// build windows
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "-win.exe", BuildTarget.StandaloneWindows64, BuildOptions.None );
+
+		// build mac
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "-osx.app", BuildTarget.StandaloneOSXIntel64, BuildOptions.None );
+
+		// build linux
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "-lin.x86-64", BuildTarget.StandaloneLinux64, BuildOptions.ShowBuiltPlayer );
 	}
 }
