@@ -120,6 +120,7 @@ public class ROSController : MonoBehaviour
 					else
 						rosMasterURI += ":11311";
 					Debug.Log ( "setting ip to " + rosMasterURI );
+					overrideURI = true;
 				}
 			}
 		} else
@@ -266,7 +267,7 @@ public class ROSController : MonoBehaviour
 		while ( !ROS.isStarted () && !ROS.ok && !stopping )
 			yield return null;
 
-		XmlRpcUtil.SetLogLevel(XmlRpcUtil.XMLRPC_LOG_LEVEL.ERROR);
+//		XmlRpcUtil.SetLogLevel(XmlRpcUtil.XMLRPC_LOG_LEVEL.ERROR);
 		if ( ROS.ok && !stopping )
 		{
 			lock ( instanceLock )

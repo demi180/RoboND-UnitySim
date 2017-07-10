@@ -235,7 +235,8 @@ public class QuadController : MonoBehaviour
 			} else
 			{
 				// add force
-				rb.AddRelativeForce ( force * Time.deltaTime, forceMode );
+				rb.AddRelativeForce ( force, forceMode );
+//				rb.AddRelativeForce ( force * Time.deltaTime, forceMode );
 				
 				// add torque
 				if ( inverseFlag )
@@ -243,7 +244,8 @@ public class QuadController : MonoBehaviour
 					inverseFlag = false;
 					torque = transform.InverseTransformDirection ( torque ) * torqueForce;
 				}
-				rb.AddRelativeTorque ( torque * Time.deltaTime, torqueMode );
+				rb.AddRelativeTorque ( torque, torqueMode );
+//				rb.AddRelativeTorque ( torque * Time.deltaTime, torqueMode );
 				
 				// update acceleration
 				LinearAcceleration = ( rb.velocity - lastVelocity ) / Time.deltaTime;

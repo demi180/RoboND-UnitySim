@@ -38,7 +38,6 @@ public class QRKeyboardTeleop : MonoBehaviour
 	Thread pubThread;
 	Subscriber<PoseStamped> poseSub;
 	Subscriber<Imu> imuSub;
-	Subscriber<Messages.std_msgs.Header> headerSub;
 
 	PoseStamped pose;
 	double yaw;
@@ -92,7 +91,6 @@ public class QRKeyboardTeleop : MonoBehaviour
 			wrenchPub = nh.advertise<Wrench> ( "quad_rotor/cmd_force", 10 );
 			poseSub = nh.subscribe<PoseStamped> ( "quad_rotor/pose", 10, PoseCallback );
 			imuSub = nh.subscribe<Imu> ( "quad_rotor/imu", 10, ImuCallback );
-			headerSub = nh.subscribe<Messages.std_msgs.Header> ( "quad_rotor/header", 10, HeaderCallback );
 			velocityPublisher = nh.advertise<Twist> ( "quad_rotor/cmd_vel", 10 );
 		}
 /*		else if (control_mode == "attitude")
@@ -232,11 +230,5 @@ public class QRKeyboardTeleop : MonoBehaviour
 	void ImuCallback (Imu imu)
 	{
 //		Debug.Log ( "Imu " + imu.header.Seq );
-	}
-
-	void HeaderCallback (Messages.std_msgs.Header header)
-	{
-//		Debug.Log ( "Header " + header.Stamp.data.toSec () );
-//		Debug.Log ( "Header " + header.Seq );
 	}
 }
