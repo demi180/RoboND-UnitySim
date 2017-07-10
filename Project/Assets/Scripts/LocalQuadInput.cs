@@ -20,8 +20,10 @@ public class LocalQuadInput : MonoBehaviour
 	bool useTwist;
 	float yAngVel;
 	float yLinVel;
+	float lastInputTime;
+	bool localInputActive;
 
-	// Update is called once per frame
+
 	void LateUpdate ()
 	{
 		float thrustInput = Input.GetAxis ( "Thrust" );
@@ -34,20 +36,32 @@ public class LocalQuadInput : MonoBehaviour
 		if ( Input.GetKeyDown ( KeyCode.B ) )
 			useTwist = !useTwist;
 
+		if ( Input.anyKey || thrust != 0 )
+			lastInputTime = Time.time;
+
+		if ( Time.time - lastInputTime > 2f )
+			localInputActive = false;
+		else
+			localInputActive = true;
+		QuadUI.InputActive = localInputActive;
+
 		if ( useTwist )
 		{
 			float yaw = Input.GetAxis ( "Yaw" );
 			yAngVel += yaw * Time.deltaTime;
 			yLinVel += thrustInput * Time.deltaTime;
 
-			if ( useTeleop )
+			if ( localInputActive )
 			{
-				teleop.SendTwist ( Vector3.up * yLinVel, Vector3.up * yAngVel );
-
-			} else
-			{
-				droneController.SetLinearVelocity ( Vector3.up * yLinVel );
-				droneController.SetAngularVelocity ( Vector3.up * yAngVel );
+				if ( useTeleop )
+				{
+					teleop.SendTwist ( Vector3.up * yLinVel, Vector3.up * yAngVel );
+					
+				} else
+				{
+					droneController.SetLinearVelocity ( Vector3.up * yLinVel );
+					droneController.SetAngularVelocity ( Vector3.up * yAngVel );
+				}
 			}
 
 		} else
@@ -57,19 +71,20 @@ public class LocalQuadInput : MonoBehaviour
 			float x = input.z / 2 + input.x / 2;
 			float z = input.z / 2 - input.x / 2;
 			Vector3 torque = new Vector3 ( x, Input.GetAxis ( "Yaw" ), z );
-			
-			if ( useTeleop )
+
+			if ( localInputActive )
 			{
-				teleop.SendWrench ( force, -torque );
-				
-			} else
-			{
-				droneController.ApplyMotorForce ( force );
-				droneController.ApplyMotorTorque ( torque );
+				if ( useTeleop )
+				{
+					teleop.SendWrench ( force, -torque );
+					
+				} else
+				{
+					droneController.ApplyMotorForce ( force );
+					droneController.ApplyMotorTorque ( torque );
+				}
 			}
 		}
-
-
 
 		if ( Input.GetKeyDown ( KeyCode.R ) )
 		{

@@ -5,9 +5,12 @@ using UnityEngine.UI;
 
 public class QuadUI : MonoBehaviour
 {
+	static QuadUI instance;
+	public static bool InputActive { get { return instance.inputActiveText.enabled; } set { instance.inputActiveText.enabled = value; } }
 	public Text recordButtonText;
 	public Image connectionStatus;
 	public Text connectionStatusText;
+	public Text inputActiveText;
 
 	Color orange = new Color ( 1, 0.5f, 0, 1 );
 	ROSStatus lastStatus;
@@ -16,6 +19,7 @@ public class QuadUI : MonoBehaviour
 
 	void Awake ()
 	{
+		instance = this;
 		lastStatus = ROSStatus.Unknown;
 	}
 
