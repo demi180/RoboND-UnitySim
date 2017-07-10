@@ -72,6 +72,9 @@ public class LocalQuadInput : MonoBehaviour
 			float z = input.z / 2 - input.x / 2;
 			Vector3 torque = new Vector3 ( x, Input.GetAxis ( "Yaw" ), z );
 
+			force *= droneController.thrustForce;
+			torque *= -droneController.torqueForce;
+
 			if ( localInputActive )
 			{
 				if ( useTeleop )

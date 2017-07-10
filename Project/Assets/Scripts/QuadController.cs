@@ -309,7 +309,7 @@ public class QuadController : MonoBehaviour
 		force = v;
 		if ( convertFromRos )
 			force = force.ToUnity ();
-		force *= thrustForce;
+//		force *= thrustForce;
 	}
 
 	public void ApplyMotorTorque (Vector3 v, bool convertFromRos = false)
@@ -318,7 +318,7 @@ public class QuadController : MonoBehaviour
 		torque = v;
 		if ( convertFromRos )
 			torque = torque.ToUnity ();
-		torque *= convertFromRos ? -torqueForce : torqueForce;
+//		torque *= convertFromRos ? -torqueForce : torqueForce;
 	}
 
 	public void SetLinearVelocity (Vector3 v, bool convertFromRos = false)

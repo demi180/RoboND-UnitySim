@@ -70,6 +70,7 @@ public class ROSController : MonoBehaviour
 		if ( ( string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.User ) ) &&
 		     string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.Machine ) ) ) || overrideURI )
 			ROS.ROS_MASTER_URI = rosMasterURI;
+		
 //			delayedStart = true;
 		instance = this;
 		StartROS ();
@@ -119,6 +120,7 @@ public class ROSController : MonoBehaviour
 						rosMasterURI += ":" + ( (int) ( jo.GetField ( "port" ).n ) ).ToString ();
 					else
 						rosMasterURI += ":11311";
+//					ROS.ROS_HOSTNAME = "udacity";
 					Debug.Log ( "setting ip to " + rosMasterURI );
 					overrideURI = true;
 				}

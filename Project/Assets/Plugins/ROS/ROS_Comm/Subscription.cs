@@ -260,6 +260,10 @@ namespace Ros_CSharp
                 EDB.WriteLine("Bad xml-rpc URI: [" + xmlrpc_uri + "]");
                 return false;
             }
+			// test
+//			if ( peer_host == "udacity" )
+//				peer_host = "192.168.30.111";
+			// end test
             XmlRpcClient c = new XmlRpcClient(peer_host, peer_port);
             if (!c.IsConnected || !c.ExecuteNonBlock("requestTopic", Params))
             {
@@ -330,6 +334,10 @@ namespace Ros_CSharp
                 }
                 string pub_host = proto[1].Get<string>();
                 int pub_port = proto[2].Get<int>();
+				// test
+//				if ( pub_host == "udacity" )
+//					pub_host = "192.168.30.111";
+				// end test
 #if DEBUG
                 EDB.WriteLine("Connecting via tcpros to topic [" + name + "] at host [" + pub_host + ":" + pub_port +
                               "]");

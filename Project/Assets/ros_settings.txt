@@ -1,5 +1,5 @@
 {
-	"ip" : "172.16.244.111",
+	"ip" : "192.168.30.111",
 	"port" : 11311,
-	"override" : false
+	"override" : true
 }
