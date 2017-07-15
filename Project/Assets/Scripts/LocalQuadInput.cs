@@ -48,8 +48,8 @@ public class LocalQuadInput : MonoBehaviour
 		if ( useTwist )
 		{
 			float yaw = Input.GetAxis ( "Yaw" );
-			yAngVel += yaw * Time.deltaTime;
-			yLinVel += thrustInput * Time.deltaTime;
+			yAngVel += yaw * 2 * Time.deltaTime;
+			yLinVel += thrustInput * 2 * Time.deltaTime;
 
 			if ( localInputActive )
 			{
@@ -97,6 +97,14 @@ public class LocalQuadInput : MonoBehaviour
 				teleop.TriggerReset ();
 			else
 				droneController.ResetOrientation ();
+		}
+
+		if ( Input.GetKeyDown ( KeyCode.G ) )
+		{
+			if ( useTeleop )
+				teleop.SetGravity ( !droneController.UseGravity );
+			else
+				droneController.UseGravity = !droneController.UseGravity;
 		}
 	}
 }

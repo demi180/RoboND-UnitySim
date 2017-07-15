@@ -40,6 +40,7 @@ public class ROSController : MonoBehaviour
 	public bool overrideURI;
 
 	ROSStatus status;
+	bool initComplete;
 	bool starting;
 	bool stopping;
 	bool delete;
@@ -73,6 +74,7 @@ public class ROSController : MonoBehaviour
 		
 //			delayedStart = true;
 		instance = this;
+		initComplete = false;
 		StartROS ();
 		new Thread ( new ThreadStart ( UpdateMasterConnection ) ).Start ();
 	}
@@ -192,14 +194,18 @@ public class ROSController : MonoBehaviour
 			}
 		}
 
-		if ( ROS.isStarted () && ROS.ok )
+		lock ( instanceLock )
 		{
-			if ( callback != null )
+			if ( instance.initComplete )
+	//		if ( ROS.isStarted () && ROS.ok )
 			{
-				new Thread ( new ThreadStart ( callback ) ).Start ();
-//				callback ();
+				if ( callback != null )
+				{
+					new Thread ( new ThreadStart ( callback ) ).Start ();
+	//				callback ();
+				}
+				return;
 			}
-			return;
 		}
 
 		lock ( callbackLock )
@@ -266,8 +272,14 @@ public class ROSController : MonoBehaviour
 
 	IEnumerator WaitForInit ()
 	{
-		while ( !ROS.isStarted () && !ROS.ok && !stopping )
+		while ( !ROS.isStarted () && !ROS.ok && !stopping && ROS.GlobalNodeHandle == null )
 			yield return null;
+
+		#if UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_LINUX_API
+		yield return new WaitForSeconds (0.1f);
+		if ( ROS.GlobalNodeHandle == null )
+			Debug.LogError ("Why is this null!?");
+		#endif
 
 //		XmlRpcUtil.SetLogLevel(XmlRpcUtil.XMLRPC_LOG_LEVEL.ERROR);
 		if ( ROS.ok && !stopping )
@@ -275,6 +287,7 @@ public class ROSController : MonoBehaviour
 			lock ( instanceLock )
 			{
 				starting = false;
+				initComplete = true;
 			}
 //			status = ROSStatus.Connected;
 			Debug.Log ( "ROS Init successful" );

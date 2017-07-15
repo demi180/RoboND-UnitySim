@@ -160,6 +160,7 @@ namespace Ros_CSharp
 
 		~NodeHandle()
 		{
+			UnityEngine.Debug.Log ( "Nodehandle being destroyed?" );
 			Dispose();
 		}
 

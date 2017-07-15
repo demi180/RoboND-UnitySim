@@ -30,33 +30,33 @@ public class BuildRoverAndRosInput : MonoBehaviour
 	static void BuildQuadIndoor ()
 	{
 		string buildOutput = "Builds/ROS/";
-		string fileName = "quad_indoor";
+		string fileName = "Indoor";
 		string[] levels = new string[1] { "Assets/Scenes/quad_indoor.unity" };
 
 		// build windows
-		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "-win.exe", BuildTarget.StandaloneWindows64, BuildOptions.None );
+//		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_win.exe", BuildTarget.StandaloneWindows64, BuildOptions.None );
 
 		// build mac
-		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "-osx.app", BuildTarget.StandaloneOSXIntel64, BuildOptions.None );
+//		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_osx.app", BuildTarget.StandaloneOSXIntel64, BuildOptions.None );
 
 		// build linux
-		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "-lin.x86-64", BuildTarget.StandaloneLinux64, BuildOptions.ShowBuiltPlayer );
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_lin.x86_64", BuildTarget.StandaloneLinux64, BuildOptions.ShowBuiltPlayer );
 	}
 
 	[MenuItem ("Build/Build Uda-City", false, 10)]
 	static void BuildUdaCity ()
 	{
 		string buildOutput = "Builds/ROS/";
-		string fileName = "uda-city-ros";
+		string fileName = "Outdoor";
 		string[] levels = new string[1] { "Assets/Scenes/proto4.unity" };
 
 		// build windows
-		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "-win.exe", BuildTarget.StandaloneWindows64, BuildOptions.None );
+//		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_win.exe", BuildTarget.StandaloneWindows64, BuildOptions.None );
 
 		// build mac
-		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "-osx.app", BuildTarget.StandaloneOSXIntel64, BuildOptions.None );
+//		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_osx.app", BuildTarget.StandaloneOSXIntel64, BuildOptions.None );
 
 		// build linux
-		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "-lin.x86-64", BuildTarget.StandaloneLinux64, BuildOptions.ShowBuiltPlayer );
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_lin.x86_64", BuildTarget.StandaloneLinux64, BuildOptions.ShowBuiltPlayer );
 	}
 }

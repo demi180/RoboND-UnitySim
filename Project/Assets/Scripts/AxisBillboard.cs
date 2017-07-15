@@ -23,6 +23,11 @@ public class AxisBillboard : MonoBehaviour
 		xmInitial = Quaternion.Inverse ( xMove.rotation );
 	}
 
+	void Start ()
+	{
+		cam = FollowCamera.ActiveCamera.transform;
+	}
+
 	void LateUpdate ()
 	{
 		quad = QuadController.ActiveController;

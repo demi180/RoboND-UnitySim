@@ -35,6 +35,7 @@ public class QRKeyboardTeleop : MonoBehaviour
 	Publisher<ThrustCommand> thrustPublisher;
 	ServiceClient<EnableMotors> motorEnableService;
 	ServiceClient<SetBool.Request, SetBool.Response> resetService;
+	ServiceClient<SetBool.Request, SetBool.Response> gravityService;
 	Thread pubThread;
 	Subscriber<PoseStamped> poseSub;
 	Subscriber<Imu> imuSub;
@@ -54,6 +55,7 @@ public class QRKeyboardTeleop : MonoBehaviour
 	double yVelocityMax;
 	double zVelocityMax;
 	bool init;
+	bool _useGravity;
 
 	void Awake ()
 	{
@@ -134,6 +136,7 @@ public class QRKeyboardTeleop : MonoBehaviour
 
 		motorEnableService = nh.serviceClient<EnableMotors> ( "enable_motors" );
 		resetService = nh.serviceClient<SetBool.Request, SetBool.Response> ( "quad_rotor/reset_orientation" );
+		gravityService = nh.serviceClient<SetBool.Request, SetBool.Response> ( "quad_rotor/gravity" );
 //		takeoffClient = new TakeoffClient ( nh, "action/takeoff" );
 //		landingClient = new LandingClient ( nh, "action/landing" );
 //		poseClient = new PoseClient ( nh, "action/pose" );
@@ -215,6 +218,26 @@ public class QRKeyboardTeleop : MonoBehaviour
 		if ( resetService.call ( req, ref resp ) )
 		{
 			Debug.Log ( "reset called!" );
+		}
+	}
+
+	public void SetGravity (bool gravity)
+	{
+		if ( !init )
+			return;
+
+		_useGravity = gravity;
+		new Thread ( _SetGravity ).Start ();
+	}
+
+	void _SetGravity ()
+	{
+		SetBool.Request req = new SetBool.Request ();
+		SetBool.Response resp = new SetBool.Response ();
+		req.data = _useGravity;
+		if ( gravityService.call ( req, ref resp ) )
+		{
+			Debug.Log ( "gravity service called: " + _useGravity );
 		}
 	}
 

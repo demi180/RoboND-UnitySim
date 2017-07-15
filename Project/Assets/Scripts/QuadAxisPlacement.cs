@@ -26,14 +26,15 @@ public class QuadAxisPlacement : MonoBehaviour
 
 		Vector3 up = quad.Up * 0.5f;
 		Vector3 fwd = -cam.transform.forward;
-		arrowParents [ 0 ].position = quad.Position + up;// + quad.XAxis * 2;
-		arrowParents [ 1 ].position = quad.Position + up;// + quad.YAxis * 2;
-		arrowParents [ 2 ].position = quad.Position + up;// * 1.5f;
+		arrowParents [ 0 ].position = quad.Position + quad.XAxis;// + up;// + quad.XAxis * 2;
+		arrowParents [ 1 ].position = quad.Position + quad.YAxis;// + up;// + quad.YAxis * 2;
+		arrowParents [ 2 ].position = quad.Position;// + up;// * 1.5f;
 		arrowParents [ 0 ].rotation = Quaternion.LookRotation ( quad.XAxis, fwd );
-//		arrowParents [ 0 ].rotation = quad.Rotation;
 		arrowParents [ 1 ].rotation = Quaternion.LookRotation ( quad.YAxis, fwd );
 		arrowParents [ 2 ].rotation = Quaternion.LookRotation ( quad.Up, fwd );
-
+		arrows [ 0 ].rectTransform.sizeDelta = new Vector2 ( 1, 0.5f );
+		arrows [ 1 ].rectTransform.sizeDelta = new Vector2 ( 1, 0.5f );
+		arrows [ 2 ].rectTransform.sizeDelta = new Vector2 ( 1, 0.5f );
 
 
 /*		// position the arrows

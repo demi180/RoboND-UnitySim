@@ -49,6 +49,8 @@ public class QuadController : MonoBehaviour
 	public Texture2D[] axisArrows;
 	public Color[] axisColors;
 	public float arrowScreenSize = 100f;
+	public bool drawArrows;
+	public bool drawArrowsAlways;
 
 	public bool rotateWithTorque;
 
@@ -82,6 +84,7 @@ public class QuadController : MonoBehaviour
 
 	Vector3 posePosition;
 	Quaternion poseOrientation;
+	Texture2D dot;
 
 	void Awake ()
 	{
@@ -103,6 +106,9 @@ public class QuadController : MonoBehaviour
 		UseGravity = rb.useGravity;
 		UpdateConstraints ();
 		rb.maxAngularVelocity = Mathf.Infinity;
+		dot = new Texture2D ( 1, 1 );
+		dot.SetPixel ( 0, 0, Color.white );
+		dot.Apply ();
 	}
 
 	void Update ()
@@ -176,19 +182,28 @@ public class QuadController : MonoBehaviour
 		if ( spinRotors )
 		{
 			float rps = maxRotorRPM / 60f;
-			float degPerSec = rps * 360;
-			curRotorSpeed = degPerSec * force.y / thrustForce;
+			float degPerSec = rps * 360f;
+			if ( useTwist )
+			{
+				curRotorSpeed = Mathf.InverseLerp ( Physics.gravity.y, -Physics.gravity.y, rb.velocity.y ) * degPerSec;
+//				curRotorSpeed = 0.5f * degPerSec * ( rb.velocity.y + Physics.gravity.y ) / -Physics.gravity.y / rb.mass;
+			} else
+			{
+				curRotorSpeed = 0.5f * degPerSec * force.y / -Physics.gravity.y / rb.mass;
+			}
+//			curRotorSpeed = degPerSec * force.y / thrustForce;
 
 			// use forward for now because rotors are rotated -90x
-			Vector3 rot = Vector3.forward * ( force.y / thrustForce ) * degPerSec * Time.deltaTime;
+			Vector3 rot = Vector3.forward * curRotorSpeed * Time.deltaTime;
+//			Vector3 rot = Vector3.forward * ( force.y / thrustForce ) * degPerSec * Time.deltaTime;
 //			Vector3 rot = Vector3.forward * ( force.y / thrustForce ) * maxRotorSpeed * Time.deltaTime;
-			frontLeftRotor.Rotate ( -rot );
-			frontRightRotor.Rotate ( rot );
-			rearLeftRotor.Rotate ( rot );
-			rearRightRotor.Rotate ( -rot );
+			frontLeftRotor.Rotate ( rot );
+			frontRightRotor.Rotate ( -rot );
+			rearLeftRotor.Rotate ( -rot );
+			rearRightRotor.Rotate ( rot );
 		}
 
-		Profiler.BeginSample ( "Raycast" );
+/*		Profiler.BeginSample ( "Raycast" );
 		ray = droneCam1.ViewportPointToRay ( new Vector3 ( 0.5f, 0.5f, droneCam1.nearClipPlane ) );
 		bool didHit;
 		int count = 1000;
@@ -210,7 +225,7 @@ public class QuadController : MonoBehaviour
 //			Debug.Log ( "short is " + ( (short) ( b1 << 8 ) + b2 ) );
 		}
 		cameraData = b.GetBytes ();
-		Profiler.EndSample ();
+		Profiler.EndSample ();*/
 	}
 
 	void FixedUpdate ()
@@ -301,6 +316,73 @@ public class QuadController : MonoBehaviour
 //		r.y += r.height;
 //		force = LinearAcceleration.ToRos ();
 //		GUI.Label ( r, "Linear Accel.: " + force.ToString () );
+
+		if ( drawArrows )
+		{
+			bool showMovement = ConstrainForceX || ConstrainForceY || ConstrainForceZ || drawArrowsAlways;
+			bool showRotation = ConstrainTorqueX || ConstrainTorqueY || ConstrainTorqueZ || drawArrowsAlways;
+			// x arrow
+			Camera cam = Camera.main;
+			float screenRatio = 1f * Screen.height / 1080;
+			Vector2 texSize = new Vector2 ( 48, 8 ) * screenRatio;
+			Vector2 texSize2 = new Vector2 ( 16, 16 ) * screenRatio;
+			float arrowMag = texSize.magnitude + 14;
+			Vector3 pos = transform.position;
+			Vector2 screenPos = cam.WorldToScreenPoint ( pos );
+			screenPos.y = Screen.height - screenPos.y;
+			Vector2 tip = cam.WorldToScreenPoint ( pos + XAxis * 0.75f );
+			tip.y = Screen.height - tip.y;
+			Vector2 toTip = ( tip - screenPos ).normalized;
+			Rect texRect = new Rect ( screenPos - texSize, texSize * 2 );
+			Rect texRect2 = new Rect ( screenPos + toTip * arrowMag - texSize2, texSize2 * 2 );
+			float angle = Vector2.Angle ( Vector2.right, toTip );
+			if ( tip.y > screenPos.y )
+				angle = -angle;
+			GUIUtility.RotateAroundPivot ( -angle, screenPos );
+			GUI.color = axisColors [ 0 ];
+			if ( showMovement && !ConstrainForceX )
+				GUI.DrawTexture ( texRect, axisArrows [ 0 ] );
+			GUIUtility.RotateAroundPivot ( angle, screenPos );
+			if ( showRotation && !ConstrainTorqueX )
+				GUI.DrawTexture ( texRect2, axisArrows [ 1 ] );
+			GUI.DrawTexture ( new Rect ( tip.x - 2, tip.y - 2, 4, 4 ), dot );
+
+			// y arrow
+			tip = cam.WorldToScreenPoint ( pos + YAxis * 0.75f );
+			tip.y = Screen.height - tip.y;
+			toTip = ( tip - screenPos ).normalized;
+			angle = Vector2.Angle ( Vector2.right, toTip );
+			if ( tip.y > screenPos.y )
+				angle = -angle;
+			GUIUtility.RotateAroundPivot ( -angle, screenPos );
+			GUI.color = axisColors [ 1 ];
+			if ( showMovement && !ConstrainForceY )
+				GUI.DrawTexture ( texRect, axisArrows [ 0 ] );
+			GUIUtility.RotateAroundPivot ( angle, screenPos );
+			texRect2.position = screenPos + toTip * arrowMag - texSize2;
+			if ( showRotation && !ConstrainTorqueY )
+				GUI.DrawTexture ( texRect2, axisArrows [ 1 ] );
+			GUI.DrawTexture ( new Rect ( tip.x - 2, tip.y - 2, 4, 4 ), dot );
+
+			// z arrow
+			tip = cam.WorldToScreenPoint ( pos + Up * 0.5f );
+			tip.y = Screen.height - tip.y;
+			toTip = ( tip - screenPos ).normalized;
+			angle = Vector2.Angle ( Vector2.right, toTip );
+			if ( tip.y > screenPos.y )
+				angle = -angle;
+			GUIUtility.RotateAroundPivot ( -angle, screenPos );
+			GUI.color = axisColors [ 2 ];
+			if ( showMovement && !ConstrainForceZ )
+				GUI.DrawTexture ( texRect, axisArrows [ 0 ] );
+			GUIUtility.RotateAroundPivot ( angle, screenPos );
+			texRect2.position = screenPos + toTip * arrowMag - texSize2;
+			if ( showRotation && !ConstrainTorqueZ )
+				GUI.DrawTexture ( texRect2, axisArrows [ 1 ] );
+			GUI.DrawTexture ( new Rect ( tip.x - 2, tip.y - 2, 4, 4 ), dot );
+			GUI.color = Color.black;
+			GUI.DrawTexture ( new Rect ( screenPos.x - 2, screenPos.y - 2, 4, 4 ), dot );
+		}
 	}
 
 	public void ApplyMotorForce (Vector3 v, bool convertFromRos = false)
