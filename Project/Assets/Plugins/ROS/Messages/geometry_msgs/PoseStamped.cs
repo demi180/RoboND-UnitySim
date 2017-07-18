@@ -63,7 +63,6 @@ Pose pose"; }
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public override void Deserialize(byte[] SERIALIZEDSTUFF, ref int currentIndex)
         {
-			UnityEngine.Debug.Log ( "deserializing posestamped" );
             int arraylength=-1;
             bool hasmetacomponents = false;
             object __thing;
@@ -81,7 +80,6 @@ Pose pose"; }
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public override byte[] Serialize(bool partofsomethingelse)
         {
-			UnityEngine.Debug.Log ( "serializing posestamped" );
             int currentIndex=0, length=0;
             bool hasmetacomponents = false;
             byte[] thischunk, scratch1, scratch2;
@@ -105,7 +103,6 @@ Pose pose"; }
                 Array.Copy(__p__,0,__a_b__d,__a_b__e,__p__.Length);
                 __a_b__e += __p__.Length;
             }
-//			UnityEngine.Debug.Log ( "Pose: " + __a_b__d.GetString () );
             return __a_b__d;
         }
 

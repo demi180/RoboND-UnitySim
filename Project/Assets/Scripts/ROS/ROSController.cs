@@ -38,6 +38,8 @@ public class ROSController : MonoBehaviour
 	public string rosMasterURI = "http://localhost:11311";
 	public string nodePrefix = "";
 	public bool overrideURI;
+	public string rosIP = "0.0.0.0";
+	public bool overrideIP;
 
 	ROSStatus status;
 	bool initComplete;
@@ -71,6 +73,14 @@ public class ROSController : MonoBehaviour
 		if ( ( string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.User ) ) &&
 		     string.IsNullOrEmpty ( Environment.GetEnvironmentVariable ( "ROS_MASTER_URI", EnvironmentVariableTarget.Machine ) ) ) || overrideURI )
 			ROS.ROS_MASTER_URI = rosMasterURI;
+
+		if ( overrideIP )
+		{
+			if ( rosIP == "0.0.0.0" )
+				Debug.LogError ( "host IP is set to override but address is set to 0.0.0.0" );
+			else
+				ROS.ROS_IP = rosIP;
+		}
 		
 //			delayedStart = true;
 		instance = this;
@@ -114,17 +124,23 @@ public class ROSController : MonoBehaviour
 				string json = System.Text.Encoding.UTF8.GetString ( bytes );
 //				Debug.Log ( "json: " + json );
 				JSONObject jo = new JSONObject ( json );
-				if ( jo.HasField ( "override" ) && jo.GetField ( "override" ).b )
+				if ( jo.HasField ( "vm-override" ) && jo.GetField ( "vm-override" ).b )
 				{
-					if ( jo.HasField ( "ip" ) && jo.GetField ( "ip" ).IsString )
-						rosMasterURI = "http://" + jo.GetField ( "ip" ).str;
-					if ( jo.HasField ( "port" ) && jo.GetField ( "port" ).IsNumber )
-						rosMasterURI += ":" + ( (int) ( jo.GetField ( "port" ).n ) ).ToString ();
+					if ( jo.HasField ( "vm-ip" ) && jo.GetField ( "vm-ip" ).IsString )
+						rosMasterURI = "http://" + jo.GetField ( "vm-ip" ).str;
+					if ( jo.HasField ( "vm-port" ) && jo.GetField ( "vm-port" ).IsNumber )
+						rosMasterURI += ":" + ( (int) ( jo.GetField ( "vm-port" ).n ) ).ToString ();
 					else
 						rosMasterURI += ":11311";
 //					ROS.ROS_HOSTNAME = "udacity";
 					Debug.Log ( "setting ip to " + rosMasterURI );
 					overrideURI = true;
+				}
+				if ( jo.HasField ( "host-override" ) && jo.GetField ( "host-override" ).b )
+				{
+					if ( jo.HasField ( "host-ip" ) && jo.GetField ( "host-ip" ).IsString )
+						rosIP = jo.GetField ( "host-ip" ).str;
+					overrideIP = true;
 				}
 			}
 		} else

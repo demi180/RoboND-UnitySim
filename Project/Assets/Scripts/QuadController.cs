@@ -56,7 +56,6 @@ public class QuadController : MonoBehaviour
 
 	public bool spinRotors = true;
 	public float maxRotorRPM = 3600;
-	public float maxRotorSpeed = 360;
 	[SerializeField]
 	float curRotorSpeed;
 
@@ -195,37 +194,11 @@ public class QuadController : MonoBehaviour
 
 			// use forward for now because rotors are rotated -90x
 			Vector3 rot = Vector3.forward * curRotorSpeed * Time.deltaTime;
-//			Vector3 rot = Vector3.forward * ( force.y / thrustForce ) * degPerSec * Time.deltaTime;
-//			Vector3 rot = Vector3.forward * ( force.y / thrustForce ) * maxRotorSpeed * Time.deltaTime;
 			frontLeftRotor.Rotate ( rot );
 			frontRightRotor.Rotate ( -rot );
 			rearLeftRotor.Rotate ( -rot );
 			rearRightRotor.Rotate ( rot );
 		}
-
-/*		Profiler.BeginSample ( "Raycast" );
-		ray = droneCam1.ViewportPointToRay ( new Vector3 ( 0.5f, 0.5f, droneCam1.nearClipPlane ) );
-		bool didHit;
-		int count = 1000;
-		b.Clear ();
-//		Profiler.EndSample ();
-		short value;
-		for ( int i = 0; i < count; i++ )
-		{
-			didHit = Physics.Raycast ( ray, out rayHit, 400 );
-			if ( didHit )
-				value = (short) rayHit.distance;
-			else
-				value = short.MaxValue;
-			byte b1 = (byte) ( value >> 8 );
-			byte b2 = (byte) ( value & 255 );
-			b.WriteByte ( b1 );
-			b.WriteByte ( b2 );
-//			Debug.Log ( "dist " + rayHit.distance );
-//			Debug.Log ( "short is " + ( (short) ( b1 << 8 ) + b2 ) );
-		}
-		cameraData = b.GetBytes ();
-		Profiler.EndSample ();*/
 	}
 
 	void FixedUpdate ()
@@ -330,10 +303,13 @@ public class QuadController : MonoBehaviour
 			Vector3 pos = transform.position;
 			Vector2 screenPos = cam.WorldToScreenPoint ( pos );
 			screenPos.y = Screen.height - screenPos.y;
+			Vector2 top = cam.WorldToScreenPoint ( pos + Up * 0.5f );
+			top.y = Screen.height - top.y;
 			Vector2 tip = cam.WorldToScreenPoint ( pos + XAxis * 0.75f );
 			tip.y = Screen.height - tip.y;
 			Vector2 toTip = ( tip - screenPos ).normalized;
 			Rect texRect = new Rect ( screenPos - texSize, texSize * 2 );
+//			Rect texRect2 = new Rect ( screenPos + ( top - screenPos ).normalized * arrowMag - texSize2, texSize2 * 2 );
 			Rect texRect2 = new Rect ( screenPos + toTip * arrowMag - texSize2, texSize2 * 2 );
 			float angle = Vector2.Angle ( Vector2.right, toTip );
 			if ( tip.y > screenPos.y )

@@ -34,10 +34,10 @@ public class BuildRoverAndRosInput : MonoBehaviour
 		string[] levels = new string[1] { "Assets/Scenes/quad_indoor.unity" };
 
 		// build windows
-//		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_win.exe", BuildTarget.StandaloneWindows64, BuildOptions.None );
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_win.exe", BuildTarget.StandaloneWindows64, BuildOptions.None );
 
 		// build mac
-//		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_osx.app", BuildTarget.StandaloneOSXIntel64, BuildOptions.None );
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_osx.app", BuildTarget.StandaloneOSXIntel64, BuildOptions.None );
 
 		// build linux
 		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_lin.x86_64", BuildTarget.StandaloneLinux64, BuildOptions.ShowBuiltPlayer );
@@ -51,10 +51,10 @@ public class BuildRoverAndRosInput : MonoBehaviour
 		string[] levels = new string[1] { "Assets/Scenes/proto4.unity" };
 
 		// build windows
-//		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_win.exe", BuildTarget.StandaloneWindows64, BuildOptions.None );
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_win.exe", BuildTarget.StandaloneWindows64, BuildOptions.None );
 
 		// build mac
-//		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_osx.app", BuildTarget.StandaloneOSXIntel64, BuildOptions.None );
+		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_osx.app", BuildTarget.StandaloneOSXIntel64, BuildOptions.None );
 
 		// build linux
 		BuildPipeline.BuildPlayer ( levels, buildOutput + fileName + "_lin.x86_64", BuildTarget.StandaloneLinux64, BuildOptions.ShowBuiltPlayer );
