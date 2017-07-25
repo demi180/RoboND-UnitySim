@@ -87,12 +87,13 @@ public class PathFollower : MonoBehaviour
 		Vector3 toTarget = destination.position - quad.Position;
 		Vector3 targetPRY = Quaternion.LookRotation ( toTarget ).eulerAngles;
 		Vector3 curPRY = quad.Rotation.eulerAngles;
-
+//		torque.x =  
 	}
 
 	void UpdateThrust ()
 	{
-		
+		Vector3 toTarget = destination.position = quad.Position;
+
 	}
 
 	public void SetPath (Path p)
