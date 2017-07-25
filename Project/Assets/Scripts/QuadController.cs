@@ -5,6 +5,7 @@ using UnityEngine.Profiling;
 
 public class QuadController : MonoBehaviour
 {
+	const float MPHToMS = 2.23693629205f;
 	public static QuadController ActiveController;
 	public static int ImageWidth = 640;
 	public static int ImageHeight = 480;
@@ -40,7 +41,11 @@ public class QuadController : MonoBehaviour
 	public Transform right;
 
 	public Camera droneCam1;
+	public PathFollower pather;
 
+	public bool clampMaxSpeed = true;
+	public float maxSpeedMPH = 60;
+	public float maxSpeedMS;
 	public float thrustForce = 2000;
 	public float torqueForce = 500;
 	public ForceMode forceMode = ForceMode.Force;
@@ -76,6 +81,9 @@ public class QuadController : MonoBehaviour
 	RaycastHit rayHit;
 	BinarySerializer b = new BinarySerializer ( 1000 );
 
+	[SerializeField]
+	float curSpeed;
+
 	byte[] cameraData;
 	bool resetFlag;
 	bool setPoseFlag;
@@ -108,6 +116,8 @@ public class QuadController : MonoBehaviour
 		dot = new Texture2D ( 1, 1 );
 		dot.SetPixel ( 0, 0, Color.white );
 		dot.Apply ();
+
+		maxSpeedMS = maxSpeedMPH * MPHToMS;
 	}
 
 	void Update ()
@@ -150,11 +160,6 @@ public class QuadController : MonoBehaviour
 //		{
 //			ResetOrientation ();
 //		}
-
-		if ( Input.GetKeyDown ( KeyCode.P ) )
-		{
-			PathPlanner.AddNode ( Position, Rotation );
-		}
 
 		// update acceleration
 //		LinearAcceleration = ( rb.velocity - lastVelocity ) / Time.deltaTime;
@@ -217,7 +222,7 @@ public class QuadController : MonoBehaviour
 			if ( useTwist )
 			{
 				// just set linear and angular velocities, ignoring forces
-				rb.velocity = LinearVelocity;
+				rb.velocity = clampMaxSpeed ? Vector3.ClampMagnitude ( LinearVelocity, maxSpeedMS ) : LinearVelocity;
 				rb.angularVelocity = AngularVelocity;
 
 			} else
@@ -225,6 +230,8 @@ public class QuadController : MonoBehaviour
 				// add force
 				rb.AddRelativeForce ( force, forceMode );
 //				rb.AddRelativeForce ( force * Time.deltaTime, forceMode );
+				if ( clampMaxSpeed )
+					rb.velocity = Vector3.ClampMagnitude ( rb.velocity, maxSpeedMS );
 				
 				// add torque
 				if ( inverseFlag )
@@ -242,6 +249,7 @@ public class QuadController : MonoBehaviour
 				AngularVelocity = rb.angularVelocity;
 			}
 		}
+		curSpeed = rb.velocity.magnitude;
 	}
 
 	void OnGUI ()

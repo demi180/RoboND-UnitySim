@@ -12,6 +12,7 @@ public class LocalQuadInput : MonoBehaviour
 {
 	public QuadController droneController;
 	public QRKeyboardTeleop teleop;
+	public PathFollower pather;
 	public bool useTeleop;
 
 	bool motorEnabled;
@@ -105,6 +106,18 @@ public class LocalQuadInput : MonoBehaviour
 				teleop.SetGravity ( !droneController.UseGravity );
 			else
 				droneController.UseGravity = !droneController.UseGravity;
+		}
+
+		if ( Input.GetKeyDown ( KeyCode.P ) )
+		{
+			PathPlanner.AddNode ( droneController.Position, droneController.Rotation );
+		}
+		if ( Input.GetKeyDown ( KeyCode.O ) )
+		{
+			thrust = 0;
+			droneController.ResetOrientation ();
+			pather.SetPath ( new Pathing.Path ( PathPlanner.GetPath () ) );
+			PathPlanner.Clear ();
 		}
 	}
 }

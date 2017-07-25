@@ -1,12 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pathing;
 
-public class PathSample
+namespace Pathing
 {
-	public Vector3 position;
-	public Quaternion orientation;
-	public float timestamp;
+	public class Path
+	{
+		public PathSample[] Nodes { get { return nodes; } }
+		PathSample[] nodes;
+		
+		public Path (PathSample[] samples)
+		{
+			nodes = samples;
+		}
+	}
+	
+	public class PathSample
+	{
+		public Vector3 position;
+		public Quaternion orientation;
+		public float timestamp;
+	}
 }
 
 public class PathPlanner : MonoBehaviour
@@ -54,5 +69,19 @@ public class PathPlanner : MonoBehaviour
 	public static PathSample[] GetPath ()
 	{
 		return instance.path.ToArray ();
+	}
+
+	public static void Clear ()
+	{
+		instance.path.Clear ();
+	}
+
+	public static void ClearViz ()
+	{
+		instance.pathRenderer.numPositions = 0;
+		int count = instance.nodeObjects.Count;
+		for ( int i = 0; i < count; i++ )
+			Destroy ( instance.nodeObjects [ i ].gameObject );
+		instance.nodeObjects.Clear ();
 	}
 }

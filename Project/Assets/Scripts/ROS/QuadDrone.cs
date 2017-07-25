@@ -262,7 +262,7 @@ public class QuadDrone : MonoBehaviour
 //		path.header.Frame_id = "global";
 //		path.header.Stamp = ROS.GetTime ();
 //		path.header.Seq = 0;
-		PathSample[] samples = PathPlanner.GetPath ();
+		Pathing.PathSample[] samples = PathPlanner.GetPath ();
 		int count = samples.Length;
 		path.poses = new PoseStamped[ count ];
 		Debug.Log ( "sending " + count + " samples" );
