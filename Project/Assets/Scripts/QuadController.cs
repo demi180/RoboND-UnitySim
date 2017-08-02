@@ -44,8 +44,11 @@ public class QuadController : MonoBehaviour
 	public PathFollower pather;
 
 	public bool clampMaxSpeed = true;
+	public bool clampAngularVelocity = true;
 	public float maxSpeedMPH = 60;
 	public float maxSpeedMS;
+	public float maxAngularDegrees = 17;
+	public float maxAngularRadians;
 	public float thrustForce = 2000;
 	public float torqueForce = 500;
 	public ForceMode forceMode = ForceMode.Force;
@@ -116,8 +119,6 @@ public class QuadController : MonoBehaviour
 		dot = new Texture2D ( 1, 1 );
 		dot.SetPixel ( 0, 0, Color.white );
 		dot.Apply ();
-
-		maxSpeedMS = maxSpeedMPH * MPHToMS;
 	}
 
 	void Update ()
@@ -214,11 +215,17 @@ public class QuadController : MonoBehaviour
 			resetFlag = false;
 		}
 		CheckSetPose ();
+		if ( maxSpeedMPH != 0 )
+			maxSpeedMS = maxSpeedMPH * MPHToMS;
+		maxAngularRadians = maxAngularDegrees * Mathf.Deg2Rad;
 
 		rb.useGravity = UseGravity;
 		CheckConstraints ();
 		if ( MotorsEnabled )
 		{
+			if ( clampAngularVelocity )
+				rb.maxAngularVelocity = maxAngularRadians;
+			
 			if ( useTwist )
 			{
 				// just set linear and angular velocities, ignoring forces
@@ -227,9 +234,9 @@ public class QuadController : MonoBehaviour
 
 			} else
 			{
+
 				// add force
 				rb.AddRelativeForce ( force, forceMode );
-//				rb.AddRelativeForce ( force * Time.deltaTime, forceMode );
 				if ( clampMaxSpeed )
 					rb.velocity = Vector3.ClampMagnitude ( rb.velocity, maxSpeedMS );
 				
@@ -240,8 +247,7 @@ public class QuadController : MonoBehaviour
 					torque = transform.InverseTransformDirection ( torque ) * torqueForce;
 				}
 				rb.AddRelativeTorque ( torque, torqueMode );
-//				rb.AddRelativeTorque ( torque * Time.deltaTime, torqueMode );
-				
+
 				// update acceleration
 				LinearAcceleration = ( rb.velocity - lastVelocity ) / Time.deltaTime;
 				lastVelocity = rb.velocity;
@@ -272,7 +278,6 @@ public class QuadController : MonoBehaviour
 		// input torque
 		r.y += r.height;
 		force = Torque.ToRos ();
-		force = new Vector3 ( -force.x, force.z, force.y );
 		GUI.Label ( r, "Torque: " + force.ToString () );
 
 		// position
