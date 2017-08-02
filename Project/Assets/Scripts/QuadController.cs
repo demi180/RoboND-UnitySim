@@ -230,7 +230,8 @@ public class QuadController : MonoBehaviour
 			{
 				// just set linear and angular velocities, ignoring forces
 				rb.velocity = clampMaxSpeed ? Vector3.ClampMagnitude ( LinearVelocity, maxSpeedMS ) : LinearVelocity;
-				rb.angularVelocity = AngularVelocity;
+				// new: flip angular velocity to generate CCW rotations
+				rb.angularVelocity = -AngularVelocity;
 
 			} else
 			{
@@ -246,13 +247,15 @@ public class QuadController : MonoBehaviour
 					inverseFlag = false;
 					torque = transform.InverseTransformDirection ( torque ) * torqueForce;
 				}
-				rb.AddRelativeTorque ( torque, torqueMode );
+				// new: flip torque to generate CCW rotations
+				rb.AddRelativeTorque ( -torque, torqueMode );
 
 				// update acceleration
 				LinearAcceleration = ( rb.velocity - lastVelocity ) / Time.deltaTime;
 				lastVelocity = rb.velocity;
 				LinearVelocity = rb.velocity;
-				AngularVelocity = rb.angularVelocity;
+				// new: flip angular velocity to match flipped torque
+				AngularVelocity = -rb.angularVelocity;
 			}
 		}
 		curSpeed = rb.velocity.magnitude;
