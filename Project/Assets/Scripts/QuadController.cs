@@ -43,14 +43,19 @@ public class QuadController : MonoBehaviour
 	public Camera droneCam1;
 	public PathFollower pather;
 
-	public bool clampMaxSpeed = true;
-	public bool clampAngularVelocity = true;
-	public float maxSpeedMPH = 60;
-	public float maxSpeedMS;
-	public float maxAngularDegrees = 17;
-	public float maxAngularRadians;
-	public float thrustForce = 2000;
-	public float torqueForce = 500;
+	public bool clampForce = true;
+	public bool clampTorque = true;
+	public float maxForce = 100;
+	public float maxTorqueDegrees = 17;
+	public float maxTorqueRadians;
+//	public bool clampMaxSpeed = true;
+//	public bool clampAngularVelocity = true;
+//	public float maxSpeedMPH = 60;
+//	public float maxSpeedMS;
+//	public float maxAngularDegrees = 17;
+//	public float maxAngularRadians;
+//	public float thrustForce = 2000;
+//	public float torqueForce = 500;
 	public ForceMode forceMode = ForceMode.Force;
 	public ForceMode torqueMode = ForceMode.Force;
 
@@ -215,21 +220,16 @@ public class QuadController : MonoBehaviour
 			resetFlag = false;
 		}
 		CheckSetPose ();
-		if ( maxSpeedMPH != 0 )
-			maxSpeedMS = maxSpeedMPH * MPHToMS;
-		maxAngularRadians = maxAngularDegrees * Mathf.Deg2Rad;
 
 		rb.useGravity = UseGravity;
 		CheckConstraints ();
 		if ( MotorsEnabled )
 		{
-			if ( clampAngularVelocity )
-				rb.maxAngularVelocity = maxAngularRadians;
-			
 			if ( useTwist )
 			{
 				// just set linear and angular velocities, ignoring forces
-				rb.velocity = clampMaxSpeed ? Vector3.ClampMagnitude ( LinearVelocity, maxSpeedMS ) : LinearVelocity;
+				rb.velocity = LinearVelocity;
+//				rb.velocity = clampMaxSpeed ? Vector3.ClampMagnitude ( LinearVelocity, maxSpeedMS ) : LinearVelocity;
 				// new: flip angular velocity to generate CCW rotations
 				rb.angularVelocity = -AngularVelocity;
 
@@ -237,15 +237,18 @@ public class QuadController : MonoBehaviour
 			{
 
 				// add force
+				force = Vector3.ClampMagnitude ( force, maxForce );
 				rb.AddRelativeForce ( force, forceMode );
-				if ( clampMaxSpeed )
-					rb.velocity = Vector3.ClampMagnitude ( rb.velocity, maxSpeedMS );
 				
-				// add torque
+				// add torque. but first clamp it
+				if ( maxTorqueDegrees != 0 )
+					maxTorqueRadians = maxTorqueDegrees * Mathf.Deg2Rad;
+				
+				torque = Vector3.ClampMagnitude ( torque, maxTorqueRadians );
 				if ( inverseFlag )
 				{
 					inverseFlag = false;
-					torque = transform.InverseTransformDirection ( torque ) * torqueForce;
+					torque = transform.InverseTransformDirection ( torque ) * maxTorqueRadians;
 				}
 				// new: flip torque to generate CCW rotations
 				rb.AddRelativeTorque ( -torque, torqueMode );

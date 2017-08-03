@@ -65,7 +65,7 @@ public class FollowCamera : MonoBehaviour
 		transform.position = target.Position - transform.forward * followDistance;
 		if ( blurRotors )
 		{
-			float forcePercent = Mathf.Abs ( target.Force.y / target.thrustForce );
+			float forcePercent = Mathf.Abs ( target.Force.y / target.maxForce );
 			blurScript.velocityScale = forcePercent * forcePercent * forcePercent;
 			if ( !blurScript.enabled )
 				blurScript.enabled = true;
