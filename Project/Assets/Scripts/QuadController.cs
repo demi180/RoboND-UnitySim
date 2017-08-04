@@ -303,8 +303,8 @@ public class QuadController : MonoBehaviour
 
 		// orientation
 		r.y += r.height;
-		GUI.Label ( r, "PRY: " + FixEuler ( Rotation.eulerAngles.ToRos () ).ToString () );
-//		GUI.Label ( r, "PRY: " + ( -Rotation.eulerAngles ).ToRos ().ToString () );
+//		GUI.Label ( r, "PRY: " + FixEuler ( Rotation.eulerAngles.ToRos () ).ToString () );
+		GUI.Label ( r, "PRY: " + Rotation.eulerAngles.ToRos ().ToString () );
 
 		// Unity quaternion
 		r.y += r.height;
