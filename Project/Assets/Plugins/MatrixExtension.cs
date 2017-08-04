@@ -82,13 +82,13 @@ public static class QuaternionExtension
 {
 	public static Quaternion ToRos (this Quaternion q)
 	{
-//		return new Quaternion ( -q.x, q.z, -q.y, -q.w ); // from Edy's code
-		return new Quaternion ( -q.z, q.x, -q.y, q.w );
+		return new Quaternion ( q.z, -q.x, q.y, q.w );
+//		return new Quaternion ( -q.z, q.x, -q.y, q.w );
 	}
 
 	public static Quaternion ToUnity (this Quaternion q)
 	{
-//		return new Quaternion ( -q.x, -q.z, q.y, -q.w ); // from Edy's code
-		return new Quaternion ( q.y, -q.z, -q.x, q.w );
+		return new Quaternion ( -q.y, q.z, q.x, q.w );
+//		return new Quaternion ( q.y, -q.z, -q.x, q.w );
 	}
 }

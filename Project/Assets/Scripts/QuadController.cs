@@ -303,7 +303,8 @@ public class QuadController : MonoBehaviour
 
 		// orientation
 		r.y += r.height;
-		GUI.Label ( r, "PRY: " + Rotation.eulerAngles.ToRos ().ToString () );
+		GUI.Label ( r, "PRY: " + FixEuler ( Rotation.eulerAngles.ToRos () ).ToString () );
+//		GUI.Label ( r, "PRY: " + ( -Rotation.eulerAngles ).ToRos ().ToString () );
 
 		// Unity quaternion
 		r.y += r.height;
@@ -397,6 +398,24 @@ public class QuadController : MonoBehaviour
 			GUI.color = Color.black;
 			GUI.DrawTexture ( new Rect ( screenPos.x - 2, screenPos.y - 2, 4, 4 ), dot );
 		}
+	}
+
+	Vector3 FixEuler (Vector3 euler)
+	{
+		euler.x = FixAngle ( euler.x );
+		euler.y = FixAngle ( euler.y );
+		euler.z = FixAngle ( euler.z );
+		return euler;
+	}
+
+	float FixAngle (float angle)
+	{
+		if ( angle > 180f )
+			angle -= 360f;
+		if ( angle < -180f )
+			angle += 360f;
+
+		return angle;
 	}
 
 	public void ApplyMotorForce (Vector3 v, bool convertFromRos = false)
