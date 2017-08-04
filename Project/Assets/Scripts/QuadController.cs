@@ -152,6 +152,17 @@ public class QuadController : MonoBehaviour
 
 	void LateUpdate ()
 	{
+		Quaternion q = transform.rotation;
+		if ( Mathf.Approximately ( q.x, 0 ) )
+			Debug.Log ( "x" );
+		if ( Mathf.Approximately ( q.y, 0 ) )
+			Debug.Log ( "y" );
+		if ( Mathf.Approximately ( q.z, 0 ) )
+			Debug.Log ( "z" );
+		if ( Mathf.Approximately ( q.w, 0 ) )
+			Debug.Log ( "w" );
+
+
 		if ( resetFlag )
 		{
 			ResetOrientation ();
@@ -451,8 +462,8 @@ public class QuadController : MonoBehaviour
 		setPoseFlag = true;
 		if ( convertFromRos )
 		{
-			posePosition = posePosition.ToUnity ();
-			poseOrientation = poseOrientation.ToUnity ();
+			posePosition = pos.ToUnity ();
+			poseOrientation = orientation.ToUnity ();
 		} else
 		{
 			posePosition = pos;
