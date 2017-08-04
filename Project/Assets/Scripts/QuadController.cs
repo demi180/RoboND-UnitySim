@@ -152,15 +152,15 @@ public class QuadController : MonoBehaviour
 
 	void LateUpdate ()
 	{
-		Quaternion q = transform.rotation;
-		if ( Mathf.Approximately ( q.x, 0 ) )
-			Debug.Log ( "x" );
-		if ( Mathf.Approximately ( q.y, 0 ) )
-			Debug.Log ( "y" );
-		if ( Mathf.Approximately ( q.z, 0 ) )
-			Debug.Log ( "z" );
-		if ( Mathf.Approximately ( q.w, 0 ) )
-			Debug.Log ( "w" );
+//		Quaternion q = transform.rotation;
+//		if ( Mathf.Approximately ( q.x, 0 ) )
+//			Debug.Log ( "x" );
+//		if ( Mathf.Approximately ( q.y, 0 ) )
+//			Debug.Log ( "y" );
+//		if ( Mathf.Approximately ( q.z, 0 ) )
+//			Debug.Log ( "z" );
+//		if ( Mathf.Approximately ( q.w, 0 ) )
+//			Debug.Log ( "w" );
 
 
 		if ( resetFlag )
@@ -278,7 +278,7 @@ public class QuadController : MonoBehaviour
 	void OnGUI ()
 	{
 		// background box
-		Rect r = new Rect ( 10, 10, 180, 200 );
+		Rect r = new Rect ( 10, 10, 200, 200 );
 		GUI.Box ( r, "" );
 		GUI.Box ( r, "" );
 
@@ -304,6 +304,14 @@ public class QuadController : MonoBehaviour
 		// orientation
 		r.y += r.height;
 		GUI.Label ( r, "PRY: " + Rotation.eulerAngles.ToRos ().ToString () );
+
+		// Unity quaternion
+		r.y += r.height;
+		GUI.Label ( r, "Local Quat: " + Rotation.ToString () );
+
+		// ros quaternion
+		r.y += r.height;
+		GUI.Label ( r, "Ros Quat: " + Rotation.ToRos ().ToString () );
 
 		// linear velocity
 		r.y += r.height;
