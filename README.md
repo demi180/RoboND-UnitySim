@@ -14,4 +14,4 @@ Controlling the quad locally:
 -Q and E will yaw the quad
 
 Capturing images for deep learning:
-# Todo: add instructions to for manual and auto capturing
+//Todo: add instructions to for manual and auto capturing
