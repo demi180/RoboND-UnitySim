@@ -17,16 +17,26 @@ public class SimpleQuadController : MonoBehaviour
 	float tiltZ;
 
 	Quaternion chassisRotation;
+	public bool active;
 	
 	void Awake ()
 	{
 		rb = GetComponent<Rigidbody> ();
 		rb.constraints = RigidbodyConstraints.FreezeRotation;
 		chassisRotation = chassis.rotation;
+		active = false;
 	}
 
 	void LateUpdate ()
 	{
+		if ( Input.GetKeyDown ( KeyCode.F12 ) )
+		{
+			active = !active;
+		}
+
+		if ( !active )
+			return;
+		
 		Vector3 input = new Vector3 ( Input.GetAxis ( "Horizontal" ), Input.GetAxis ( "Thrust" ), Input.GetAxis ( "Vertical" ) );
 
 		Vector3 forwardVelocity = Vector3.forward * input.z * moveSpeed;
@@ -61,6 +71,17 @@ public class SimpleQuadController : MonoBehaviour
 			Input.ResetInputAxes ();
 			rb.velocity = Vector3.zero;
 			transform.rotation = Quaternion.identity;
+		}
+	}
+
+	void OnGUI ()
+	{
+		GUI.backgroundColor = active ? Color.green : Color.red;
+//		GUI.contentColor = Color.white;
+		Rect r = new Rect ( 10, Screen.height - 100, 60, 25 );
+		if ( GUI.Button ( r, "Input " + ( active ? "on" : "off" ) ) )
+		{
+			active = !active;
 		}
 	}
 
