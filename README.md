@@ -7,8 +7,8 @@ The project features two main environments ('scenes') to experiment with:
 2. proto4: an outdoor city environment
 
 Controlling the quad locally:
--To enable local control, press F12 or click the "Input off" button on-screen. Doing so again will disable control
--The drone has a simplified local control script that allows the user to quickly and easily move around as if it was a game character.
+<br>-To enable local control, press F12 or click the "Input off" button on-screen. Doing so again will disable control
+<br>-The drone has a simplified local control script that allows the user to quickly and easily move around as if it was a game character.
 -Use WSAD or the arrow keys to move the quad forward, back, left, or right
 -Use Space and C to move the quad up and down
 -Q and E will yaw the quad
