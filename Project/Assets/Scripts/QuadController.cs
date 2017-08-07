@@ -124,6 +124,8 @@ public class QuadController : MonoBehaviour
 		dot = new Texture2D ( 1, 1 );
 		dot.SetPixel ( 0, 0, Color.white );
 		dot.Apply ();
+//		Debug.Log ( "itr: " + rb.inertiaTensorRotation );
+		rb.inertiaTensorRotation = Quaternion.identity;
 	}
 
 	void Update ()
@@ -234,6 +236,7 @@ public class QuadController : MonoBehaviour
 
 		rb.useGravity = UseGravity;
 		CheckConstraints ();
+
 		if ( MotorsEnabled )
 		{
 			if ( useTwist )
@@ -242,6 +245,14 @@ public class QuadController : MonoBehaviour
 				rb.velocity = LinearVelocity;
 //				rb.velocity = clampMaxSpeed ? Vector3.ClampMagnitude ( LinearVelocity, maxSpeedMS ) : LinearVelocity;
 				// new: flip angular velocity to generate CCW rotations
+//				Vector3 angVel = -AngularVelocity;
+//				if ( ConstrainTorqueX )
+//					angVel.z = 0;
+//				if ( ConstrainTorqueY )
+//					angVel.x = 0;
+//				if ( ConstrainTorqueZ )
+//					angVel.y = 0;
+//				rb.angularVelocity = angVel;
 				rb.angularVelocity = -AngularVelocity;
 
 			} else
@@ -262,6 +273,24 @@ public class QuadController : MonoBehaviour
 					torque = transform.InverseTransformDirection ( torque ) * maxTorqueRadians;
 				}
 				// new: flip torque to generate CCW rotations
+//				Vector3 newTorque = -torque;
+//				Vector3 angVel = rb.angularVelocity;
+//				if ( ConstrainTorqueX )
+//				{
+//					newTorque.z = 0;
+//					angVel.z = 0;
+//				}
+//				if ( ConstrainTorqueY )
+//				{
+//					newTorque.x = 0;
+//					angVel.x = 0;
+//				}
+//				if ( ConstrainTorqueZ )
+//				{
+//					newTorque.y = 0;
+//					angVel.y = 0;
+//				}
+//				rb.AddRelativeTorque ( newTorque, torqueMode );
 				rb.AddRelativeTorque ( -torque, torqueMode );
 
 				// update acceleration
@@ -269,6 +298,8 @@ public class QuadController : MonoBehaviour
 				lastVelocity = rb.velocity;
 				LinearVelocity = rb.velocity;
 				// new: flip angular velocity to match flipped torque
+//				rb.angularVelocity = angVel;
+//				AngularVelocity = -angVel;
 				AngularVelocity = -rb.angularVelocity;
 			}
 		}
@@ -360,7 +391,7 @@ public class QuadController : MonoBehaviour
 			GUIUtility.RotateAroundPivot ( angle, screenPos );
 			if ( showRotation && !ConstrainTorqueX )
 				GUI.DrawTexture ( texRect2, axisArrows [ 1 ] );
-			GUI.DrawTexture ( new Rect ( tip.x - 2, tip.y - 2, 4, 4 ), dot );
+//			GUI.DrawTexture ( new Rect ( tip.x - 2, tip.y - 2, 4, 4 ), dot );
 
 			// y arrow
 			tip = cam.WorldToScreenPoint ( pos + YAxis * 0.75f );
@@ -377,7 +408,7 @@ public class QuadController : MonoBehaviour
 			texRect2.position = screenPos + toTip * arrowMag - texSize2;
 			if ( showRotation && !ConstrainTorqueY )
 				GUI.DrawTexture ( texRect2, axisArrows [ 1 ] );
-			GUI.DrawTexture ( new Rect ( tip.x - 2, tip.y - 2, 4, 4 ), dot );
+//			GUI.DrawTexture ( new Rect ( tip.x - 2, tip.y - 2, 4, 4 ), dot );
 
 			// z arrow
 			tip = cam.WorldToScreenPoint ( pos + Up * 0.5f );
@@ -394,9 +425,9 @@ public class QuadController : MonoBehaviour
 			texRect2.position = screenPos + toTip * arrowMag - texSize2;
 			if ( showRotation && !ConstrainTorqueZ )
 				GUI.DrawTexture ( texRect2, axisArrows [ 1 ] );
-			GUI.DrawTexture ( new Rect ( tip.x - 2, tip.y - 2, 4, 4 ), dot );
-			GUI.color = Color.black;
-			GUI.DrawTexture ( new Rect ( screenPos.x - 2, screenPos.y - 2, 4, 4 ), dot );
+//			GUI.DrawTexture ( new Rect ( tip.x - 2, tip.y - 2, 4, 4 ), dot );
+//			GUI.color = Color.black;
+//			GUI.DrawTexture ( new Rect ( screenPos.x - 2, screenPos.y - 2, 4, 4 ), dot );
 		}
 	}
 
