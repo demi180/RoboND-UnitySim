@@ -9,6 +9,7 @@ public class Menu : MonoBehaviour
 	public GameObject rosObject;
 	public GameObject quadObject;
 	public GameObject quadCamObject;
+	public GameObject quadCanvasObject;
 
 	public GameObject peopleSpawnerObject;
 	public GameObject peopleCamObject;
@@ -42,20 +43,36 @@ public class Menu : MonoBehaviour
 		// controls
 		if ( mode == 0 )
 		{
-			rosObject.SetActive ( false );
-		}
+			rosObject.SetActive ( true );
+			quadObject.SetActive ( true );
+			quadCamObject.SetActive ( true );
+			quadCanvasObject.SetActive ( true );
+			peopleSpawnerObject.SetActive ( false );
+			peopleCamObject.SetActive ( false );
+			recordingObject.SetActive ( false );
+		} else
 
 		// deep learning
 		if ( mode == 1 )
 		{
 			rosObject.SetActive ( false );
+			quadObject.SetActive ( false );
+			quadCamObject.SetActive ( false );
+			quadCanvasObject.SetActive ( false );
+			peopleSpawnerObject.SetActive ( true );
+			peopleCamObject.SetActive ( true );
+			recordingObject.SetActive ( true );
 		}
 
-		canvas.enabled = false;
+		gameObject.SetActive ( false );
+//		canvas.enabled = false;
 	}
 
 	public void OnExitButton ()
 	{
+		#if !UNITY_EDITOR
+		ROSController.StopROS ();
 		Application.Quit ();
+		#endif
 	}
 }
