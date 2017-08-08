@@ -9,8 +9,6 @@ using UnityEngine.UI;
 
 public class CommandServer : MonoBehaviour
 {
-	public RobotRemoteControl robotRemoteControl;
-	public IRobotController robotController;
 	public Camera frontFacingCamera;
 	private SocketIOComponent _socket;
 	public RawImage inset1;
@@ -27,11 +25,6 @@ public class CommandServer : MonoBehaviour
 		_socket.On("open", OnOpen);
 		_socket.On("steer", OnSteer);
 		_socket.On("manual", onManual);
-		_socket.On ( "fixed_turn", OnFixedTurn );
-		_socket.On ( "pickup", OnPickup );
-		_socket.On ( "get_samples", GetSamplePositions );
-		robotController = robotRemoteControl.robot;
-		frontFacingCamera = robotController.recordingCam;
 		inset1Tex = new Texture2D ( 1, 1 );
 		inset2Tex = new Texture2D ( 1, 1 );
 		inset3Tex = new Texture2D ( 1, 1 );
@@ -39,10 +32,6 @@ public class CommandServer : MonoBehaviour
 
 	void Update ()
 	{
-		if ( Input.GetKeyDown ( KeyCode.P ) )
-		{
-			GetSamplePositions ( null );
-		}
 	}
 
 	void OnOpen(SocketIOEvent obj)
@@ -61,12 +50,6 @@ public class CommandServer : MonoBehaviour
 	{
 //		Debug.Log ( "Steer" );
 		JSONObject jsonObject = obj.data;
-		robotRemoteControl.SteeringAngle = -float.Parse(jsonObject.GetField("steering_angle").str); // he wanted the angles CCW
-		robotRemoteControl.ThrottleInput = float.Parse(jsonObject.GetField("throttle").str);
-		if ( jsonObject.HasField ( "brake" ) )
-			robotRemoteControl.BrakeInput = float.Parse ( jsonObject.GetField ( "brake" ).str );
-		else
-			robotRemoteControl.BrakeInput = 0;
 
 		// try to load image1
 		bool loaded = false;
@@ -147,23 +130,6 @@ public class CommandServer : MonoBehaviour
 		EmitTelemetry(obj);
 	}
 
-	void OnFixedTurn(SocketIOEvent obj)
-	{
-		JSONObject json = obj.data;
-		float angle = float.Parse ( json.GetField ( "angle" ).str );
-		float time = 0;
-		if ( json.HasField ( "time" ) )
-			time = float.Parse ( json.GetField ( "time" ).str );
-		robotRemoteControl.FixedTurn ( angle, time );
-		EmitTelemetry ( obj );
-	}
-
-	void OnPickup (SocketIOEvent obj)
-	{
-		robotRemoteControl.PickupSample ();
-		EmitTelemetry ( obj );
-	}
-
 	void EmitTelemetry(SocketIOEvent obj)
 	{
 //		Debug.Log ( "Emitting" );
@@ -174,7 +140,7 @@ public class CommandServer : MonoBehaviour
 			// Collect Data from the Car
 			Dictionary<string, string> data = new Dictionary<string, string>();
 
-			data["steering_angle"] = robotController.SteerAngle.ToString("N4");
+/*			data["steering_angle"] = robotController.SteerAngle.ToString("N4");
 //			data["vert_angle"] = robotController.VerticalAngle.ToString ("N4");
 			data["throttle"] = robotController.ThrottleInput.ToString("N4");
 			data["brake"] = robotController.BrakeInput.ToString ("N4");
@@ -187,44 +153,11 @@ public class CommandServer : MonoBehaviour
 			data["roll"] = robotController.Roll.ToString ("N4");
 			data["fixed_turn"] = robotController.IsTurningInPlace ? "1" : "0";
 			data["near_sample"] = robotController.IsNearObjective ? "1" : "0";
-			data["picking_up"] = robotController.IsPickingUpSample ? "1" : "0";
+			data["picking_up"] = robotController.IsPickingUpSample ? "1" : "0";*/
 			data["image"] = Convert.ToBase64String(CameraHelper.CaptureFrame(frontFacingCamera));
 
 //			Debug.Log ("sangle " + data["steering_angle"] + " vert " + data["vert_angle"] + " throt " + data["throttle"] + " speed " + data["speed"] + " image " + data["image"]);
 			_socket.Emit("telemetry", new JSONObject(data));
 		});
-	}
-
-	void GetSamplePositions (SocketIOEvent obj)
-	{
-		UnityMainThreadDispatcher.Instance ().Enqueue ( () =>
-		{
-			Debug.Log ("Sending sample positions");
-
-			Dictionary<string, string> data = new Dictionary<string, string> ();
-
-			int count = ObjectiveSpawner.samples.Length;
-			data[ "sample_count" ] = count.ToString ();
-			string x = "";
-			string y = "";
-
-			for (int i = 0; i < count; i++ )
-			{
-				GameObject go = ObjectiveSpawner.samples[i];
-				x += go.transform.position.x.ToString ("N2") + ",";
-				y += go.transform.position.z.ToString ("N2") + ",";
-//				data[ "sample" + i + "_pos_x" ] = go.transform.position.x.ToString ("N4");
-//				data[ "sample" + i + "_pos_y" ] = go.transform.position.z.ToString ("N4");
-			}
-			x = x.TrimEnd (',');
-			y = y.TrimEnd (',');
-			data["samples_x"] = x;
-			data["samples_y"] = y;
-//			Debug.Log (x + "\n" + y);
-
-//			foreach (KeyValuePair<string, string> pair in data)
-//				Debug.Log ("key: " + pair.Key + " value: " + pair.Value + "\n");
-			_socket.Emit ("sample_positions", new JSONObject(data));
-		} );
 	}
 }

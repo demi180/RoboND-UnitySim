@@ -116,7 +116,7 @@ public class FollowCamera : MonoBehaviour
 		}
 	}
 
-	void ChangePoseType (CameraPoseType newType)
+	public void ChangePoseType (CameraPoseType newType)
 	{
 		poseType = newType;
 

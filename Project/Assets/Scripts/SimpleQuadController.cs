@@ -6,6 +6,8 @@ public class SimpleQuadController : MonoBehaviour
 {
 	public Transform chassis;
 	public Transform camTransform;
+	public QuadController controller;
+	public FollowCamera followCam;
 	public float moveSpeed = 10;
 	public float thrustForce = 25;
 	public float maxTilt = 22.5f;
@@ -24,6 +26,10 @@ public class SimpleQuadController : MonoBehaviour
 		rb = GetComponent<Rigidbody> ();
 		rb.constraints = RigidbodyConstraints.FreezeRotation;
 		chassisRotation = chassis.rotation;
+		if ( controller == null )
+			controller = GetComponent<QuadController> ();
+		if ( followCam == null )
+			followCam = camTransform.GetComponent<FollowCamera> ();
 		active = false;
 	}
 
@@ -32,6 +38,17 @@ public class SimpleQuadController : MonoBehaviour
 		if ( Input.GetKeyDown ( KeyCode.F12 ) )
 		{
 			active = !active;
+		}
+
+		if ( Input.GetKeyDown ( KeyCode.R ) )
+		{
+			controller.ResetOrientation ();
+			followCam.ChangePoseType ( CameraPoseType.Iso );
+		}
+
+		if ( Input.GetKeyDown ( KeyCode.G ) )
+		{
+			controller.UseGravity = !controller.UseGravity;
 		}
 
 		if ( !active )
@@ -64,13 +81,6 @@ public class SimpleQuadController : MonoBehaviour
 		{
 			transform.Rotate ( Vector3.up * yaw * turnSpeed * Time.deltaTime, Space.World );
 			camTransform.Rotate ( Vector3.up * yaw * turnSpeed * Time.deltaTime, Space.World );
-		}
-
-		if ( Input.GetKeyDown ( KeyCode.R ) )
-		{
-			Input.ResetInputAxes ();
-			rb.velocity = Vector3.zero;
-			transform.rotation = Quaternion.identity;
 		}
 	}
 
