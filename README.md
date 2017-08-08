@@ -9,7 +9,7 @@ This project ..something, something.. quad drone controls and deep learning exer
 The city scene starts with a menu to choose between controlling the quad for the Controls and Deep Learning projects, and setting up to train the neural network for the Deep Learning project. In the training mode, a human character will spawn in a random place with a random appearance, and a camera follows the person around to record.
 
 Controlling the quad locally:
-1. Fire up the scene or the executable with the indoor environment
+1. Fire up the scene or the executable with the indoor environment, or the outdoor one and selecting Controls from the menu
 2. To enable local control, press F12 or click the "Input off" button on-screen. Doing so again will disable control
 3. The drone has a simplified local control script that allows the user to quickly and easily move around as if it was a game character.
 4. Use WSAD or the arrow keys to move the quad forward, back, left, or right
