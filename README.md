@@ -14,7 +14,7 @@ Controlling the quad locally:
 4. Use Space and C to move the quad up and down
 5. Q and E will yaw the quad
 
-Capturing images for deep learning:
+Capturing images for deep learning (proto4):
 <br>//Todo: add instructions to for manual and auto capturing
 
 Ros commands available locally:
