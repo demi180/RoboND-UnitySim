@@ -328,10 +328,10 @@ public class QuadController : MonoBehaviour
 		// motor status
 		r.x = 15;
 		r.height = 20;
-		GUI.Label ( r, "Motors enabled: <color=yellow>" + MotorsEnabled + "</color>" );
+//		GUI.Label ( r, "Motors enabled: <color=yellow>" + MotorsEnabled + "</color>" );
 
 		// input force
-		r.y += r.height;
+//		r.y += r.height;
 		Vector3 force = Force.ToRos ();
 		GUI.Label ( r, "Force: " + force.ToString () );
 
@@ -346,16 +346,16 @@ public class QuadController : MonoBehaviour
 
 		// orientation
 		r.y += r.height;
-//		GUI.Label ( r, "PRY: " + FixEuler ( Rotation.eulerAngles.ToRos () ).ToString () );
-		GUI.Label ( r, "PRY: " + Rotation.eulerAngles.ToRos ().ToString () );
+//		GUI.Label ( r, "RPY: " + FixEuler ( Rotation.eulerAngles.ToRos () ).ToString () );
+		GUI.Label ( r, "RPY: " + ( -Rotation.eulerAngles ).ToRos ().ToString () );
 
 		// Unity quaternion
-		r.y += r.height;
-		GUI.Label ( r, "Local Quat: " + Rotation.ToString () );
+//		r.y += r.height;
+//		GUI.Label ( r, "Local Quat: " + Rotation.ToString () );
 
 		// ros quaternion
-		r.y += r.height;
-		GUI.Label ( r, "Ros Quat: " + Rotation.ToRos ().ToString () );
+//		r.y += r.height;
+//		GUI.Label ( r, "Ros Quat: " + Rotation.ToRos ().ToString () );
 
 		// linear velocity
 		r.y += r.height;
