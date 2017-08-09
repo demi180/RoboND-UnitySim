@@ -113,6 +113,7 @@ public class QuadController : MonoBehaviour
 			rearRightRotor
 		};
 		MotorsEnabled = true;
+//		UseGravity = false;
 		Forward = forward.forward;
 		Right = right.forward;
 		Up = transform.up;
@@ -121,11 +122,22 @@ public class QuadController : MonoBehaviour
 		UseGravity = rb.useGravity;
 		UpdateConstraints ();
 		rb.maxAngularVelocity = Mathf.Infinity;
-		dot = new Texture2D ( 1, 1 );
-		dot.SetPixel ( 0, 0, Color.white );
-		dot.Apply ();
-//		Debug.Log ( "itr: " + rb.inertiaTensorRotation );
+//		dot = new Texture2D ( 1, 1 );
+//		dot.SetPixel ( 0, 0, Color.white );
+//		dot.Apply ();
+//		Debug.Log ( "it: " + rb.inertiaTensor + " itr: " + rb.inertiaTensorRotation );
+//		rb.ResetInertiaTensor ();
+//		rb.inertiaTensorRotation = Quaternion.identity;
+//		Debug.Log ( "2 it: " + rb.inertiaTensor + " itr: " + rb.inertiaTensorRotation );
+//		gameObject.SetActive ( false );
+//		gameObject.SetActive ( true );
+	}
+
+	void Start ()
+	{
 		rb.inertiaTensorRotation = Quaternion.identity;
+		// for whatever reason, setting inertiaTensorRotation stops the quad from accepting commands (mostly torque) until it's deactivated and activated
+		QuadActivator.Activate ( gameObject );
 	}
 
 	void Update ()

@@ -72,7 +72,10 @@ public class QuadDrone : MonoBehaviour
 			enabled = false;
 			return;
 		}
+	}
 
+	void Start ()
+	{
 		ROSController.StartROS ( OnRosInit );
 	}
 

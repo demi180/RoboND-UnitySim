@@ -18,14 +18,12 @@ public class SimpleQuadController : MonoBehaviour
 	float tiltX;
 	float tiltZ;
 
-	Quaternion chassisRotation;
 	public bool active;
 	
 	void Awake ()
 	{
 		rb = GetComponent<Rigidbody> ();
 		rb.constraints = RigidbodyConstraints.FreezeRotation;
-		chassisRotation = chassis.rotation;
 		if ( controller == null )
 			controller = GetComponent<QuadController> ();
 		if ( followCam == null )
@@ -94,16 +92,4 @@ public class SimpleQuadController : MonoBehaviour
 			active = !active;
 		}
 	}
-
-/*	void FixedUpdate ()
-	{
-		Vector3 forwardVelocity = Vector3.fwd * inputs[1] * moveSpeed;
-		Vector3 sidewaysVelocity = Vector3.right * inputs[2] * moveSpeed;
-		Vector3 upVelocity = Vector3.up * inputs[0] * thrustForce;
-		Vector3 inputVelo = forwardVelocity + sidewaysVelocity + upVelocity;
-
-		rb.AddRelativeForce ( inputVelo * Time.deltaTime, ForceMode.VelocityChange );
-		Vector3 velo = Vector3.ClampMagnitude ( rb.velocity, moveSpeed );
-		rb.velocity = velo;
-	}*/
 }
