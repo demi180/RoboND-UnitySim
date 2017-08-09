@@ -24,9 +24,11 @@ public class FollowCamera : MonoBehaviour
 	public CameraMotionBlur blurScript;
 	public float followDistance = 5;
 	public float height = 4;
+	public float zoomSpeed = 4;
+	public float rotateSpeed = 2;
 
 	public bool autoAlign = false;
-	public Vector3 forward;
+//	public Vector3 forward;
 	public CameraPoseType poseType;
 
 	public bool blurRotors = true;
@@ -39,6 +41,8 @@ public class FollowCamera : MonoBehaviour
 	Quaternion targetRotation;
 	float initialFollowDistance;
 
+	float rmbTime;
+
 	void Awake ()
 	{
 		if ( ActiveCamera == null )
@@ -49,7 +53,7 @@ public class FollowCamera : MonoBehaviour
 
 	void Start ()
 	{
-		forward = target.Forward;
+//		forward = target.Forward;
 		if ( ROSController.instance != null )
 			ROSController.StartROS ( OnRosInit );
 	}
@@ -75,21 +79,44 @@ public class FollowCamera : MonoBehaviour
 				blurScript.enabled = false;
 		}
 
-		if ( Input.GetKeyDown ( KeyCode.F8 ) )
-		{
-			float dist = Random.Range ( 2f, 20f );
-			new System.Threading.Thread ( () =>
-			{
-				SetFloat.Request req = new SetFloat.Request ();
-				SetFloat.Response resp = new SetFloat.Response ();
-				req.data = dist;
+		float scroll = Input.GetAxis ( "Mouse ScrollWheel" );
+		float zoom = -scroll * zoomSpeed;
+		followDistance += zoom;
+		followDistance = Mathf.Clamp ( followDistance, 1.5f, 20 );
 
-				if ( nh.serviceClient<SetFloat.Request, SetFloat.Response> ( "/quad_rotor/camera_distance" ).call ( req, ref resp ) )
-					Debug.Log ( resp.success + " " + resp.newData );
-				else
-					Debug.Log ( "Failed" );
-			} ).Start ();
+		if ( Input.GetMouseButtonDown ( 1 ) )
+			rmbTime = Time.time;
+		if ( Input.GetMouseButtonUp ( 1 ) && Time.time - rmbTime < 0.1f )
+		{
+			Vector3 forward = target.forward.forward;
+			Vector3 right = target.right.right;
+			transform.rotation = Quaternion.LookRotation ( forward - right - Vector3.up, forward - right + Vector3.up );
 		}
+
+		if ( Input.GetMouseButton ( 1 ) && Time.time - rmbTime > 0.2f )
+		{
+			float x = Input.GetAxis ( "Mouse X" );
+			transform.RotateAround ( target.Position, Vector3.up, x * rotateSpeed );
+//			transform.Rotate ( Vector3.up * x * rotateSpeed, Space.World );
+			float y = Input.GetAxis ( "Mouse Y" );
+			transform.RotateAround ( target.Position, transform.right, -y * rotateSpeed );
+		}
+
+//		if ( Input.GetKeyDown ( KeyCode.F8 ) )
+//		{
+//			float dist = Random.Range ( 2f, 20f );
+//			new System.Threading.Thread ( () =>
+//			{
+//				SetFloat.Request req = new SetFloat.Request ();
+//				SetFloat.Response resp = new SetFloat.Response ();
+//				req.data = dist;
+//
+//				if ( nh.serviceClient<SetFloat.Request, SetFloat.Response> ( "/quad_rotor/camera_distance" ).call ( req, ref resp ) )
+//					Debug.Log ( resp.success + " " + resp.newData );
+//				else
+//					Debug.Log ( "Failed" );
+//			} ).Start ();
+//		}
 
 		if ( Input.GetKeyDown ( KeyCode.Alpha1 ) || Input.GetKeyDown ( KeyCode.Alpha2 ) || Input.GetKeyDown ( KeyCode.Alpha3 ) || Input.GetKeyDown ( KeyCode.Alpha4 ) || Input.GetKeyDown ( KeyCode.Alpha5 ) )
 		{

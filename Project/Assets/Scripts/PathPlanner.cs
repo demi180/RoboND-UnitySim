@@ -35,6 +35,8 @@ public class PathPlanner : MonoBehaviour
 	LineRenderer pathRenderer;
 	List<Transform> nodeObjects;
 
+	bool clearVizFlag;
+
 	void Awake ()
 	{
 		instance = this;
@@ -43,6 +45,14 @@ public class PathPlanner : MonoBehaviour
 //		pathRenderer.SetPositions ( new Vector3[0] );
 		path = new List<PathSample> ();
 		nodeObjects = new List<Transform> ();
+	}
+
+	void Update ()
+	{
+		if ( clearVizFlag )
+		{
+			_ClearViz ();
+		}
 	}
 
 	public static void AddNode (Vector3 position, Quaternion orientation)
@@ -71,17 +81,25 @@ public class PathPlanner : MonoBehaviour
 		return instance.path.ToArray ();
 	}
 
-	public static void Clear ()
+	public static void Clear (bool clearViz = true)
 	{
 		instance.path.Clear ();
+		if ( clearViz )
+			ClearViz ();
 	}
 
 	public static void ClearViz ()
 	{
-		instance.pathRenderer.numPositions = 0;
-		int count = instance.nodeObjects.Count;
+		instance.clearVizFlag = true;
+	}
+
+	void _ClearViz ()
+	{
+		pathRenderer.numPositions = 0;
+		int count = nodeObjects.Count;
 		for ( int i = 0; i < count; i++ )
-			Destroy ( instance.nodeObjects [ i ].gameObject );
-		instance.nodeObjects.Clear ();
+			Destroy ( nodeObjects [ i ].gameObject );
+		nodeObjects.Clear ();
+		clearVizFlag = false;
 	}
 }

@@ -8,6 +8,7 @@ public class SimpleQuadController : MonoBehaviour
 	public Transform camTransform;
 	public QuadController controller;
 	public FollowCamera followCam;
+	public PathFollower pather;
 	public float moveSpeed = 10;
 	public float thrustForce = 25;
 	public float maxTilt = 22.5f;
@@ -79,6 +80,21 @@ public class SimpleQuadController : MonoBehaviour
 		{
 			transform.Rotate ( Vector3.up * yaw * turnSpeed * Time.deltaTime, Space.World );
 			camTransform.Rotate ( Vector3.up * yaw * turnSpeed * Time.deltaTime, Space.World );
+		}
+
+		if ( Input.GetKeyDown ( KeyCode.P ) )
+		{
+			PathPlanner.AddNode ( controller.Position, controller.Rotation );
+		}
+		if ( Input.GetKeyDown ( KeyCode.O ) )
+		{
+			controller.ResetOrientation ();
+			pather.SetPath ( new Pathing.Path ( PathPlanner.GetPath () ) );
+			PathPlanner.Clear ( false ); // clear the path but keep the visualization
+		}
+		if ( Input.GetKeyDown ( KeyCode.I ) )
+		{
+			PathPlanner.Clear ();
 		}
 	}
 

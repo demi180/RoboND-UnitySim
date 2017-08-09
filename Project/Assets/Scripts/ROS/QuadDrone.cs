@@ -61,7 +61,7 @@ public class QuadDrone : MonoBehaviour
 	ServiceServer constrainTorqueZSrv;
 	ServiceServer triggerResetSrv;
 	ServiceServer setPoseSrv;
-//	ServiceServer resetS
+	ServiceServer clearPathSrv;
 
 	uint frameSeq = 0;
 
@@ -105,6 +105,7 @@ public class QuadDrone : MonoBehaviour
 		triggerResetSrv = nh.advertiseService<SetBool.Request, SetBool.Response> ( "quad_rotor/reset_orientation", TriggerReset );
 //		triggerResetSrv = nh.advertiseService<Empty.Request, Empty.Response> ( "quad_rotor/reset_orientation", TriggerReset );
 		setPoseSrv = nh.advertiseService<SetPose.Request, SetPose.Response> ( "quad_rotor/set_pose", SetPoseService );
+		clearPathSrv = nh.advertiseService<SetBool.Request, SetBool.Response> ( "quad_rotor/clear_path", ClearPathService );
 	}
 
 	bool OnEnableMotors (EnableMotors.Request req, ref EnableMotors.Response resp)
@@ -396,4 +397,15 @@ public class QuadDrone : MonoBehaviour
 		resp.success = true;
 		return true;
 	}
+
+	bool ClearPathService (SetBool.Request req, ref SetBool.Response resp)
+	{
+		Debug.Log ( "clear path service!" );
+		PathPlanner.Clear ();
+		resp.message = "";
+		resp.success = true;
+		return true;
+	}
+
+
 }
