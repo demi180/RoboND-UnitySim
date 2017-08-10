@@ -43,7 +43,7 @@ The city scene starts with a menu to choose between controlling the quad for the
 12. `O`: Begin following current path
 13. `I`: Clear all waypoints
 14. `L`: Toggle this info on/off
-15.`Esc`: Quit
+15. `Esc`: Quit
 
 # Capturing images for deep learning (city only):
 1. Fire up the executable with the city environment. Select `DL Training` from the menu
