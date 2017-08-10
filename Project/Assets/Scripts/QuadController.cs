@@ -64,6 +64,7 @@ public class QuadController : MonoBehaviour
 	public float arrowScreenSize = 100f;
 	public bool drawArrows;
 	public bool drawArrowsAlways;
+	public bool showLegend;
 
 	public bool rotateWithTorque;
 
@@ -166,17 +167,6 @@ public class QuadController : MonoBehaviour
 
 	void LateUpdate ()
 	{
-//		Quaternion q = transform.rotation;
-//		if ( Mathf.Approximately ( q.x, 0 ) )
-//			Debug.Log ( "x" );
-//		if ( Mathf.Approximately ( q.y, 0 ) )
-//			Debug.Log ( "y" );
-//		if ( Mathf.Approximately ( q.z, 0 ) )
-//			Debug.Log ( "z" );
-//		if ( Mathf.Approximately ( q.w, 0 ) )
-//			Debug.Log ( "w" );
-
-
 		if ( resetFlag )
 		{
 			ResetOrientation ();
@@ -186,16 +176,9 @@ public class QuadController : MonoBehaviour
 
 		if ( Input.GetKeyDown ( KeyCode.Escape ) )
 			Application.Quit ();
-
-//		if ( Input.GetKeyDown ( KeyCode.R ) )
-//		{
-//			ResetOrientation ();
-//		}
-
-		// update acceleration
-//		LinearAcceleration = ( rb.velocity - lastVelocity ) / Time.deltaTime;
-//		lastVelocity = rb.velocity;
-
+		
+		if ( Input.GetKeyDown ( KeyCode.L ) )
+			showLegend = !showLegend;
 
 		// use this to have a follow camera rotate with the quad. not proper torque!
 		if ( rotateWithTorque )
@@ -441,6 +424,113 @@ public class QuadController : MonoBehaviour
 //			GUI.color = Color.black;
 //			GUI.DrawTexture ( new Rect ( screenPos.x - 2, screenPos.y - 2, 4, 4 ), dot );
 		}
+
+		GUI.color = Color.white;
+		GUIStyle label = GUI.skin.label;
+		TextClipping clipping = label.clipping;
+		label.clipping = TextClipping.Overflow;
+		bool wrap = label.wordWrap;
+		label.wordWrap = false;
+		int fontSize = label.fontSize;
+		label.fontSize = (int) ( 22f * Screen.height / 1080 );
+
+		string info = "";
+
+		if ( showLegend )
+		{
+			info = @"L: Legend on/off
+F12: Control on/off
+WSAD/Arrows: Move around
+Space/C: Thrust up/down
+Q/E: Turn around
+Scroll wheel: zoom in/out
+RMB (drag): Rotate camera
+RMB: Reset camera
+G: Gravity on/off
+R: Reset Quad orientation
+1-4: Cycle views
+P: Plot waypoint
+O: Follow path
+I: Clear waypoints
+Esc: Quit";
+
+			Vector2 size = label.CalcSize ( new GUIContent ( info ) );
+			r = new Rect ( Screen.width - size.x - 10, 150, size.x + 10, size.y );
+			r.x -= 10;
+//			r = new Rect ( Screen.width - 160, 150, 200, 250 );
+			GUI.Box ( r, "" );
+			GUI.Box ( r, "" );
+			r.x += 5;
+			GUILayout.BeginArea ( r );
+
+			GUILayout.Label ( info );
+			GUILayout.EndArea ();
+
+//			GUI.BeginGroup ( r );
+//			// legend
+//			r.x = 5;
+//			r.y = 0;
+//			r.height = 350;
+//			info += 350
+//			GUI.Label ( r, "L: Toggle legend" );
+//
+//			// move
+//			r.y += r.height;
+//			GUI.Label ( r, "WSAD: Move around" );
+//
+//			// thrust
+//			r.y += r.height;
+//			GUI.Label ( r, "Space/C: Thrust up/down" );
+//
+//			// turn
+//			r.y += r.height;
+//			GUI.Label ( r, "Q/E: Turn around" );
+//
+//			// zoom
+//			r.y += r.height;
+//			GUI.Label ( r, "Scrollwheel: Zoom in/out" );
+//
+//			// cam rotate
+//			r.y += r.height;
+//			GUI.Label ( r, "RMB (drag): Rotate camera" );
+//
+//			// cam reset
+//			r.y += r.height;
+//			GUI.Label ( r, "RMB: Reset camera" );
+//
+//			// gravity
+//			r.y += r.height;
+//			GUI.Label ( r, "Q/E: Turn around" );
+//
+//				G: Gravity on/off
+//				R: Reset quad orientation
+//				1-4: Switch camera views (Front/side/top/Iso)
+//				P: Plot waypoint
+//				O: Begin following current path
+//				I: Clear all waypoints
+//				L: Toggle this info on/off
+//				Esc: Quit
+//			 */
+//			GUI.EndGroup ();
+		} else
+		{
+			info = "L: Legend on/off";
+
+			Vector2 size = label.CalcSize ( new GUIContent ( info ) );
+			r = new Rect ( Screen.width - size.x - 10, 150, size.x + 10, size.y );
+			r.x -= 10;
+			GUI.Box ( r, "" );
+			GUI.Box ( r, "" );
+			r.x += 5;
+
+			GUILayout.BeginArea ( r );
+			GUILayout.Label ( info );
+			GUILayout.EndArea ();
+		}
+
+		label.clipping = clipping;
+		label.wordWrap = wrap;
+		label.fontSize = fontSize;
 	}
 
 	Vector3 FixEuler (Vector3 euler)

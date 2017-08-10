@@ -37,6 +37,8 @@ public class SimpleQuadController : MonoBehaviour
 		if ( Input.GetKeyDown ( KeyCode.F12 ) )
 		{
 			active = !active;
+			if ( active )
+				controller.UseGravity = false;
 		}
 
 		if ( Input.GetKeyDown ( KeyCode.R ) )
