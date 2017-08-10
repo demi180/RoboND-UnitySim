@@ -46,7 +46,7 @@ The city scene starts with a menu to choose between controlling the quad for the
 15.`Esc`: Quit
 
 # Capturing images for deep learning (city only):
-1. Fire up the scene or the executable with the city environment. Select DL Training from the menu
-2. To begin recording, press R to bring up the dialog and choose where to save the recording. Select or create a convenient folder, such as in your Desktop or Documents, and confirm, and recording begins.
+1. Fire up the executable with the city environment. Select `DL Training` from the menu
+2. To begin recording, press `R` to bring up the dialog and choose where to save the recording. Select or create a convenient folder, such as in your Desktop or Documents, and confirm, and recording begins.
 3. Images are captured from two cameras - one that sees the environment as you do, and one that sees in black&white as shown at the bottom right. The images are captured once every 3 seconds or so.
-4. To stop recording, press R again, or simply close the executable (or stop the Editor if launching from Unity). If using Unity, the snapshot frequency as well as the camera's rotation and position speeds can be controlled as well from the Inspector, with the OrbitCamera object selected in the Hierarchy
+4. To stop recording, press `R` again, or simply close the executable (`Esc`)
