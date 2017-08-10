@@ -108,7 +108,17 @@ namespace Ros_CSharp
 
                 try
                 {
+					if ( isp == null )
+						UnityEngine.Debug.Log ("isp is null");
+					if ( isp.helper == null )
+						UnityEngine.Debug.Log ("helper is null");
                     bool ok = isp.helper.call(parms);
+					if ( link == null )
+						UnityEngine.Debug.Log ("link is null");
+					if ( parms == null )
+						UnityEngine.Debug.Log ("parms is null");
+					if ( parms.response == null )
+						UnityEngine.Debug.Log ("response is null");
                     link.processResponse(parms.response, ok);
                 }
                 catch (Exception e)

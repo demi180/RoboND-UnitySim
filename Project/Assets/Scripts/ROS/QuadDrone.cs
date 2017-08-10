@@ -262,10 +262,10 @@ public class QuadDrone : MonoBehaviour
 	{
 		Debug.Log ( "path service called!" );
 		Path path = new Path ();
-//		path.header = new Messages.std_msgs.Header ();
-//		path.header.Frame_id = "global";
-//		path.header.Stamp = ROS.GetTime ();
-//		path.header.Seq = 0;
+		path.header = new Messages.std_msgs.Header ();
+		path.header.Frame_id = "global";
+		path.header.Stamp = ROS.GetTime ();
+		path.header.Seq = 0;
 		Pathing.PathSample[] samples = PathPlanner.GetPath ();
 		int count = samples.Length;
 		path.poses = new PoseStamped[ count ];
@@ -273,16 +273,17 @@ public class QuadDrone : MonoBehaviour
 		for ( int i = 0; i < count; i++ )
 		{
 			PoseStamped pst = new PoseStamped ();
-//			pst.header = new Messages.std_msgs.Header ();
-//			pst.header.Frame_id = "local";
-//			pst.header.Stamp = ROS.GetTime ();
-//			pst.header.Seq = (uint) i;
+			pst.header = new Messages.std_msgs.Header ();
+			pst.header.Frame_id = "local";
+			pst.header.Stamp = ROS.GetTime ();
+			pst.header.Seq = (uint) i;
 			pst.pose = new Messages.geometry_msgs.Pose ();
 			pst.pose.position = new Messages.geometry_msgs.Point ( samples [ i ].position.ToRos () );
 			pst.pose.orientation = new Messages.geometry_msgs.Quaternion ( samples [ i ].orientation.ToRos () );
 			path.poses [ i ] = pst;
 		}
 		resp.plan = path;
+
 		return true;
 	}
 
