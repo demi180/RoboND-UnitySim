@@ -262,7 +262,7 @@ public class ROSController : MonoBehaviour
 		}
 	}
 
-	public static void StopROS ()
+	public static void StopROS (Action callback = null)
 	{
 		if ( ROS.isStarted () && !ROS.shutting_down && !instance.stopping )
 		{
@@ -278,7 +278,10 @@ public class ROSController : MonoBehaviour
 			Debug.Log ( "stopping ROS" );
 			ROS.shutdown ();
 			ROS.waitForShutdown ();
+
 		}
+		if ( callback != null )
+			callback ();
 	}
 
 	public static void AddNode (NodeHandle nh)

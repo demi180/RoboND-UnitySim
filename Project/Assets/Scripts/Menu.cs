@@ -71,8 +71,7 @@ public class Menu : MonoBehaviour
 	public void OnExitButton ()
 	{
 		#if !UNITY_EDITOR
-		ROSController.StopROS ();
-		Application.Quit ();
+		ROSController.StopROS (new System.Action ( () => { Application.Quit (); } ));
 		#endif
 	}
 }
