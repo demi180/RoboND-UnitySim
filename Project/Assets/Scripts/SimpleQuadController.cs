@@ -38,7 +38,13 @@ public class SimpleQuadController : MonoBehaviour
 		{
 			active = !active;
 			if ( active )
+			{
 				controller.UseGravity = false;
+				controller.rb.isKinematic = true;
+				controller.rb.isKinematic = false;
+				controller.rb.freezeRotation = true;
+			} else
+				controller.rb.freezeRotation = false;
 		}
 
 		if ( Input.GetKeyDown ( KeyCode.R ) )

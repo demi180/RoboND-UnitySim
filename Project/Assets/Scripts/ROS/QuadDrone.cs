@@ -32,6 +32,7 @@ using SetPath = Messages.quad_controller.SetPath;
 public class QuadDrone : MonoBehaviour
 {
 	public QuadController droneController;
+	public SimpleQuadController inputCtrl;
 	public PathFollower pather;
 	public bool active;
 
@@ -76,6 +77,7 @@ public class QuadDrone : MonoBehaviour
 			return;
 		}
 
+		inputCtrl = GetComponent<SimpleQuadController> ();
 		pather = GetComponent<PathFollower> ();
 	}
 
@@ -129,6 +131,9 @@ public class QuadDrone : MonoBehaviour
 
 	void TwistCallback (Twist msg)
 	{
+		if ( inputCtrl.active )
+			return;
+
 		Vector3 linear = msg.linear.ToUnityVector ();
 		Vector3 angular = msg.angular.ToUnityVector ();
 		if ( droneController != null )
@@ -142,6 +147,9 @@ public class QuadDrone : MonoBehaviour
 
 	void WrenchCallback (Wrench msg)
 	{
+		if ( inputCtrl.active )
+			return;
+
 		Vector3 force = msg.force.ToUnityVector ();
 		Vector3 torque = msg.torque.ToUnityVector ();
 		if ( droneController != null )
