@@ -402,6 +402,8 @@ namespace Messages
 		quad_controller__SetFloat__Response,
 		quad_controller__SetPath__Request,
 		quad_controller__SetPath__Response,
+		quad_controller__GetPath__Request,
+		quad_controller__GetPath__Response,
 
 		// hector stuff
 		hector_uav_msgs__Altimeter = 1000,
@@ -521,6 +523,7 @@ namespace Messages
 		quad_controller__SetInt,
 		quad_controller__SetFloat,
 		quad_controller__SetPath,
+		quad_controller__GetPath,
 
 
 		// hector stuff

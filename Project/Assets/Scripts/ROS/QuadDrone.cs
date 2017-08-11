@@ -16,11 +16,11 @@ using Wrench = Messages.geometry_msgs.Wrench;
 using Imu = Messages.sensor_msgs.Imu;
 using Image = Messages.sensor_msgs.Image;
 using Path = Messages.nav_msgs.Path;
-using GetPlan = Messages.nav_msgs.GetPlan;
 using SetBool = Messages.std_srvs.SetBool;
 using Empty = Messages.std_srvs.Empty;
 using Trigger = Messages.std_srvs.Trigger;
 using SetPose = Messages.quad_controller.SetPose;
+using GetPath = Messages.quad_controller.GetPath;
 using SetPath = Messages.quad_controller.SetPath;
 
 
@@ -90,7 +90,7 @@ public class QuadDrone : MonoBehaviour
 	{
 		nh = ROS.GlobalNodeHandle;
 //		nh = new NodeHandle ( "~" );
-		pathSrv = nh.advertiseService<GetPlan.Request, GetPlan.Response> ( "quad_rotor/get_path", PathService );
+		pathSrv = nh.advertiseService<GetPath.Request, GetPath.Response> ( "quad_rotor/get_path", GetPathService );
 //		setOrientSrv = nh.advertiseService<Messages.std_srvs.Empty.Request> ("quad_rotor/reset_orientation", TriggerReset)
 //		enableMotorSrv = nh.advertiseService<EnableMotors.Request, EnableMotors.Response> ( "enable_motors", OnEnableMotors );
 		nh.setParam ( "control_mode", "wrench" ); // for now force twist mode
@@ -272,9 +272,9 @@ public class QuadDrone : MonoBehaviour
 		#endif
 	}
 
-	bool PathService (GetPlan.Request req, ref GetPlan.Response resp)
+	bool GetPathService (GetPath.Request req, ref GetPath.Response resp)
 	{
-		Debug.Log ( "path service called!" );
+		Debug.Log ( "getpath service called!" );
 		Path path = new Path ();
 		path.header = new Messages.std_msgs.Header ();
 		path.header.Frame_id = "global";
@@ -296,7 +296,7 @@ public class QuadDrone : MonoBehaviour
 			pst.pose.orientation = new Messages.geometry_msgs.Quaternion ( samples [ i ].orientation.ToRos () );
 			path.poses [ i ] = pst;
 		}
-		resp.plan = path;
+		resp.path = path;
 
 		return true;
 	}
