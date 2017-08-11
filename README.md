@@ -7,6 +7,10 @@ The project features two main environments ('scenes') to experiment with:
 2. proto4: an outdoor city environment
 The city scene starts with a menu to choose between controlling the quad for the Controls and Deep Learning projects, and setting up to train the neural network for the Deep Learning project. In the training mode, a human character will spawn in a random place with a random appearance, and a camera follows the person around to record.
 
+**Firing up the executable**  
+Find your OS's executable [here](https://github.com/udacity/RoboND-Controls-Lab/releases)  
+Either run from a terminal or edit the app, and append either the word `indoor` or the word `outdoor` (or `city`) to the path. If nothing is specified, the indoor scene will be loaded.
+
 # ROS Services and Topics
 **Quad**
 1. `quad_rotor/cmd_force` (subscribed), of type [Wrench](http://docs.ros.org/jade/api/geometry_msgs/html/msg/Wrench.html)
@@ -67,7 +71,7 @@ $ rosservice call /quad_rotor/gravity "data: true"
 14. `L`: Toggle this info on/off
 15. `Esc`: Quit
 
-# Capturing images for deep learning (city only):
+# Capturing images for deep learning (city only): #
 1. Fire up the executable with the city environment. Select `DL Training` from the menu
 2. To begin recording, press `R` to bring up the dialog and choose where to save the recording. Select or create a convenient folder, such as in your Desktop or Documents, and confirm, and recording begins.
 3. Images are captured from two cameras - one that sees the environment as you do, and one that sees in black&white as shown at the bottom right. The images are captured once every 3 seconds or so.
