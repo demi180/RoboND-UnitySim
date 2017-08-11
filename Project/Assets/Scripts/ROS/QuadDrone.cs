@@ -21,6 +21,7 @@ using SetBool = Messages.std_srvs.SetBool;
 using Empty = Messages.std_srvs.Empty;
 using Trigger = Messages.std_srvs.Trigger;
 using SetPose = Messages.quad_controller.SetPose;
+using SetPath = Messages.quad_controller.SetPath;
 
 
 
@@ -31,6 +32,7 @@ using SetPose = Messages.quad_controller.SetPose;
 public class QuadDrone : MonoBehaviour
 {
 	public QuadController droneController;
+	public PathFollower pather;
 	public bool active;
 
 	// node to link everything up to ros
@@ -62,6 +64,7 @@ public class QuadDrone : MonoBehaviour
 	ServiceServer triggerResetSrv;
 	ServiceServer setPoseSrv;
 	ServiceServer clearPathSrv;
+	ServiceServer setPathSrv;
 
 	uint frameSeq = 0;
 
@@ -72,6 +75,8 @@ public class QuadDrone : MonoBehaviour
 			enabled = false;
 			return;
 		}
+
+		pather = GetComponent<PathFollower> ();
 	}
 
 	void Start ()
@@ -106,6 +111,7 @@ public class QuadDrone : MonoBehaviour
 //		triggerResetSrv = nh.advertiseService<Empty.Request, Empty.Response> ( "quad_rotor/reset_orientation", TriggerReset );
 		setPoseSrv = nh.advertiseService<SetPose.Request, SetPose.Response> ( "quad_rotor/set_pose", SetPoseService );
 		clearPathSrv = nh.advertiseService<SetBool.Request, SetBool.Response> ( "quad_rotor/clear_path", ClearPathService );
+		setPathSrv = nh.advertiseService<SetPath.Request, SetPath.Response> ( "quad_rotor/set_path", SetPathService );
 	}
 
 	bool OnEnableMotors (EnableMotors.Request req, ref EnableMotors.Response resp)
@@ -408,5 +414,37 @@ public class QuadDrone : MonoBehaviour
 		return true;
 	}
 
+	bool SetPathService (SetPath.Request req, ref SetPath.Response resp)
+	{
+		Debug.Log ( "Set path service!" );
+		PathPlanner.Clear ( true );
 
+		if ( req.path.poses.Length > 0 )
+		{
+			string info = "";
+			int idx = 0;
+
+			PathPlanner.Clear ( true );
+			foreach ( PoseStamped ps in req.path.poses )
+			{
+				info += "pose " + ( idx++ ) + "position: " + ps.pose.position + " orientation: " + ps.pose.orientation + "\n";
+				PathPlanner.AddNode ( ps.pose.position.ToUnity ().ToUnity (), ps.pose.orientation.ToUnity ().ToUnity () );
+			}
+			Debug.Log ( info );
+			
+			resp.success = true;
+			resp.message = "";
+
+			droneController.ResetOrientation ();
+			pather.SetPath ( new Pathing.Path ( PathPlanner.GetPath () ) );
+			PathPlanner.Clear ( false ); // clear the path but keep the visualization
+			
+		} else
+		{
+			resp.success = false;
+			resp.message = "Need to include at least 1 pose for a path";
+		}
+
+		return true;
+	}
 }
