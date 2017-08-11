@@ -23,10 +23,30 @@ The city scene starts with a menu to choose between controlling the quad for the
 12. `quad_rotor/reset_orientation`, of type [SetBool](http://docs.ros.org/jade/api/std_srvs/html/srv/SetBool.html)
 13. `quad_rotor/set_pose`, of type _SetPose_ (see Project/Assets/Scripts/Ros/SetPose.srv)
 14. `quad_rotor/clear_path`, of type [SetBool](http://docs.ros.org/jade/api/std_srvs/html/srv/SetBool.html)
+15. `quad_rotor/set_path`, of type _SetPath_ (see Project/Assets/Scripts/Ros/SetPath.srv)
 
 **Camera**
 1. `quad_rotor/camera_pose_type`, of type _SetInt_ (see Project/Assets/Scripts/Ros/SetInt.srv)
 2. `quad_rotor/camera_distance`, of type _SetFloat_ (see Project/Assets/Scripts/Ros/SetFloat.srv)
+
+### Examples ###
+
+To publish an upward thrust of 0.1, use this format:
+```
+$ rostopic pub /quad_rotor/cmd_force geometry_msgs/Wrench "force:
+  x: 0.0
+  y: 0.0
+  z: 0.1
+torque:
+  x: 0.0
+  y: 0.0
+  z: 0.0"
+```
+_Note: if gravity is on, a force that small won't lift the quad off the ground_  
+
+To turn on gravity, use the following:  
+`$ rosservice call /quad_rotor/gravity "data: true"`
+
 
 # Controlling the Quad and Camera
 1. `F12`: toggle local control on/off
