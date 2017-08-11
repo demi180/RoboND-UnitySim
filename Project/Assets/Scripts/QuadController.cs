@@ -86,7 +86,6 @@ public class QuadController : MonoBehaviour
 	Vector3 force;
 	Vector3 torque;
 	Vector3 lastVelocity;
-	bool inverseFlag;
 	Ray ray;
 	RaycastHit rayHit;
 	BinarySerializer b = new BinarySerializer ( 1000 );
@@ -260,37 +259,16 @@ public class QuadController : MonoBehaviour
 			{
 
 				// add force
-				force = Vector3.ClampMagnitude ( force, maxForce );
+				if ( clampForce )
+					force = Vector3.ClampMagnitude ( force, maxForce );
 				rb.AddRelativeForce ( force, forceMode );
 				
 				// add torque. but first clamp it
 				if ( maxTorqueDegrees != 0 )
 					maxTorqueRadians = maxTorqueDegrees * Mathf.Deg2Rad;
-				
-				torque = Vector3.ClampMagnitude ( torque, maxTorqueRadians );
-				if ( inverseFlag )
-				{
-					inverseFlag = false;
-					torque = transform.InverseTransformDirection ( torque ) * maxTorqueRadians;
-				}
-				// new: flip torque to generate CCW rotations
-//				Vector3 newTorque = -torque;
-//				Vector3 angVel = rb.angularVelocity;
-//				if ( ConstrainTorqueX )
-//				{
-//					newTorque.z = 0;
-//					angVel.z = 0;
-//				}
-//				if ( ConstrainTorqueY )
-//				{
-//					newTorque.x = 0;
-//					angVel.x = 0;
-//				}
-//				if ( ConstrainTorqueZ )
-//				{
-//					newTorque.y = 0;
-//					angVel.y = 0;
-//				}
+
+				if ( clampTorque )
+					torque = Vector3.ClampMagnitude ( torque, maxTorqueRadians );
 //				rb.AddRelativeTorque ( newTorque, torqueMode );
 				rb.AddRelativeTorque ( -torque, torqueMode );
 
