@@ -45,7 +45,9 @@ torque:
 _Note: if gravity is on, a force that small won't lift the quad off the ground_  
 
 To turn on gravity, use the following:  
-`$ rosservice call /quad_rotor/gravity "data: true"`
+```
+$ rosservice call /quad_rotor/gravity "data: true"
+```
 
 
 # Controlling the Quad and Camera
