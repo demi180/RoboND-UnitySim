@@ -9,7 +9,7 @@ The city scene starts with a menu to choose between controlling the quad for the
 
 **Firing up the executable**  
 Find your OS's executable [here](https://github.com/udacity/RoboND-Controls-Lab/releases)  
-Either run from a terminal or edit the app, and append either the word `indoor` or the word `outdoor` (or `city`) to the path. If nothing is specified, the indoor scene will be loaded.
+Either run from a terminal or edit the app properties, and append either the word `indoor` or the word `outdoor` (or `city`) to the path. If nothing is specified, the indoor scene will be loaded.
 
 # ROS Services and Topics
 **Quad**
