@@ -127,7 +127,7 @@ public class PathFollower : MonoBehaviour
 
 	public void SetPath (Path p)
 	{
-		if ( p != null && p.Nodes != null && p.Nodes.Length > 0 )
+		if ( p != null && p.Nodes != null && p.Nodes.Length > 1 )
 		{
 			path = p;
 			tr.position = p.Nodes [ 0 ].position;

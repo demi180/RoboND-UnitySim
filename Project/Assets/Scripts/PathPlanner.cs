@@ -21,6 +21,18 @@ namespace Pathing
 		public Vector3 position;
 		public Quaternion orientation;
 		public float timestamp;
+
+		public PathSample ()
+		{
+			
+		}
+
+		public PathSample (Vector3 pos, Quaternion q, float t)
+		{
+			position = pos;
+			orientation = q;
+			timestamp = t;
+		}
 	}
 }
 
@@ -36,6 +48,7 @@ public class PathPlanner : MonoBehaviour
 	List<Transform> nodeObjects;
 
 	bool clearVizFlag;
+	bool rebuildPathFlag;
 
 	void Awake ()
 	{
@@ -53,6 +66,11 @@ public class PathPlanner : MonoBehaviour
 		{
 			_ClearViz ();
 		}
+
+		if ( rebuildPathFlag )
+		{
+			RebuildPath ();
+		}
 	}
 
 	public static void AddNode (Vector3 position, Quaternion orientation)
@@ -62,7 +80,6 @@ public class PathPlanner : MonoBehaviour
 
 	void _AddNode (Vector3 position, Quaternion orientation)
 	{
-		
 		pathRenderer.numPositions = pathRenderer.numPositions + 1;
 		pathRenderer.SetPosition ( pathRenderer.numPositions - 1, position );
 
@@ -101,5 +118,29 @@ public class PathPlanner : MonoBehaviour
 			Destroy ( nodeObjects [ i ].gameObject );
 		nodeObjects.Clear ();
 		clearVizFlag = false;
+	}
+
+	public static void SetPath (List<PathSample> nodes)
+	{
+		instance.path = nodes;
+		instance.rebuildPathFlag = true;
+	}
+
+	void RebuildPath ()
+	{
+		int count = nodeObjects.Count;
+		for ( int i = 0; i < count; i++ )
+			Destroy ( nodeObjects [ i ].gameObject );
+		nodeObjects.Clear ();
+		count = path.Count;
+		for ( int i = 0; i < count; i++ )
+		{
+			if ( path [ i ].timestamp == -1 )
+				path [ i ].timestamp = Time.time;
+			pathRenderer.SetPosition ( i, path[i].position );
+			Transform node = Instantiate ( nodePrefab, path [ i ].position, path [ i ].orientation, transform );
+			nodeObjects.Add ( node );
+		}
+		rebuildPathFlag = false;
 	}
 }

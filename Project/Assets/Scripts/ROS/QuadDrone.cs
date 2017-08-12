@@ -68,6 +68,7 @@ public class QuadDrone : MonoBehaviour
 	ServiceServer setPathSrv;
 
 	uint frameSeq = 0;
+	bool waitStartPath;
 
 	void Awake ()
 	{
@@ -84,6 +85,14 @@ public class QuadDrone : MonoBehaviour
 	void Start ()
 	{
 		ROSController.StartROS ( OnRosInit );
+	}
+
+	void LateUpdate ()
+	{
+		if ( waitStartPath )
+		{
+			DelayedStartPath ();
+		}
 	}
 
 	void OnRosInit ()
@@ -427,32 +436,41 @@ public class QuadDrone : MonoBehaviour
 		Debug.Log ( "Set path service!" );
 		PathPlanner.Clear ( true );
 
-		if ( req.path.poses.Length > 0 )
+		if ( req.path.poses.Length > 1 )
 		{
 			string info = "";
 			int idx = 0;
 
 			PathPlanner.Clear ( true );
+			List<Pathing.PathSample> nodes = new List<Pathing.PathSample> ();
 			foreach ( PoseStamped ps in req.path.poses )
 			{
 				info += "pose " + ( idx++ ) + "position: " + ps.pose.position + " orientation: " + ps.pose.orientation + "\n";
-				PathPlanner.AddNode ( ps.pose.position.ToUnity ().ToUnity (), ps.pose.orientation.ToUnity ().ToUnity () );
+				nodes.Add ( new Pathing.PathSample ( ps.pose.position.ToUnity ().ToUnity (), ps.pose.orientation.ToUnity ().ToUnity (), -1 ) );
+//				PathPlanner.AddNode ( ps.pose.position.ToUnity ().ToUnity (), ps.pose.orientation.ToUnity ().ToUnity () );
 			}
 			Debug.Log ( info );
+			PathPlanner.SetPath ( nodes );
 			
 			resp.success = true;
 			resp.message = "";
 
-			droneController.ResetOrientation ();
-			pather.SetPath ( new Pathing.Path ( PathPlanner.GetPath () ) );
-			PathPlanner.Clear ( false ); // clear the path but keep the visualization
+			waitStartPath = true;
 			
 		} else
 		{
 			resp.success = false;
-			resp.message = "Need to include at least 1 pose for a path";
+			resp.message = "Need to include at least 2 poses for a path";
 		}
 
 		return true;
+	}
+
+	void DelayedStartPath ()
+	{
+		droneController.ResetOrientation ();
+		pather.SetPath ( new Pathing.Path ( PathPlanner.GetPath () ) );
+		PathPlanner.Clear ( false ); // clear the path but keep the visualization
+		waitStartPath = false;
 	}
 }
