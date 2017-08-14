@@ -9,7 +9,8 @@ The city scene starts with a menu to choose between controlling the quad for the
 
 **Firing up the executable**  
 Find your OS's executable [here](https://github.com/udacity/RoboND-Controls-Lab/releases)  
-Either run from a terminal or edit the app properties, and append either the word `indoor` or the word `outdoor` (or `city`) to the path. If nothing is specified, the indoor scene will be loaded.
+Either run from a terminal or edit the app properties, and append either the word `indoor` or the word `outdoor` (or `city`) to the path. If nothing is specified, the indoor scene will be loaded.  
+For issues connecting the sim to your VM or host OS, see the troubleshooting section at the bottom.
 
 # ROS Services and Topics
 **Quad**
@@ -76,3 +77,40 @@ $ rosservice call /quad_rotor/gravity "data: true"
 2. To begin recording, press `R` to bring up the dialog and choose where to save the recording. Select or create a convenient folder, such as in your Desktop or Documents, and confirm, and recording begins.
 3. Images are captured from two cameras - one that sees the environment as you do, and one that sees in black&white as shown at the bottom right. The images are captured once every 3 seconds or so.
 4. To stop recording, press `R` again, or simply close the executable (`Esc`)
+
+# Troubleshooting #
+**ros_settings.txt**  
+Included in the project and the executables is a config file named __ros_settings.txt__. This file can be used to control which IP the sim tries to connect to. Depending on your host OS and whether you're running Ros in a VM or locally, you may or may not need to modify this file for the sim to successfully talk to ros.
+The file begins in a a format like this:
+```
+{
+	"vm-ip" : "192.168.30.111",
+	"vm-port" : 11311,
+	"vm-override" : true,
+	"host-ip": "0.0.0.0",
+	"host-override" : false
+}
+```
+The first line:  
+```
+"vm-ip" : "192.168.30.111",
+```
+Sets the IP where Ros is running.
+```
+"vm-port" : 11311,
+```
+This one is the port where Ros is running. You'll almost never need to modify this.  
+```
+"vm-override" : true,
+```
+This controls whether the above info is used or not. If you run Ros in a VM, keep this to _true_. If you're running Ros locally, set it to _false_ and sim will use _127.0.0.1_.  
+```
+"host-ip": "0.0.0.0",
+```
+This value can override the _sim's_ IP to respond to requests if you're having trouble publishing or subscribing to topics, or calling services. This mostly happens when running the sim itself in Ubuntu or Debian, which have an entry in /etc/hosts linking your host's _hostname_ to the address _127.0.1.1_, which Ros (in the sim) usually has issues with. You could instead modify your hosts file, at your own risk.
+```
+"host-override" : false
+```
+If you need to change `host-ip`, you'll want to set this to _true_.
+
+If you modify any settings in the file, you'll need to stop and play (in the Editor) or relaunch the sim afterward.
