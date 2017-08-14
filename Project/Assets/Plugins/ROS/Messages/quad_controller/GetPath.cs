@@ -21,10 +21,11 @@ namespace Messages.quad_controller
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public override SrvTypes srvtype() { return SrvTypes.quad_controller__GetPath; }
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public override string ServiceDefinition() { return @"---
+        public override string ServiceDefinition() { return @"bool ignoreMe
+---
 nav_msgs/Path path"; }
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public override string MD5Sum() { return "58d6f138c7de7ef47c75d4b7e5df5472"; }
+        public override string MD5Sum() { return "f65fd00b2e3f675220a83a94307b7f12"; }
         
         [System.Diagnostics.DebuggerStepThrough]
         public GetPath()
@@ -48,16 +49,17 @@ nav_msgs/Path path"; }
 
         public class Request : IRosMessage
         {
+				public bool ignoreMe; //woo
 
 
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-            public override string MD5Sum() { return "d41d8cd98f00b204e9800998ecf8427e"; }
+            public override string MD5Sum() { return "9b6724bbfcc986844015a2e2d7750a81"; }
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
             public override bool HasHeader() { return false; }
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
             public override bool IsMetaType() { return false; }
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-            public override string MessageDefinition() { return @""; }
+            public override string MessageDefinition() { return @"bool ignoreMe"; }
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
             public override MsgTypes msgtype() { return MsgTypes.quad_controller__GetPath__Request; }
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -92,6 +94,8 @@ nav_msgs/Path path"; }
                 int piecesize=0;
                 IntPtr h;
                 
+                //ignoreMe
+                ignoreMe = SERIALIZEDSTUFF[currentIndex++]==1;
             }
 
             [System.Diagnostics.DebuggerStepThrough]
@@ -103,6 +107,10 @@ nav_msgs/Path path"; }
                 List<byte[]> pieces = new List<byte[]>();
                 GCHandle h;
                 
+                //ignoreMe
+                thischunk = new byte[1];
+                thischunk[0] = (byte) ((bool)ignoreMe ? 1 : 0 );
+                pieces.Add(thischunk);
                 //combine every array in pieces into one array and return it
                 int __a_b__f = pieces.Sum((__a_b__c)=>__a_b__c.Length);
                 int __a_b__e=0;
@@ -122,6 +130,8 @@ nav_msgs/Path path"; }
                 int strlength;
                 byte[] strbuf, myByte;
                 
+                //ignoreMe
+                ignoreMe = rand.Next(2) == 1;
             }
 
             public override bool Equals(IRosMessage ____other)
@@ -130,6 +140,7 @@ nav_msgs/Path path"; }
                 bool ret = true;
                 quad_controller.GetPath.Request other = (Messages.quad_controller.GetPath.Request)____other;
 
+                ret &= ignoreMe == other.ignoreMe;
                 return ret;
             }
         }
@@ -141,7 +152,7 @@ nav_msgs/Path path"; }
 
 
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-            public override string MD5Sum() { return "d41d8cd98f00b204e9800998ecf8427e"; }
+            public override string MD5Sum() { return "9b6724bbfcc986844015a2e2d7750a81"; }
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
             public override bool HasHeader() { return false; }
             [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
