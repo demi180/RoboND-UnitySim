@@ -107,7 +107,7 @@ public class QuadDrone : MonoBehaviour
 		wrenchSub = nh.subscribe<Wrench> ( "quad_rotor/cmd_force", 10, WrenchCallback );
 		posePub = nh.advertise<PoseStamped> ( "quad_rotor/pose", 10, false );
 		imuPub = nh.advertise<Imu> ( "quad_rotor/imu", 10, false );
-		imgPub = nh.advertise<Image> ( "quad_rotor/image", 10, false );
+//		imgPub = nh.advertise<Image> ( "quad_rotor/image", 10, false );
 		pubThread = new Thread ( PublishAll );
 		pubThread.Start ();
 
